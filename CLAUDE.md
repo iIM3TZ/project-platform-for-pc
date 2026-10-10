@@ -64,13 +64,13 @@ Core tables:
 Later: `price_alerts`, `notifications`.
 
 Examples of `specs` by category:
-- CPU: `{ "socket": "AM5", "cores": 6, "tdp_w": 65, "integrated_gpu": true }`
+- CPU: `{ "socket": "AM5", "cores": 6, "tdp_w": 65 }`
 - Motherboard: `{ "socket": "AM5", "ram_type": "DDR5", "form_factor": "ATX", "ram_slots": 4 }`
 - RAM: `{ "ram_type": "DDR5", "capacity_gb": 32, "speed_mhz": 6000, "modules": 2 }`
-- GPU: `{ "tdp_w": 115, "length_mm": 240, "outputs": ["HDMI 2.1", "DP 1.4a"] }`
+- GPU: `{ "tdp_w": 115, "length_mm": 240, "outputs": ["HDMI 2.1", "DP"] }`
 - PSU: `{ "wattage": 650, "rating": "80+ Gold" }`
 - Case: `{ "supported_form_factors": ["ATX", "mATX", "ITX"], "max_gpu_length_mm": 330 }`
-- Monitor: `{ "size_in": 27, "resolution": "2560x1440", "refresh_hz": 165, "panel": "IPS", "inputs": ["HDMI", "DP"] }`
+- Monitor: `{ "size_in": 27, "resolution": "2560x1440", "refresh_hz": 165, "panel": "IPS", "inputs": ["HDMI 2.1", "DP"] }`
 - Mouse: `{ "wireless": true, "weight_g": 60, "dpi": 26000 }`
 - Keyboard: `{ "layout": "75%", "switch_type": "linear", "arabic_letters": true }`
 
