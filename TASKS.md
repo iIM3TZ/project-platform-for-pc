@@ -1,0 +1,65 @@
+# Project Tasks
+
+Work on one task at a time, in order. When a task is done and tested, change `[ ]` to `[x]` and commit.
+Deployment happens right after Phase 4. Later phases are improvements on a live project.
+
+## Phase 0: Planning
+- [ ] Create GitHub repo, npm project and full folder structure (see CLAUDE.md), with a minimal Express server and `GET /api/health`
+- [ ] Define categories (core parts and peripherals) and the `specs` fields for each category
+- [ ] Write the list of compatibility rules (socket, RAM type, wattage, motherboard and case size, GPU length)
+- [ ] Define the pages and what each page shows
+- [ ] Design the database and write `server/db/schema.sql`, then create the tables in PostgreSQL
+
+## Phase 1: Foundation
+- [ ] Connect Express to PostgreSQL (`pg` Pool, `.env`)
+- [ ] API for stores and categories
+- [ ] API for products and offers
+- [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) and shared components (buttons, cards, tables, form fields)
+- [ ] Simple admin page to add parts and offers
+- [ ] Seed data: 30 to 50 parts from 4 stores (`server/db/seed.sql`)
+
+## Phase 2: Compare
+- [ ] Home page and navigation bar
+- [ ] Parts listing page with search
+- [ ] Category-specific filters
+- [ ] Part page: offers table from all stores, sortable by price, delivery time or trust score
+
+## Phase 3: Accounts
+- [ ] Sign-up and sign-in pages
+- [ ] bcrypt password hashing, JWT in an httpOnly cookie
+- [ ] Auth middleware to protect routes
+
+## Phase 4: Build your PC and cart
+- [ ] UI for picking core parts
+- [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
+- [ ] Peripherals section and its warnings (monitor vs GPU, ports)
+- [ ] Totals and the cheapest offer for each part
+- [ ] Saving builds; guest builds in localStorage moved to the account after sign-in
+- [ ] Cart: links grouped by store, total cost, longest delivery time
+
+## Deploy (right after Phase 4)
+- [ ] Test every page on mobile and fix responsive issues
+- [ ] Input validation, rate limiting, check all queries are parameterized
+- [ ] Deploy the server (Render or Railway) and the database (Neon or Supabase)
+- [ ] README with screenshots, project description and how to run it
+- [ ] Add the project and its link to the CV and LinkedIn
+
+## Phase 5: Price updates
+- [ ] "Paste link" tool in the admin page (read JSON-LD from the product page)
+- [ ] Scheduled update job with node-cron for at least one store
+- [ ] `price_history` and a price chart on the part page
+
+## Phase 6: Price alerts
+- [ ] Turn on an alert for a part (any drop, or a target price)
+- [ ] Check alerts after each price update, with a minimum drop and at most one alert per day
+- [ ] In-site notifications and email with Nodemailer
+
+## Phase 7: Smart features
+- [ ] Extract specs from product descriptions with AI, reviewed before saving
+- [ ] Suggest a build from a budget and purpose
+- [ ] Store trust score with the reasons shown
+
+## Phase 8: Tests and polish
+- [ ] API tests with Jest and Supertest
+- [ ] Run tests automatically with GitHub Actions
+- [ ] Update README and CV with the new features
