@@ -4,7 +4,7 @@ Work on one task at a time, in order. When a task is done and tested, change `[ 
 Deployment happens right after Phase 4. Later phases are improvements on a live project.
 
 ## Phase 0: Planning
-- [ ] Create GitHub repo, npm project and full folder structure (see CLAUDE.md), with a minimal Express server and `GET /api/health`
+- [x] Create GitHub repo, npm project and full folder structure (see CLAUDE.md), with a minimal Express server and `GET /api/health`
 - [ ] Define categories (core parts and peripherals) and the `specs` fields for each category
 - [ ] Write the list of compatibility rules (socket, RAM type, wattage, motherboard and case size, GPU length)
 - [ ] Define the pages and what each page shows
