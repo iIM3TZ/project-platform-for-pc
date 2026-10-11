@@ -6,7 +6,7 @@ A web platform for the Saudi market that compares prices of PC parts and periphe
 Main features:
 1. **Compare**: search a part and see offers from every store side by side: price in SAR, shipping cost, total (price + shipping), delivery time, and a store trust score. Each store can have up to two trusted sellers, so the page compares sellers inside the same store and across stores, and shows each store's price range (lowest to highest offer) and its best offer. Later, with price history, it also shows the lowest and highest price in the last 30 days.
 2. **Build your PC**: pick core parts (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) with automatic compatibility checks, plus optional peripherals (monitor, mouse, keyboard, headset...). Later: a budget-based build suggestion.
-3. **Cart**: collects all chosen parts, grouped by store, with total cost, each product link, and the longest delivery time.
+3. **Shopping list** (قائمة الشراء): separate from builds. Users add single parts with the offer they chose, or move a whole build into it. Parts are grouped by store, with total cost, each product link, and the longest delivery time. There is no payment on the site; users buy from the stores through the links.
 4. **Accounts**: users sign in to save builds and continue where they left off. Guests can build too (saved in localStorage) and their build moves to their account after sign-up.
 5. **Price alerts** (later phase): notify a user in the site and by email when a part's price drops.
 
@@ -65,6 +65,7 @@ Core tables:
 - `users`: id, name, email (unique), password_hash, role (`user` or `admin`, default `user`), created_at
 - `builds`: id, user_id, name, budget, purpose, updated_at
 - `build_items`: id, build_id, product_id, offer_id, quantity
+- `shopping_list_items`: id, user_id, product_id, offer_id, quantity, added_at
 
 Later: `price_alerts`, `notifications`.
 
@@ -113,6 +114,7 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: 
 
 ## Design rules (frontend)
 - `client/css/base.css` defines all design tokens as CSS variables (colors, fonts, spacing, radius) and the shared components (buttons, cards, tables, form fields, badges). Pages never hardcode colors or font families.
+- **Search bar** in the navigation bar on every page: searches parts by name, brand or model and opens the parts listing page with the results.
 - **Light and dark mode**: colors are defined twice in `base.css`, once for light and once under `[data-theme="dark"]` on `<html>`. The first visit follows the system setting (`prefers-color-scheme`); a toggle in the navigation bar overrides it and the choice is saved in localStorage. Both themes must have readable contrast.
 - Mobile-first and responsive. Every page must work at 375px width without horizontal scrolling.
 - A font that supports Arabic and English from Google Fonts (e.g. IBM Plex Sans Arabic) with a fallback stack.

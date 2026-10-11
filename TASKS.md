@@ -20,8 +20,8 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Seed data: 30 to 50 parts from 4 stores (`server/db/seed.sql`)
 
 ## Phase 2: Compare
-- [ ] Home page and navigation bar (with the language switch and the light/dark toggle)
-- [ ] Parts listing page with search
+- [ ] Home page and navigation bar (with the search bar, the language switch and the light/dark toggle)
+- [ ] Parts listing page with search results (by name, brand or model)
 - [ ] Category-specific filters
 - [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best place to buy
 
@@ -31,13 +31,13 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
-## Phase 4: Build your PC and cart
+## Phase 4: Build your PC and shopping list
 - [ ] UI for picking core parts
 - [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
 - [ ] Totals and the cheapest offer for each part
 - [ ] Saving builds; guest builds in localStorage moved to the account after sign-in
-- [ ] Cart: links grouped by store, total cost, longest delivery time
+- [ ] Shopping list (separate from builds): add single offers from the part page or a whole build, links grouped by store, total cost, longest delivery time; guests in localStorage, moved to the account after sign-in
 
 ## Deploy (right after Phase 4)
 - [ ] Test every page on mobile and fix responsive issues
