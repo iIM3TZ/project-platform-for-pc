@@ -22,7 +22,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Home page and navigation bar
 - [ ] Parts listing page with search
 - [ ] Category-specific filters
-- [ ] Part page: offers table from all stores, sortable by price, delivery time or trust score
+- [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best place to buy
 
 ## Phase 3: Accounts
 - [ ] Sign-up and sign-in pages
@@ -46,9 +46,9 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 
 ## Phase 5: Price updates
 - [ ] "Paste link" tool in the admin page (read JSON-LD from the product page)
-- [ ] Scheduled update job with node-cron for at least one store
+- [ ] Scheduled update job with node-cron for at least one store, running every 3 days; plus an "update now" button in the admin page to refresh one offer or all offers manually
 - [ ] Mark an offer as "broken link" when the update job fails to read its price 3 times in a row; hide broken offers from users and list them in the admin page for review
-- [ ] `price_history` and a price chart on the part page
+- [ ] `price_history`, a price chart on the part page, and the lowest and highest price in the last 30 days for each store
 
 ## Phase 6: Price alerts
 - [ ] Turn on an alert for a part (any drop, or a target price)
