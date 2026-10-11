@@ -56,14 +56,14 @@ Do not install a new dependency without asking first and explaining why it is ne
 ## Database (PostgreSQL)
 Core tables:
 - `categories`: id, name_ar, name_en, slug, kind (`core` or `peripheral`)
-- `stores`: id, name, website, logo_url, ships_from, avg_delivery_days, has_warranty, return_policy, trust_score
-- `products`: id, category_id, brand, name, model, image_url, specs (JSONB, fields depend on category), is_hidden
+- `stores`: id, name, website, logo_url, ships_from (country code, `SA` = local), avg_delivery_days, has_warranty, return_policy_ar, return_policy_en, trust_score (0 to 10)
+- `products`: id, category_id, brand, name, model, image_url, specs (JSONB, fields depend on category), view_count, is_hidden, created_at
 - `offers`: id, product_id, store_id, seller_name, is_official, seller_rating, seller_reviews, price, shipping_cost, currency, delivery_days_min, delivery_days_max, url, in_stock, is_hidden, updated_at
   - One product can have up to two offers in the same store (one per seller).
   - Only trusted sellers are added: the store itself (`is_official = true`, e.g. "Sold by Amazon"), or a seller rated 4.5 or higher with at least 100 reviews. The admin checks this before saving.
 - `price_history`: id, offer_id, price, recorded_at
 - `users`: id, username (unique, used to sign in and shown on the site), email (unique), password_hash, role (`user` or `admin`, default `user`), created_at
-- `builds`: id, user_id, name, budget, purpose, updated_at
+- `builds`: id, user_id, name, budget, purpose, created_at, updated_at
 - `build_items`: id, build_id, product_id, offer_id, quantity
 - `shopping_list_items`: id, user_id, product_id, offer_id, quantity, added_at
 
@@ -134,4 +134,7 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: 
 - `npm run dev`: start the server with nodemon
 - `npm start`: start the server
 - `npm test`: run tests (later phase)
-- Create tables: run `server/db/schema.sql` in pgAdmin or with `psql`
+- Create tables: run `server/db/schema.sql` in pgAdmin
+
+## Database access
+- Do not connect to the database or run any database commands (`psql`, `pg_isready`, scripts that query the database). Write the SQL in files (e.g. `server/db/schema.sql`, `server/db/seed.sql`) and the project owner runs them in pgAdmin.
