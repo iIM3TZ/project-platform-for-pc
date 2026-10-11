@@ -6,7 +6,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 ## Phase 0: Planning
 - [x] Create GitHub repo, npm project and full folder structure (see CLAUDE.md), with a minimal Express server and `GET /api/health`
 - [x] Define categories (core parts and peripherals) and the `specs` fields for each category
-- [ ] Write the list of compatibility rules (socket, RAM type, wattage, motherboard and case size, GPU length)
+- [x] Write the list of compatibility rules (socket, RAM type, wattage, motherboard and case size, GPU length)
 - [ ] Define the pages and what each page shows
 - [ ] Design the database and write `server/db/schema.sql`, then create the tables in PostgreSQL
 

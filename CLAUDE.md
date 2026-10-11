@@ -80,21 +80,19 @@ Examples of `specs` by category:
 - Keyboard: `{ "layout": "75%", "switch_type": "linear", "arabic_letters": true }`
 
 ## Compatibility rules (server/src/services/compatibility.js)
-Core parts (errors, block the build):
-- CPU socket must match motherboard socket.
-- RAM type must match motherboard RAM type.
-- Motherboard form factor must be supported by the case.
-- GPU length must fit the case max GPU length.
-- GPU thickness (`slots`) must fit the case `max_gpu_slots` (only checked when both values are set).
-- If the CPU has no included cooler, the build needs a cooler.
-- The cooler must support the CPU socket.
-- Air cooler height must fit the case max cooler height (only checked when both values are set).
-- Total estimated power (sum of TDPs + ~100W for the rest) must be below PSU wattage with ~20% headroom.
+The full list, with the exact checks and the Arabic/English messages, is in `docs/compatibility.md`. Summary:
+
+Core parts (errors: the build is not marked as ready):
+- CPU socket matches the motherboard; RAM type, RAM sticks and max RAM fit the motherboard; M.2 drives fit the M.2 slots.
+- Motherboard size, GPU length and GPU thickness fit the case.
+- A cooler is added when the CPU has none; it supports the CPU socket and an air cooler fits the case height.
+- Power: CPU TDP + GPU TDP + 100 W must not exceed the PSU wattage (warning below 20% headroom).
 
 Peripherals (warnings only, do not block):
 - High resolution/refresh monitor with a weak GPU.
 - Monitor input not available on the GPU outputs.
 
+A rule runs only when its parts are chosen, and is skipped when an optional field is missing.
 Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: "...", parts: [ids] }`.
 
 ## Conventions
