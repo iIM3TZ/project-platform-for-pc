@@ -30,6 +30,9 @@ Do not install a new dependency without asking first and explaining why it is ne
     /pages              page-specific styles
   /js
     api.js              all fetch calls to the backend live here
+    i18n.js             current language, translation lookup t(key), switching ar/en
+    theme.js            light/dark mode switching
+    /locales            ar.json and en.json: every UI text, by key
     /components         reusable UI pieces (part card, offers table, alert banner...)
     /pages              one script per page
 /server
@@ -92,11 +95,14 @@ Peripherals (warnings only, do not block):
 - High resolution/refresh monitor with a weak GPU.
 - Monitor input not available on the GPU outputs.
 
-Each rule returns `{ level: "error" | "warning", message_ar: "...", parts: [ids] }`.
+Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: "...", parts: [ids] }`.
 
 ## Conventions
-- Code, file names, variables, DB columns and API routes in **English**. All user-facing text in **Arabic**.
-- Pages use `<html lang="ar" dir="rtl">`. Use CSS logical properties (`margin-inline-start`, `padding-inline`) instead of left/right.
+- Code, file names, variables, DB columns and API routes in **English**.
+- **Two languages**: the site is in Arabic (default) and English, with a language switch in the navigation bar. The choice is saved in localStorage.
+  - UI text never goes directly in HTML or JS. It lives in `client/js/locales/ar.json` and `en.json` and is read with `t(key)` from `i18n.js`. Both files must have the same keys.
+  - Data shown to users has both languages in the database (`name_ar` / `name_en`, `message_ar` / `message_en`). The API returns both and the client picks one.
+  - Arabic pages use `<html lang="ar" dir="rtl">`, English pages `lang="en" dir="ltr"`; switching the language updates both attributes. Use CSS logical properties (`margin-inline-start`, `padding-inline`) instead of left/right so the layout works in both directions.
 - **SQL**: always parameterized queries (`$1, $2`). Never build SQL by string concatenation.
 - **API**: REST under `/api` (e.g. `GET /api/products?category=gpu&q=4060`, `GET /api/products/:id/offers`). Consistent JSON: `{ data }` on success, `{ error: { message } }` on failure, correct HTTP status codes.
 - Validate all input on the server. Central error-handling middleware.
@@ -106,8 +112,9 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", parts: [ids]
 
 ## Design rules (frontend)
 - `client/css/base.css` defines all design tokens as CSS variables (colors, fonts, spacing, radius) and the shared components (buttons, cards, tables, form fields, badges). Pages never hardcode colors or font families.
+- **Light and dark mode**: colors are defined twice in `base.css`, once for light and once under `[data-theme="dark"]` on `<html>`. The first visit follows the system setting (`prefers-color-scheme`); a toggle in the navigation bar overrides it and the choice is saved in localStorage. Both themes must have readable contrast.
 - Mobile-first and responsive. Every page must work at 375px width without horizontal scrolling.
-- Arabic-friendly font from Google Fonts (e.g. IBM Plex Sans Arabic) with a fallback stack.
+- A font that supports Arabic and English from Google Fonts (e.g. IBM Plex Sans Arabic) with a fallback stack.
 - Accessible: real `<button>` and `<label>` elements, visible focus states, alt text on images.
 - Show loading, empty and error states for every list fetched from the API.
 

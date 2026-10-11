@@ -14,12 +14,13 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Connect Express to PostgreSQL (`pg` Pool, `.env`)
 - [ ] API for stores and categories
 - [ ] API for products and offers
-- [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) and shared components (buttons, cards, tables, form fields)
+- [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
+- [ ] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
 - [ ] Simple admin page to add parts and offers
 - [ ] Seed data: 30 to 50 parts from 4 stores (`server/db/seed.sql`)
 
 ## Phase 2: Compare
-- [ ] Home page and navigation bar
+- [ ] Home page and navigation bar (with the language switch and the light/dark toggle)
 - [ ] Parts listing page with search
 - [ ] Category-specific filters
 - [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best place to buy
