@@ -57,8 +57,8 @@ Do not install a new dependency without asking first and explaining why it is ne
 Core tables:
 - `categories`: id, name_ar, name_en, slug, kind (`core` or `peripheral`)
 - `stores`: id, name, website, logo_url, ships_from, avg_delivery_days, has_warranty, return_policy, trust_score
-- `products`: id, category_id, brand, name, model, image_url, specs (JSONB, fields depend on category)
-- `offers`: id, product_id, store_id, seller_name, is_official, seller_rating, seller_reviews, price, shipping_cost, currency, delivery_days_min, delivery_days_max, url, in_stock, updated_at
+- `products`: id, category_id, brand, name, model, image_url, specs (JSONB, fields depend on category), is_hidden
+- `offers`: id, product_id, store_id, seller_name, is_official, seller_rating, seller_reviews, price, shipping_cost, currency, delivery_days_min, delivery_days_max, url, in_stock, is_hidden, updated_at
   - One product can have up to two offers in the same store (one per seller).
   - Only trusted sellers are added: the store itself (`is_official = true`, e.g. "Sold by Amazon"), or a seller rated 4.5 or higher with at least 100 reviews. The admin checks this before saving.
 - `price_history`: id, offer_id, price, recorded_at
@@ -67,7 +67,9 @@ Core tables:
 - `build_items`: id, build_id, product_id, offer_id, quantity
 - `shopping_list_items`: id, user_id, product_id, offer_id, quantity, added_at
 
-Later: `price_alerts`, `notifications`.
+- `notifications`: id, user_id, message_ar, message_en, link, read_at, created_at (first used when an admin deletes a part or offer that is in a user's build or shopping list; price alerts reuse it later)
+
+Later: `price_alerts`.
 
 Examples of `specs` by category:
 - CPU: `{ "socket": "AM5", "cores": 6, "tdp_w": 65 }`

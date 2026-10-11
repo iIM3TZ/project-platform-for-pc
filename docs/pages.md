@@ -101,8 +101,15 @@ Later: price alerts and notifications (Phase 6).
 
 ## Admin
 
-- **Parts**: add or edit a part (category, brand, name, model, image, and the specs fields for that category).
+- **Dashboard**: number of parts, offers, stores and users, and offers not updated for a long time.
+- **Parts**: add or edit a part (category, brand, name, model, image, and the specs fields for that category; the specs form changes with the category).
 - **Offers**: add or edit an offer for a part (store, seller, official, rating, reviews, price, currency, shipping, delivery days, link, in stock).
+  - If the seller is not official and is rated below 4.5 or has fewer than 100 reviews, the form shows a warning; the admin must tick "I checked this seller" to save.
+- **Hide or delete** parts and offers:
+  - **Hide** (the main option): the item disappears from the site but stays in the admin page and can be shown again. Saved builds and shopping lists keep it and show "no longer available".
+  - **Delete** (permanent): asks for confirmation first. If the item is used in saved builds or shopping lists, the confirmation shows how many and suggests hiding instead. If the admin still deletes it: a deleted part is removed from those builds and lists; a deleted offer is replaced by the cheapest other offer for that part.
+  - **Users are told**: each affected user gets a notification (e.g. "RTX 4060 ASUS Dual was removed from your build \"Gaming PC\" because it is no longer available"). It shows as a banner on Build or Shopping list until they close it.
+  - Guests (build in localStorage): when the build loads and a part no longer exists, the page removes it and shows the same kind of banner.
 - **Stores**: add or edit a store (name, website, ships from, delivery, warranty, returns, trust score).
 - **Users**: list of users; give or remove admin access (an admin cannot remove their own).
 - Later (Phase 5): "paste link" tool, "update now" button, and the list of broken links.
