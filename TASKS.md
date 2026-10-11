@@ -26,7 +26,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best place to buy
 
 ## Phase 3: Accounts
-- [ ] Sign-up and sign-in pages
+- [ ] Sign-up and sign-in pages (username + email + password; sign in with username or email; show/hide password)
 - [ ] bcrypt password hashing, JWT in an httpOnly cookie
 - [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
@@ -56,6 +56,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Turn on an alert for a part (any drop, or a target price)
 - [ ] Check alerts after each price update, with a minimum drop and at most one alert per day
 - [ ] In-site notifications and email with Nodemailer
+- [ ] "Forgot password": email a reset link (one-time token that expires) with Nodemailer
 
 ## Phase 7: Smart features
 - [ ] Extract specs from product descriptions with AI, reviewed before saving

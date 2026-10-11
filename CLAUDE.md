@@ -62,7 +62,7 @@ Core tables:
   - One product can have up to two offers in the same store (one per seller).
   - Only trusted sellers are added: the store itself (`is_official = true`, e.g. "Sold by Amazon"), or a seller rated 4.5 or higher with at least 100 reviews. The admin checks this before saving.
 - `price_history`: id, offer_id, price, recorded_at
-- `users`: id, name, email (unique), password_hash, role (`user` or `admin`, default `user`), created_at
+- `users`: id, username (unique, used to sign in and shown on the site), email (unique), password_hash, role (`user` or `admin`, default `user`), created_at
 - `builds`: id, user_id, name, budget, purpose, updated_at
 - `build_items`: id, build_id, product_id, offer_id, quantity
 - `shopping_list_items`: id, user_id, product_id, offer_id, quantity, added_at
