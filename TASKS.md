@@ -28,7 +28,8 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 ## Phase 3: Accounts
 - [ ] Sign-up and sign-in pages
 - [ ] bcrypt password hashing, JWT in an httpOnly cookie
-- [ ] Auth middleware to protect routes
+- [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
+- [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
 ## Phase 4: Build your PC and cart
 - [ ] UI for picking core parts

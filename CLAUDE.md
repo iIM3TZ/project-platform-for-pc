@@ -1,7 +1,7 @@
 # PC Parts Price Comparison Platform
 
 ## What this project is
-A web platform for the Saudi market that compares prices of PC parts and peripherals across several online stores (Amazon.sa, Noon, AliExpress, local PC stores) and lets users build a PC.
+A web platform for the Saudi market that compares prices of PC parts and peripherals across several online stores (Amazon.sa, Noon, AliExpress, Newegg, local PC stores) and lets users build a PC.
 
 Main features:
 1. **Compare**: search a part and see offers from every store side by side: price in SAR, shipping cost, total (price + shipping), delivery time, and a store trust score. Each store can have up to two trusted sellers, so the page compares sellers inside the same store and across stores, and shows each store's price range (lowest to highest offer) and its best offer. Later, with price history, it also shows the lowest and highest price in the last 30 days.
@@ -62,7 +62,7 @@ Core tables:
   - One product can have up to two offers in the same store (one per seller).
   - Only trusted sellers are added: the store itself (`is_official = true`, e.g. "Sold by Amazon"), or a seller rated 4.5 or higher with at least 100 reviews. The admin checks this before saving.
 - `price_history`: id, offer_id, price, recorded_at
-- `users`: id, name, email (unique), password_hash, created_at
+- `users`: id, name, email (unique), password_hash, role (`user` or `admin`, default `user`), created_at
 - `builds`: id, user_id, name, budget, purpose, updated_at
 - `build_items`: id, build_id, product_id, offer_id, quantity
 
@@ -104,9 +104,12 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: 
 - **SQL**: always parameterized queries (`$1, $2`). Never build SQL by string concatenation.
 - **API**: REST under `/api` (e.g. `GET /api/products?category=gpu&q=4060`, `GET /api/products/:id/offers`). Consistent JSON: `{ data }` on success, `{ error: { message } }` on failure, correct HTTP status codes.
 - Validate all input on the server. Central error-handling middleware.
+- **Roles**: every user is `user` or `admin`. Admin-only actions (adding or editing parts, stores and offers, updating prices, managing users) are protected on the server by a `requireAdmin` middleware that returns 403 for anyone else. Hiding a button in the UI is not protection.
+  - The first admin is set with SQL (`UPDATE users SET role = 'admin' WHERE email = ...`). After that, an admin can make another user admin, or remove it, from the admin page. An admin cannot remove their own admin role, so the site never ends up with no admin.
 - `async/await` everywhere, no callback chains.
 - Secrets only in `.env` (never committed). Keep `.env.example` updated.
-- Money: store as `NUMERIC(10,2)` in SAR. Format in the UI with `Intl.NumberFormat('ar-SA')`.
+- Money: store as `NUMERIC(10,2)`. Offers keep the store's own price and `currency` (most are `SAR`; international stores such as Newegg may be `USD`). The API converts every price to SAR with a fixed rate from config (1 USD = 3.75 SAR) before comparing or adding totals, so users always see SAR. Format in the UI with `Intl.NumberFormat` for the current language.
+- International stores (`ships_from` outside Saudi Arabia, e.g. Newegg, AliExpress) show a note that customs fees or VAT may be added on delivery.
 
 ## Design rules (frontend)
 - `client/css/base.css` defines all design tokens as CSS variables (colors, fonts, spacing, radius) and the shared components (buttons, cards, tables, form fields, badges). Pages never hardcode colors or font families.
