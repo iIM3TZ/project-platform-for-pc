@@ -8,7 +8,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [x] Define categories (core parts and peripherals) and the `specs` fields for each category
 - [x] Write the list of compatibility rules (socket, RAM type, wattage, motherboard and case size, GPU length)
 - [x] Define the pages and what each page shows
-- [ ] Design the database and write `server/db/schema.sql`, then create the tables in PostgreSQL
+- [x] Design the database and write `server/db/schema.sql`, then create the tables in PostgreSQL
 
 ## Phase 1: Foundation
 - [ ] Connect Express to PostgreSQL (`pg` Pool, `.env`)
