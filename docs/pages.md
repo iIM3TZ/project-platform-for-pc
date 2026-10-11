@@ -84,15 +84,19 @@ Later: price alerts and notifications (Phase 6).
 
 ## Sign up / Sign in
 
-- Sign up: name, email, password (with password rules shown).
-- Sign in: email and password.
-- Clear error messages (email already used, wrong email or password).
-- After sign-in, a guest build in localStorage moves to the account.
+- Sign up: **username**, email, password (with password rules shown, e.g. at least 8 characters).
+  - Username: unique, 3 to 20 characters, English letters, numbers and `_` only. It is the name shown on the site.
+  - Email is still needed for password reset and price alert emails.
+- Sign in: username **or** email, and password.
+- Show/hide password button (eye icon) on every password field.
+- Clear error messages: username already taken, email already used, and one message for a wrong sign-in ("wrong username/email or password"), without saying which part was wrong.
+- After sign-in, a guest build and shopping list in localStorage move to the account.
+- Later (Phase 6): "Forgot password" link that emails a reset link.
 
 ## My builds
 
 - List of saved builds: name, purpose, total price, status (ready or not), last updated.
-- Open a build (goes to Build), rename it, or delete it.
+- Open a build (goes to Build), rename it, **duplicate it** (a copy to try other parts without changing the original), or delete it.
 - Empty state with a link to Build.
 
 ## Admin
