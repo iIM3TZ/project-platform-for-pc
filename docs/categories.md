@@ -111,7 +111,7 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 | `supported_form_factors` | string[] | yes      | `["ATX", "mATX", "ITX"]`  | |
 | `max_gpu_length_mm`      | integer  | yes      | `330`                     | the GPU `length_mm` must be less than or equal to this |
 | `max_gpu_slots`          | number   | no       | `2`                       | the GPU `slots` must be less than or equal to this; check only when both are set |
-| `max_cooler_height_mm`   | integer  | no       | `165`                     | |
+| `max_cooler_height_mm`   | integer  | no       | `165`                     | the cooler `height_mm` must be less than or equal to this; check only when both are set |
 | `side_panel`             | string   | no       | `"glass"`                 | `glass`, `solid`, `mesh` |
 | `color`                  | string   | no       | `"black"`                 | |
 
@@ -119,8 +119,8 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 | field               | type     | required | example              | notes |
 |---------------------|----------|----------|----------------------|-------|
 | `type`              | string   | yes      | `"air"`              | `air`, `aio` |
-| `supported_sockets` | string[] | yes      | `["AM5", "LGA1700"]` | |
-| `height_mm`         | integer  | no       | `155`                | air coolers |
+| `supported_sockets` | string[] | yes      | `["AM5", "LGA1700"]` | must include the CPU socket |
+| `height_mm`         | integer  | no       | `155`                | air coolers; must fit the case |
 | `radiator_mm`       | integer  | no       | `240`                | AIO only: `120`, `240`, `280`, `360` |
 
 ## Peripherals
