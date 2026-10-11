@@ -78,10 +78,12 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 ### `gpu`
 | field                | type     | required | example            | notes |
 |----------------------|----------|----------|--------------------|-------|
+| `chip_brand`         | string   | yes      | `"NVIDIA"`         | `NVIDIA`, `AMD`; main filter. The card maker (ASUS, MSI, Gigabyte...) is the `brand` column |
 | `chipset`            | string   | yes      | `"RTX 4060"`       | |
 | `vram_gb`            | integer  | yes      | `8`                | |
 | `tdp_w`              | integer  | yes      | `115`              | used in the power estimate |
 | `length_mm`          | integer  | yes      | `240`              | must fit the case |
+| `slots`              | number   | no       | `2.5`              | card thickness in expansion slots; must fit the case |
 | `outputs`            | string[] | yes      | `["HDMI 2.1", "DP"]`| video port list |
 | `performance_tier`   | integer  | yes      | `3`                | 1 (entry) to 5 (high end), set by the admin; used for the monitor warning |
 | `recommended_psu_w`  | integer  | no       | `550`              | |
@@ -107,7 +109,8 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 | field                    | type     | required | example                   | notes |
 |--------------------------|----------|----------|---------------------------|-------|
 | `supported_form_factors` | string[] | yes      | `["ATX", "mATX", "ITX"]`  | |
-| `max_gpu_length_mm`      | integer  | yes      | `330`                     | |
+| `max_gpu_length_mm`      | integer  | yes      | `330`                     | the GPU `length_mm` must be less than or equal to this |
+| `max_gpu_slots`          | number   | no       | `2`                       | the GPU `slots` must be less than or equal to this; check only when both are set |
 | `max_cooler_height_mm`   | integer  | no       | `165`                     | |
 | `side_panel`             | string   | no       | `"glass"`                 | `glass`, `solid`, `mesh` |
 | `color`                  | string   | no       | `"black"`                 | |
@@ -131,6 +134,17 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 | `panel`       | string   | yes      | `"IPS"`         | `IPS`, `VA`, `TN`, `OLED` |
 | `inputs`      | string[] | yes      | `["HDMI 2.1", "DP"]`| video port list |
 | `response_ms` | number   | no       | `1`             | |
+
+The monitor maker (Samsung, LG, ASUS...) is the `brand` column.
+
+Panel types, shown as help text next to the panel filter and on the part page:
+
+| value  | description_en | description_ar |
+|--------|----------------|----------------|
+| `IPS`  | Accurate colors and wide viewing angles. A good all-round choice. | ألوان دقيقة وزوايا رؤية واسعة. خيار متوازن لأغلب الاستخدامات. |
+| `VA`   | Deep blacks and high contrast, good for movies. Can show slight blur in fast motion. | أسود عميق وتباين عالي، ممتازة للأفلام. ممكن يظهر تشويش بسيط في الحركة السريعة. |
+| `TN`   | Fastest response and lowest price, but weaker colors and narrow viewing angles. | أسرع استجابة وأرخص سعر، لكن ألوانها أضعف وزوايا الرؤية ضيقة. |
+| `OLED` | Each pixel makes its own light: perfect blacks, very fast response, best image. Highest price. | كل بكسل يضيء بنفسه: أسود مثالي واستجابة سريعة جداً وأفضل صورة. أغلى نوع. |
 
 ### `mouse`
 | field      | type    | required | example | notes |

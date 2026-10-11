@@ -47,6 +47,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 ## Phase 5: Price updates
 - [ ] "Paste link" tool in the admin page (read JSON-LD from the product page)
 - [ ] Scheduled update job with node-cron for at least one store
+- [ ] Mark an offer as "broken link" when the update job fails to read its price 3 times in a row; hide broken offers from users and list them in the admin page for review
 - [ ] `price_history` and a price chart on the part page
 
 ## Phase 6: Price alerts
