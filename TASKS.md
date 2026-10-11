@@ -32,7 +32,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
 ## Phase 4: Build your PC and shopping list
-- [ ] UI for picking core parts
+- [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it
 - [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
 - [ ] Totals and the cheapest offer for each part
