@@ -6,12 +6,7 @@ async function listStores(req, res) {
 }
 
 async function getStore(req, res) {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ error: { message: 'Store id must be a positive integer' } });
-  }
-
-  const store = await storeModel.findById(id);
+  const store = await storeModel.findById(req.id);
   if (!store) {
     return res.status(404).json({ error: { message: 'Store not found' } });
   }

@@ -13,7 +13,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 ## Phase 1: Foundation
 - [x] Connect Express to PostgreSQL (`pg` Pool, `.env`)
 - [x] API for stores and categories
-- [ ] API for products and offers
+- [x] API for products and offers
 - [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
 - [ ] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
 - [ ] Simple admin page to add parts and offers

@@ -37,21 +37,23 @@ Later: price alerts and notifications (Phase 6).
 
 - Category tabs or select, filters for the chosen category (e.g. socket for CPUs, `chip_brand` and VRAM for GPUs, resolution and panel for monitors), and price range.
 - Filters for every category: **brand** (ASUS, MSI, Gigabyte..., from the brands of the parts in that category) and **store** (show only parts with an offer in the chosen stores).
-- Results as cards: image, name, brand, lowest total price (price + shipping) and in how many stores it is available.
+- Results as cards: image, name, brand, in how many stores it is available, and two prices:
+  - **Cheapest**: the lowest total price (price + shipping) and its store.
+  - **Most trusted**: the best offer from the most trusted seller (see "Most trusted offer" below) and its store. If it is also the cheapest, the card shows one price with both labels.
 - Sort by lowest price or name.
 - Loading, empty ("no parts match") and error states.
 
 ## Part
 
 - Image, name, brand, model, and the specs table for its category (panel types show their help text).
-- Under the specs, the lowest total price and the store it comes from, and an **"Explore prices in stores"** button.
+- Under the specs, the **cheapest** offer and the **most trusted** offer (price and store for each), and an **"Explore prices in stores"** button.
 - The button opens a dropdown list of stores. Each store shows its best price; the cheapest store is highlighted. Clicking the button again closes the list.
-- **Inside each store** (expand the store row): up to two trusted sellers and the store's price range.
+- **Inside each store** (expand the store row): the store's price range and up to two sellers: its **cheapest** seller and its **most trusted** seller, each with a badge. If one seller is both, it shows once with both badges.
 - Each offer row: seller (and "official" badge), price, shipping, total, delivery days, in stock, "last updated", and three actions:
   - **"Buy from store"**: opens the store page in a new tab.
   - **"Add to build"**: adds the part to the current build with this offer, so it goes through the compatibility checks.
   - **"Add to shopping list"**: adds only this link to the shopping list, without a build.
-- Sort offers by total price, delivery time or store trust score; the best place to buy is highlighted.
+- Sort offers by total price, delivery time or store trust score; the cheapest and the most trusted offers each get a badge.
 - International stores (e.g. Newegg, AliExpress) show the customs/VAT note.
 - A quick **"Add to build"** button outside the list adds the part with the cheapest offer.
 - Adding to the build replaces the part in that category, except storage which can have several.
@@ -119,3 +121,14 @@ Later: price alerts and notifications (Phase 6).
 - **Stores**: add or edit a store (name, website, ships from, delivery, warranty, returns, trust score).
 - **Users**: list of users; give or remove admin access (an admin cannot remove their own).
 - Later (Phase 5): "paste link" tool, "update now" button, and the list of broken links.
+
+## Most trusted offer
+
+Every offer on the site is already from a trusted seller (official, or rated 4.5+ with 100+ reviews). Among them, the "most trusted" offer is picked in this order:
+
+1. Official sellers (sold by the store itself) come first.
+2. Then the store with the higher `trust_score`.
+3. Then the seller with the higher rating, then more reviews.
+4. If still tied, the cheaper total price wins.
+
+Only offers that are in stock and not hidden count, for both "cheapest" and "most trusted".
