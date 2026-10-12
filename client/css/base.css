@@ -10,26 +10,28 @@
 
 :root {
   /* Colors */
-  --color-bg: #f6f7f9;
-  --color-surface: #ffffff;
-  --color-surface-2: #eef0f3;
-  --color-border: #d9dde3;
+  /* Light theme is a soft grey instead of pure white, to reduce glare */
+  --color-bg: #e9ebee;
+  --color-surface: #f5f6f8;
+  --color-surface-2: #e1e4e8;
+  --color-border: #cfd4da;
   --color-text: #14171c;
   --color-text-muted: #5b6472;
 
-  --color-primary: #c2410c;
-  --color-primary-hover: #9a3412;
-  --color-primary-soft: #fdeee6;
+  --color-primary: #c43c00;        /* fills: buttons, focus ring */
+  --color-primary-hover: #a33200;
+  --color-primary-text: #a63300;   /* orange text and links, darker so it stays readable */
+  --color-primary-soft: #fde2d2;
   --color-on-primary: #ffffff;
 
   --color-success: #157540;
   --color-success-soft: #e6f4ec;
   --color-warning: #7a5c00;
   --color-warning-soft: #fdf6d8;
-  --color-danger: #c62828;
-  --color-danger-soft: #fdeaea;
+  --color-danger: #d00000;
+  --color-danger-soft: #fde4e4;
 
-  --color-focus: #c2410c;
+  --color-focus: #c43c00;
 
   /* Product image box: white in both themes, to match photos with white backgrounds */
   --color-media-bg: #ffffff;
@@ -79,9 +81,10 @@
   --color-text: #e8ebf0;
   --color-text-muted: #9aa4b2;
 
-  --color-primary: #ff8a4c;
-  --color-primary-hover: #ffa574;
-  --color-primary-soft: #3a1d0e;
+  --color-primary: #ff7a29;
+  --color-primary-hover: #ff9a5c;
+  --color-primary-text: #ff7a29;
+  --color-primary-soft: #3d1a06;
   --color-on-primary: #1a0b03;
 
   --color-success: #4cc38a;
@@ -91,7 +94,7 @@
   --color-danger: #ff7a7a;
   --color-danger-soft: #3a1717;
 
-  --color-focus: #ffa574;
+  --color-focus: #ff9a5c;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
   color-scheme: dark;
@@ -107,9 +110,10 @@
     --color-text: #e8ebf0;
     --color-text-muted: #9aa4b2;
 
-    --color-primary: #ff8a4c;
-    --color-primary-hover: #ffa574;
-    --color-primary-soft: #3a1d0e;
+    --color-primary: #ff7a29;
+    --color-primary-hover: #ff9a5c;
+    --color-primary-text: #ff7a29;
+    --color-primary-soft: #3d1a06;
     --color-on-primary: #1a0b03;
 
     --color-success: #4cc38a;
@@ -119,7 +123,7 @@
     --color-danger: #ff7a7a;
     --color-danger-soft: #3a1717;
 
-    --color-focus: #ffa574;
+    --color-focus: #ff9a5c;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
     color-scheme: dark;
@@ -163,7 +167,7 @@ p {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 a:hover {
   color: var(--color-primary-hover);
@@ -249,7 +253,7 @@ img {
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 .btn-ghost:hover {
   background: var(--color-primary-soft);
@@ -454,7 +458,7 @@ img {
   color: var(--color-text);
 }
 
-.badge-primary { background: var(--color-primary-soft); color: var(--color-primary); }
+.badge-primary { background: var(--color-primary-soft); color: var(--color-primary-text); }
 .badge-success { background: var(--color-success-soft); color: var(--color-success); }
 .badge-warning { background: var(--color-warning-soft); color: var(--color-warning); }
 .badge-danger  { background: var(--color-danger-soft);  color: var(--color-danger); }
@@ -469,7 +473,7 @@ img {
   background: var(--color-surface-2);
 }
 
-.alert-info    { background: var(--color-primary-soft); color: var(--color-primary); }
+.alert-info    { background: var(--color-primary-soft); color: var(--color-primary-text); }
 .alert-success { background: var(--color-success-soft); color: var(--color-success); }
 .alert-warning { background: var(--color-warning-soft); color: var(--color-warning); }
 .alert-danger  { background: var(--color-danger-soft);  color: var(--color-danger); }

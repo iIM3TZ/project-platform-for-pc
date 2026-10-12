@@ -15,7 +15,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [x] API for stores and categories
 - [x] API for products and offers
 - [x] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
-- [ ] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
+- [x] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
 - [ ] Simple admin page to add parts and offers
 - [ ] Seed data: 30 to 50 parts from the stores in `seed.sql` (Amazon.sa, Noon, AliExpress, Newegg and local PC stores) (`server/db/seed.sql`)
 

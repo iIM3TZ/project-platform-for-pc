@@ -1,0 +1,48 @@
+{
+  "site": {
+    "name": "قطعتي",
+    "tagline": "قارن أسعار قطع الكمبيوتر في المتاجر السعودية"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "parts": "القطع",
+    "build": "جمّع جهازك",
+    "shoppingList": "قائمة الشراء",
+    "myBuilds": "تجميعاتي",
+    "admin": "لوحة الأدمن",
+    "signIn": "دخول",
+    "signUp": "تسجيل",
+    "signOut": "خروج",
+    "searchPlaceholder": "ابحث عن قطعة بالاسم أو الشركة أو الموديل",
+    "searchLabel": "بحث"
+  },
+  "language": {
+    "switchTo": "English",
+    "switchLabel": "تغيير اللغة إلى الإنجليزية"
+  },
+  "theme": {
+    "toLight": "الوضع الفاتح",
+    "toDark": "الوضع الداكن"
+  },
+  "actions": {
+    "addToBuild": "أضف للتجميعة",
+    "addToShoppingList": "أضف لقائمة الشراء",
+    "goToStore": "اذهب للمتجر",
+    "details": "التفاصيل",
+    "retry": "إعادة المحاولة",
+    "close": "إغلاق"
+  },
+  "offers": {
+    "cheapest": "الأرخص",
+    "mostTrusted": "الأضمن",
+    "official": "بائع رسمي",
+    "outOfStock": "غير متوفر",
+    "customsNote": "قد تضاف رسوم جمارك أو ضريبة عند التوصيل",
+    "availableIn": "متوفر في {count} متاجر"
+  },
+  "states": {
+    "loading": "جاري التحميل...",
+    "empty": "ما فيه نتائج.",
+    "error": "صار خطأ، حاول مرة ثانية."
+  }
+}

@@ -29,6 +29,33 @@
     </p>
 
     <section class="sg-section">
+      <h2>اللغة والثيم</h2>
+      <div class="sg-row">
+        <button class="btn btn-secondary" type="button" id="language-toggle"
+                data-i18n="language.switchTo" data-i18n-aria-label="language.switchLabel">English</button>
+        <button class="btn btn-secondary" type="button" id="theme-toggle"></button>
+      </div>
+      <p class="text-muted">النصوص تحت تتغير مع اللغة (من ar.json و en.json)، والاتجاه يتغير بين اليمين واليسار:</p>
+      <div class="card sg-stack">
+        <strong data-i18n="site.tagline"></strong>
+        <div class="sg-row">
+          <span data-i18n="nav.parts"></span> · <span data-i18n="nav.build"></span> · <span data-i18n="nav.shoppingList"></span>
+        </div>
+        <input class="input" type="search" data-i18n-placeholder="nav.searchPlaceholder" data-i18n-aria-label="nav.searchLabel">
+        <div class="sg-row">
+          <span class="badge badge-success" data-i18n="offers.cheapest"></span>
+          <span class="badge badge-primary" data-i18n="offers.mostTrusted"></span>
+          <span id="available-in" class="text-muted"></span>
+          <span id="price-demo" class="price"></span>
+        </div>
+        <div class="sg-row">
+          <button class="btn btn-primary" type="button" data-i18n="actions.addToBuild"></button>
+          <button class="btn btn-secondary" type="button" data-i18n="actions.addToShoppingList"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sg-section">
       <h2>الألوان</h2>
       <div class="sg-row">
         <div class="sg-swatch" style="background: var(--color-bg)">bg</div>
@@ -60,7 +87,7 @@
         <button class="btn btn-danger" type="button">احذف</button>
         <button class="btn btn-primary btn-sm" type="button">زر صغير</button>
         <button class="btn btn-primary" type="button" disabled>معطّل</button>
-        <a class="btn btn-secondary" href="#" target="_blank" rel="noopener">اشترِ من المتجر ↗</a>
+        <a class="btn btn-secondary" href="#" target="_blank" rel="noopener">اذهب للمتجر ↗</a>
       </div>
     </section>
 
@@ -179,5 +206,28 @@
       </div>
     </section>
   </main>
+
+  <script type="module">
+    import { initLanguage, toggleLanguage, t, formatPrice } from '/js/i18n.js';
+    import { initTheme, toggleTheme, getTheme } from '/js/theme.js';
+
+    const themeButton = document.getElementById('theme-toggle');
+
+    // Labels that are built in code (not with data-i18n) are refreshed here
+    function renderDynamicText() {
+      themeButton.textContent = getTheme() === 'dark' ? t('theme.toLight') : t('theme.toDark');
+      document.getElementById('available-in').textContent = t('offers.availableIn', { count: 3 });
+      document.getElementById('price-demo').textContent = formatPrice(1199);
+    }
+
+    initTheme();
+    await initLanguage();
+    renderDynamicText();
+
+    document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
+    themeButton.addEventListener('click', toggleTheme);
+    document.addEventListener('languagechange', renderDynamicText);
+    document.addEventListener('themechange', renderDynamicText);
+  </script>
 </body>
 </html>
