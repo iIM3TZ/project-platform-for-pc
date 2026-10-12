@@ -10,6 +10,11 @@ const app = express();
 
 app.use(express.json());
 
+// The style guide is a developer page: hide it on the live site
+if (process.env.NODE_ENV === 'production') {
+  app.get('/pages/styleguide.html', (req, res) => res.status(404).end());
+}
+
 // Static frontend
 app.use(express.static(path.join(__dirname, '..', '..', 'client')));
 
