@@ -12,12 +12,12 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 
 ## Phase 1: Foundation
 - [x] Connect Express to PostgreSQL (`pg` Pool, `.env`)
-- [ ] API for stores and categories
+- [x] API for stores and categories
 - [ ] API for products and offers
 - [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
 - [ ] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
 - [ ] Simple admin page to add parts and offers
-- [ ] Seed data: 30 to 50 parts from 5 stores: Amazon.sa, Noon, AliExpress, Newegg and one local PC store (`server/db/seed.sql`)
+- [ ] Seed data: 30 to 50 parts from the stores in `seed.sql` (Amazon.sa, Noon, AliExpress, Newegg and local PC stores) (`server/db/seed.sql`)
 
 ## Phase 2: Compare
 - [ ] Home page and navigation bar (with the search bar, the language switch and the light/dark toggle)

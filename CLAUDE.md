@@ -135,6 +135,7 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: 
 - `npm start`: start the server
 - `npm test`: run tests (later phase)
 - Create tables: run `server/db/schema.sql` in pgAdmin
+- Sample data: run `server/db/seed.sql` in pgAdmin after the schema (safe to run again)
 
 ## Database access
 - Do not connect to the database or run any database commands (`psql`, `pg_isready`, scripts that query the database). Write the SQL in files (e.g. `server/db/schema.sql`, `server/db/seed.sql`) and the project owner runs them in pgAdmin.
