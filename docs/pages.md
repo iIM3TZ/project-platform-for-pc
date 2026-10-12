@@ -50,7 +50,7 @@ Later: price alerts and notifications (Phase 6).
 - The button opens a dropdown list of stores. Each store shows its best price; the cheapest store is highlighted. Clicking the button again closes the list.
 - **Inside each store** (expand the store row): the store's price range and up to two sellers: its **cheapest** seller and its **most trusted** seller, each with a badge. If one seller is both, it shows once with both badges.
 - Each offer row: seller (and "official" badge), price, shipping, total, delivery days, in stock, "last updated", and three actions:
-  - **"Buy from store"**: opens the store page in a new tab.
+  - **"Buy from store"**: a clear button with the store logo and name and an ↗ icon, opens the store page in a new tab. The part image itself links to the part page on our site, not to the store.
   - **"Add to build"**: adds the part to the current build with this offer, so it goes through the compatibility checks.
   - **"Add to shopping list"**: adds only this link to the shopping list, without a build.
 - Sort offers by total price, delivery time or store trust score; the cheapest and the most trusted offers each get a badge.
@@ -62,7 +62,7 @@ Later: price alerts and notifications (Phase 6).
 
 ## Build
 
-- **Interactive PC case** at the top: an SVG drawing of an open case in a 3D-looking (isometric) view, no libraries. A line comes out of each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and ends in a small circle. Clicking a circle opens the **part picker** for that category. Circle color: grey = not chosen, green = chosen, red = has a compatibility error. Circles are real `<button>` elements with labels, so they work with the keyboard and screen readers.
+- **Interactive PC case** at the top: an SVG drawing of an open case in a 3D-looking (isometric) view, no libraries. A line comes out of each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and ends in a small circle. **Hovering** a circle (or focusing it with the keyboard) shows a small tooltip with the category name, e.g. "GPU / كرت الشاشة", and the chosen part if there is one, e.g. "GPU: RTX 4060 Dual". **Clicking** it opens the **part picker** for that category. On touch screens there is no hover, so a tap opens the picker directly. Circle color: grey = not chosen, green = chosen, red = has a compatibility error. Circles are real `<button>` elements with labels, so they work with the keyboard and screen readers.
 - Under the drawing, the same parts as a list (always shown, and the main view on small phones). One row per category: core parts first (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler), then peripherals.
 - Each row: the chosen part with its best total price, or a "Choose" button that opens the part picker for that category; buttons to change or remove.
 - **Part picker** (a dropdown panel next to the circle or row, without leaving the page; full width on phones):
