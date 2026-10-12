@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const db = require('./config/db');
 
 const app = express();
 
@@ -8,8 +9,15 @@ app.use(express.json());
 // Static frontend
 app.use(express.static(path.join(__dirname, '..', '..', 'client')));
 
-app.get('/api/health', (req, res) => {
-  res.json({ data: { status: 'ok' } });
+// Reports whether the server is up and can reach the database
+app.get('/api/health', async (req, res) => {
+  try {
+    await db.query('SELECT 1');
+    res.json({ data: { status: 'ok', database: 'connected' } });
+  } catch (err) {
+    console.error('Health check failed:', err.message);
+    res.status(503).json({ error: { message: 'Database is not reachable' } });
+  }
 });
 
 module.exports = app;
