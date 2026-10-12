@@ -1,0 +1,48 @@
+{
+  "site": {
+    "name": "Qitati",
+    "tagline": "Compare PC part prices across Saudi stores"
+  },
+  "nav": {
+    "home": "Home",
+    "parts": "Parts",
+    "build": "Build your PC",
+    "shoppingList": "Shopping list",
+    "myBuilds": "My builds",
+    "admin": "Admin",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "searchPlaceholder": "Search parts by name, brand or model",
+    "searchLabel": "Search"
+  },
+  "language": {
+    "switchTo": "العربية",
+    "switchLabel": "Switch language to Arabic"
+  },
+  "theme": {
+    "toLight": "Light mode",
+    "toDark": "Dark mode"
+  },
+  "actions": {
+    "addToBuild": "Add to build",
+    "addToShoppingList": "Add to shopping list",
+    "goToStore": "Go to store",
+    "details": "Details",
+    "retry": "Try again",
+    "close": "Close"
+  },
+  "offers": {
+    "cheapest": "Cheapest",
+    "mostTrusted": "Most trusted",
+    "official": "Official seller",
+    "outOfStock": "Out of stock",
+    "customsNote": "Customs fees or VAT may be added on delivery",
+    "availableIn": "Available in {count} stores"
+  },
+  "states": {
+    "loading": "Loading...",
+    "empty": "No results.",
+    "error": "Something went wrong. Please try again."
+  }
+}

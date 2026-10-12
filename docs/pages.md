@@ -50,7 +50,7 @@ Later: price alerts and notifications (Phase 6).
 - The button opens a dropdown list of stores. Each store shows its best price; the cheapest store is highlighted. Clicking the button again closes the list.
 - **Inside each store** (expand the store row): the store's price range and up to two sellers: its **cheapest** seller and its **most trusted** seller, each with a badge. If one seller is both, it shows once with both badges.
 - Each offer row: seller (and "official" badge), price, shipping, total, delivery days, in stock, "last updated", and three actions:
-  - **"Buy from store"**: a clear button with the store logo and name and an ↗ icon, opens the store page in a new tab. The part image itself links to the part page on our site, not to the store.
+  - **"Go to store"**: a clear button with the store logo and name and an ↗ icon, opens the store page in a new tab. The part image itself links to the part page on our site, not to the store.
   - **"Add to build"**: adds the part to the current build with this offer, so it goes through the compatibility checks.
   - **"Add to shopping list"**: adds only this link to the shopping list, without a build.
 - Sort offers by total price, delivery time or store trust score; the cheapest and the most trusted offers each get a badge.
@@ -84,7 +84,7 @@ Later: price alerts and notifications (Phase 6).
 
 - Everything the user added (single parts from the part page, or a whole build), grouped by store, each with the offer the user chose.
 - Each part can switch to another store or seller from a dropdown.
-- Each part: name, seller, price, shipping, quantity, a **"Buy from store"** link, and a remove button.
+- Each part: name, seller, price, shipping, quantity, a **"Go to store"** link, and a remove button.
 - Guests keep the list in localStorage; signed-in users save it to their account (moved after sign-in, like builds).
 - Per store: subtotal and delivery days.
 - Grand total and the longest delivery time.
