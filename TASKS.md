@@ -17,7 +17,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
 - [ ] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
 - [ ] Simple admin page to add parts and offers
-- [ ] Seed data: 30 to 50 parts from 4 stores (`server/db/seed.sql`)
+- [ ] Seed data: 30 to 50 parts from 5 stores: Amazon.sa, Noon, AliExpress, Newegg and one local PC store (`server/db/seed.sql`)
 
 ## Phase 2: Compare
 - [ ] Home page and navigation bar (with the search bar, the language switch and the light/dark toggle)
@@ -32,7 +32,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
 ## Phase 4: Build your PC and shopping list
-- [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it
+- [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it; clicking a circle or "Choose" opens a part picker dropdown for that category (scrollable list, search box, price filter, compatible parts only)
 - [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
 - [ ] Totals and the cheapest offer for each part

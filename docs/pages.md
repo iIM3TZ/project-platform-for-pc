@@ -60,17 +60,23 @@ Later: price alerts and notifications (Phase 6).
 
 ## Build
 
-- **Interactive PC case** at the top: an SVG drawing of an open case in a 3D-looking (isometric) view, no libraries. A line comes out of each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and ends in a small circle. Clicking a circle opens Parts for that category (compatible parts only). Circle color: grey = not chosen, green = chosen, red = has a compatibility error. Circles are real `<button>` elements with labels, so they work with the keyboard and screen readers.
+- **Interactive PC case** at the top: an SVG drawing of an open case in a 3D-looking (isometric) view, no libraries. A line comes out of each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and ends in a small circle. Clicking a circle opens the **part picker** for that category. Circle color: grey = not chosen, green = chosen, red = has a compatibility error. Circles are real `<button>` elements with labels, so they work with the keyboard and screen readers.
 - Under the drawing, the same parts as a list (always shown, and the main view on small phones). One row per category: core parts first (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler), then peripherals.
-- Each row: the chosen part with its best total price, or a "Choose" button that opens Parts for that category; buttons to change or remove.
-- "Choose" shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Show all" switch.
+- Each row: the chosen part with its best total price, or a "Choose" button that opens the part picker for that category; buttons to change or remove.
+- **Part picker** (a dropdown panel next to the circle or row, without leaving the page; full width on phones):
+  - A scrollable list of parts of that category only (e.g. all GPUs). Each item: image, name, brand and best total price.
+  - A search box at the top to find a part by name, brand or model.
+  - A price filter (min and max).
+  - Shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Show all" switch.
+  - Clicking a part shows two buttons: **"Add to build"** (puts it in the build with its cheapest offer and closes the panel) and **"Add to shopping list"** (adds only this part to the shopping list, without changing the build). A small "Details" link opens its part page.
+  - Closes with Escape, a close button, or a click outside; works with the keyboard.
 - **Compatibility results** at the top: errors in red, warnings in yellow, each linked to the parts involved.
 - Estimated power draw next to the PSU.
 - Total price and build status: ready, or what is missing or not compatible.
 - **Budget bar** when the build has a budget: spent and remaining, and a warning when the total goes over the budget.
 - **"Share"** button: copies a link to the build. The link holds the chosen parts and offers (e.g. `build.html?parts=12:40,15:52`), so it works for guests too and opens a read-only copy that the visitor can save as their own.
 - Save button: guests save in localStorage; signed-in users save to their account (name, budget, purpose).
-- **"Move all to shopping list"** button: adds every part of the build, with its chosen offer, to the shopping list.
+- **"Add all to shopping list"** button: adds every part in the build, with its chosen offer, to the shopping list. Works for a full build or a partial one (only the parts chosen so far).
 
 ## Shopping list
 
