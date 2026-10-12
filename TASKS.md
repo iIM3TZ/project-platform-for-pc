@@ -46,11 +46,25 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] README with screenshots, project description and how to run it
 - [ ] Add the project and its link to the CV and LinkedIn
 
+## Teaser (right after the first deploy)
+- [ ] Choose the site name, and create X and TikTok accounts with that name
+- [ ] Short teaser posts and videos: screen recordings of the interactive PC case, compatibility errors and price comparison ("coming soon")
+- [ ] Build-in-public updates while working on Phase 5 (what was added this week)
+
 ## Phase 5: Price updates
 - [ ] "Paste link" tool in the admin page (read JSON-LD from the product page)
 - [ ] Scheduled update job with node-cron for at least one store, running every 3 days; plus an "update now" button in the admin page to refresh one offer or all offers manually
 - [ ] Mark an offer as "broken link" when the update job fails to read its price 3 times in a row; hide broken offers from users and list them in the admin page for review
 - [ ] `price_history`, a price chart on the part page, and the lowest and highest price in the last 30 days for each store
+
+## Public launch (after Phase 5)
+- [ ] Domain name (e.g. `.sa` or `.com`) pointed at the server
+- [ ] Open Graph and Twitter card tags (title, description, image) so links show a preview card on X
+- [ ] Real data: enough parts with real prices and product links across the stores
+- [ ] Privacy policy, terms and a disclaimer (prices can change; not affiliated with the stores), and a contact page
+- [ ] Visit analytics (to see how many people come from X and TikTok)
+- [ ] Check hosting speed and limits for real visitors (free plans sleep and are slow on the first visit)
+- [ ] Launch posts on X and TikTok
 
 ## Phase 6: Price alerts
 - [ ] Turn on an alert for a part (any drop, or a target price)

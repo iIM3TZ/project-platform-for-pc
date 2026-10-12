@@ -10,7 +10,7 @@ Main features:
 4. **Accounts**: users sign in to save builds and continue where they left off. Guests can build too (saved in localStorage) and their build moves to their account after sign-up.
 5. **Price alerts** (later phase): notify a user in the site and by email when a part's price drops.
 
-This is a portfolio (CV) project. Code must be clean, readable and easy to explain in an interview.
+This is a portfolio (CV) project that will also launch publicly (teaser on X and TikTok after the first deploy, public launch after Phase 5). Code must be clean, readable and easy to explain in an interview.
 
 ## Tech stack (do not add frameworks)
 - **Frontend**: plain HTML, CSS and vanilla JavaScript (ES modules). No React, Vue, Tailwind or Bootstrap.
