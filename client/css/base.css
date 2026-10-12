@@ -1,0 +1,511 @@
+/* ============================================================
+   base.css: design tokens and shared components.
+   The only place colors and fonts are defined. Pages use the variables.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+
+/* ---------- Tokens: light theme (default) ---------- */
+
+:root {
+  /* Colors */
+  --color-bg: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef0f3;
+  --color-border: #d9dde3;
+  --color-text: #14171c;
+  --color-text-muted: #5b6472;
+
+  --color-primary: #c2410c;
+  --color-primary-hover: #9a3412;
+  --color-primary-soft: #fdeee6;
+  --color-on-primary: #ffffff;
+
+  --color-success: #157540;
+  --color-success-soft: #e6f4ec;
+  --color-warning: #7a5c00;
+  --color-warning-soft: #fdf6d8;
+  --color-danger: #c62828;
+  --color-danger-soft: #fdeaea;
+
+  --color-focus: #c2410c;
+
+  /* Product image box: white in both themes, to match photos with white backgrounds */
+  --color-media-bg: #ffffff;
+  --color-media-text: #5b6472;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08);
+
+  /* Typography */
+  --font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, 'Noto Sans Arabic', Arial, sans-serif;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --line-height: 1.6;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --container-width: 1200px;
+  color-scheme: light;
+}
+
+
+/* ---------- Tokens: dark theme ---------- */
+
+/* Set by the theme toggle */
+:root[data-theme="dark"] {
+  --color-bg: #0f1217;
+  --color-surface: #171b22;
+  --color-surface-2: #1f252e;
+  --color-border: #2c333d;
+  --color-text: #e8ebf0;
+  --color-text-muted: #9aa4b2;
+
+  --color-primary: #ff8a4c;
+  --color-primary-hover: #ffa574;
+  --color-primary-soft: #3a1d0e;
+  --color-on-primary: #1a0b03;
+
+  --color-success: #4cc38a;
+  --color-success-soft: #12301f;
+  --color-warning: #f2c94c;
+  --color-warning-soft: #332a0c;
+  --color-danger: #ff7a7a;
+  --color-danger-soft: #3a1717;
+
+  --color-focus: #ffa574;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+}
+
+/* First visit, before the user picks a theme: follow the system setting */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0f1217;
+    --color-surface: #171b22;
+    --color-surface-2: #1f252e;
+    --color-border: #2c333d;
+    --color-text: #e8ebf0;
+    --color-text-muted: #9aa4b2;
+
+    --color-primary: #ff8a4c;
+    --color-primary-hover: #ffa574;
+    --color-primary-soft: #3a1d0e;
+    --color-on-primary: #1a0b03;
+
+    --color-success: #4cc38a;
+    --color-success-soft: #12301f;
+    --color-warning: #f2c94c;
+    --color-warning-soft: #332a0c;
+    --color-danger: #ff7a7a;
+    --color-danger-soft: #3a1717;
+
+    --color-focus: #ffa574;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+    color-scheme: dark;
+  }
+}
+
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--text-base);
+  line-height: var(--line-height);
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 var(--space-3);
+  line-height: 1.3;
+  font-weight: 700;
+}
+h1 { font-size: var(--text-3xl); }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-xl); }
+h4 { font-size: var(--text-lg); }
+
+p {
+  margin: 0 0 var(--space-3);
+}
+
+a {
+  color: var(--color-primary);
+}
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Visible focus for keyboard users on every interactive element */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Hidden on screen but read by screen readers */
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.container {
+  inline-size: 100%;
+  max-inline-size: var(--container-width);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Numbers and prices keep their order inside Arabic text */
+.price {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+}
+
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: 44px; /* easy to tap on phones */
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.btn-secondary:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+}
+.btn-ghost:hover {
+  background: var(--color-primary-soft);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-surface);
+}
+.btn-danger:hover {
+  filter: brightness(0.92);
+  color: var(--color-surface);
+}
+
+.btn-sm {
+  min-block-size: 36px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ---------- Cards ---------- */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Product image at the top of a card. A square white box in both themes, because
+   product photos come on white backgrounds; images keep their shape (contain), so a
+   long GPU and a square CPU both fit and every card has the same height. */
+.card-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  margin-block-end: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-media-bg);
+  overflow: hidden;
+}
+
+.card-media img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  padding: var(--space-2);
+}
+
+/* Shown when a product has no image yet */
+.card-media-empty {
+  color: var(--color-media-text);
+  font-size: var(--text-sm);
+}
+
+.card-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+/* Responsive grid of cards: 1 column on phones, more on wider screens */
+.card-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+
+
+/* ---------- Tables ---------- */
+
+/* Wide tables scroll inside this box instead of the whole page */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--space-3);
+  text-align: start;
+  border-block-end: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table th {
+  background: var(--color-surface-2);
+  font-weight: 600;
+}
+
+.table tbody tr:last-child td {
+  border-block-end: 0;
+}
+
+.table tbody tr:hover {
+  background: var(--color-surface-2);
+}
+
+
+/* ---------- Form fields ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-block-end: var(--space-4);
+}
+
+.field label {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.input,
+.select,
+.textarea {
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.textarea {
+  min-block-size: 96px;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 0;
+  border-color: var(--color-focus);
+}
+
+.field-hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.field-error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}
+
+.input[aria-invalid="true"],
+.select[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.checkbox input {
+  inline-size: 18px;
+  block-size: 18px;
+  accent-color: var(--color-primary);
+}
+
+
+/* ---------- Badges ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.badge-primary { background: var(--color-primary-soft); color: var(--color-primary); }
+.badge-success { background: var(--color-success-soft); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-soft); color: var(--color-warning); }
+.badge-danger  { background: var(--color-danger-soft);  color: var(--color-danger); }
+
+
+/* ---------- Alerts (compatibility results, notices, errors) ---------- */
+
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border-inline-start: 4px solid currentColor;
+  background: var(--color-surface-2);
+}
+
+.alert-info    { background: var(--color-primary-soft); color: var(--color-primary); }
+.alert-success { background: var(--color-success-soft); color: var(--color-success); }
+.alert-warning { background: var(--color-warning-soft); color: var(--color-warning); }
+.alert-danger  { background: var(--color-danger-soft);  color: var(--color-danger); }
+
+
+/* ---------- Loading, empty and error states ---------- */
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  inline-size: 32px;
+  block-size: 32px;
+  border: 3px solid var(--color-border);
+  border-block-start-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Respect users who turn off animations in their system settings */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

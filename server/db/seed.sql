@@ -66,6 +66,17 @@ WHERE NOT EXISTS (
 );
 
 
+-- Product images (files in client/images/products, served at /images/products/...)
+UPDATE products SET image_url = v.image_url
+FROM (VALUES
+  ('Ryzen 5 7600X',                     '/images/products/amd-ryzen-5-7600x.jpg'),
+  ('Dual GeForce RTX 4060 OC',          '/images/products/asus-dual-rtx-4060.jpg'),
+  ('Vengeance 32GB (2x16GB) DDR5 6000', '/images/products/corsair-vengeance-ddr5-32gb.jpg'),
+  ('UltraGear 27GP850-B',               '/images/products/lg-27gp850-b.jpg')
+) AS v(name, image_url)
+WHERE products.name = v.name;
+
+
 -- ============================================================
 -- Sample offers. Prices are approximate test values, not real store prices,
 -- and the links point to the store home page, not to a product page.

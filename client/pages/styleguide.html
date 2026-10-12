@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!--
+  Developer page: shows every shared component from base.css so they can be checked
+  in light and dark mode. Not linked from the site. The text here is written directly
+  because it is a dev tool; real pages read their text from the locale files.
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style guide</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <style>
+    .sg-section { margin-block: var(--space-6); }
+    .sg-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+    .sg-stack { display: grid; gap: var(--space-3); }
+    .sg-swatch {
+      inline-size: 120px; padding: var(--space-3); border-radius: var(--radius-md);
+      border: 1px solid var(--color-border); font-size: var(--text-sm);
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>دليل التصميم</h1>
+    <p class="text-muted">
+      كل المكونات المشتركة من base.css. لتجربة الوضع الداكن: غيّر إعداد جهازك، أو من أدوات المطور
+      (F12 ثم Ctrl+Shift+P واكتب "dark").
+    </p>
+
+    <section class="sg-section">
+      <h2>الألوان</h2>
+      <div class="sg-row">
+        <div class="sg-swatch" style="background: var(--color-bg)">bg</div>
+        <div class="sg-swatch" style="background: var(--color-surface)">surface</div>
+        <div class="sg-swatch" style="background: var(--color-surface-2)">surface-2</div>
+        <div class="sg-swatch" style="background: var(--color-primary); color: var(--color-on-primary)">primary</div>
+        <div class="sg-swatch" style="background: var(--color-success-soft); color: var(--color-success)">success</div>
+        <div class="sg-swatch" style="background: var(--color-warning-soft); color: var(--color-warning)">warning</div>
+        <div class="sg-swatch" style="background: var(--color-danger-soft); color: var(--color-danger)">danger</div>
+      </div>
+    </section>
+
+    <section class="sg-section">
+      <h2>الخطوط</h2>
+      <h1>عنوان كبير H1</h1>
+      <h2>عنوان H2</h2>
+      <h3>عنوان H3</h3>
+      <p>نص عادي: قارن أسعار قطع الكمبيوتر في المتاجر السعودية. English text: Compare PC part prices.</p>
+      <p class="text-muted">نص ثانوي باهت.</p>
+      <p>السعر: <span class="price">1,199.00 ر.س</span></p>
+    </section>
+
+    <section class="sg-section">
+      <h2>الأزرار</h2>
+      <div class="sg-row">
+        <button class="btn btn-primary" type="button">أضف للتجميعة</button>
+        <button class="btn btn-secondary" type="button">أضف لقائمة الشراء</button>
+        <button class="btn btn-ghost" type="button">التفاصيل</button>
+        <button class="btn btn-danger" type="button">احذف</button>
+        <button class="btn btn-primary btn-sm" type="button">زر صغير</button>
+        <button class="btn btn-primary" type="button" disabled>معطّل</button>
+        <a class="btn btn-secondary" href="#" target="_blank" rel="noopener">اشترِ من المتجر ↗</a>
+      </div>
+    </section>
+
+    <section class="sg-section">
+      <h2>الشارات</h2>
+      <div class="sg-row">
+        <span class="badge badge-success">💰 الأرخص</span>
+        <span class="badge badge-primary">🛡️ الأضمن</span>
+        <span class="badge">بائع رسمي</span>
+        <span class="badge badge-warning">قد تضاف جمارك</span>
+        <span class="badge badge-danger">غير متوفر</span>
+      </div>
+    </section>
+
+    <section class="sg-section">
+      <h2>التنبيهات</h2>
+      <div class="sg-stack">
+        <div class="alert alert-danger" role="alert">المعالج (AM5) لا يركب على اللوحة الأم (LGA1700).</div>
+        <div class="alert alert-warning">مزود الطاقة يكفي بالكاد. ننصح بقدرة 750 واط أو أكثر.</div>
+        <div class="alert alert-success">التجميعة جاهزة، كل القطع متوافقة.</div>
+        <div class="alert alert-info">تم حذف قطعة من تجميعتك لأنها لم تعد متوفرة.</div>
+      </div>
+    </section>
+
+    <section class="sg-section">
+      <h2>البطاقات</h2>
+      <div class="card-grid">
+        <article class="card">
+          <a class="card-media" href="#" aria-label="Dual GeForce RTX 4060 OC">
+            <img src="/images/products/asus-dual-rtx-4060.jpg" alt="Dual GeForce RTX 4060 OC">
+          </a>
+          <h3 class="card-title">Dual GeForce RTX 4060 OC</h3>
+          <p class="text-muted">ASUS · متوفر في 3 متاجر</p>
+          <p><span class="badge badge-success">💰 الأرخص</span> <span class="price">1,199.00 ر.س</span></p>
+          <p><span class="badge badge-primary">🛡️ الأضمن</span> <span class="price">1,229.00 ر.س</span></p>
+        </article>
+        <article class="card">
+          <a class="card-media" href="#" aria-label="Ryzen 5 7600X">
+            <img src="/images/products/amd-ryzen-5-7600x.jpg" alt="Ryzen 5 7600X">
+          </a>
+          <h3 class="card-title">Ryzen 5 7600X</h3>
+          <p class="text-muted">AMD · متوفر في 3 متاجر</p>
+          <p><span class="badge badge-success">💰 الأرخص</span> <span class="badge badge-primary">🛡️ الأضمن</span></p>
+          <p><span class="price">879.00 ر.س</span></p>
+        </article>
+        <article class="card">
+          <a class="card-media" href="#" aria-label="Vengeance 32GB DDR5">
+            <img src="/images/products/corsair-vengeance-ddr5-32gb.jpg" alt="Vengeance 32GB (2x16GB) DDR5 6000">
+          </a>
+          <h3 class="card-title">Vengeance 32GB DDR5 6000</h3>
+          <p class="text-muted">Corsair · متوفر في متجرين</p>
+        </article>
+        <article class="card">
+          <a class="card-media" href="#" aria-label="UltraGear 27GP850-B">
+            <img src="/images/products/lg-27gp850-b.jpg" alt="LG UltraGear 27GP850-B">
+          </a>
+          <h3 class="card-title">UltraGear 27GP850-B</h3>
+          <p class="text-muted">LG · متوفر في متجر واحد</p>
+        </article>
+        <article class="card">
+          <a class="card-media" href="#" aria-label="قطعة بدون صورة">
+            <span class="card-media-empty">لا توجد صورة</span>
+          </a>
+          <h3 class="card-title">قطعة بدون صورة</h3>
+          <p class="text-muted">كذا تطلع البطاقة لو ما فيه image_url</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="sg-section">
+      <h2>الجدول</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>المتجر</th><th>البائع</th><th>السعر</th><th>الشحن</th><th>الإجمالي</th><th>التوصيل</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Amazon.sa</td><td>TechZone</td><td class="price">1,199.00</td><td>0</td><td class="price">1,199.00</td><td>2-5 أيام</td></tr>
+            <tr><td>Noon</td><td>noon <span class="badge">رسمي</span></td><td class="price">1,229.00</td><td>0</td><td class="price">1,229.00</td><td>1-4 أيام</td></tr>
+            <tr><td>Newegg</td><td>Newegg</td><td class="price">1,124.96</td><td>131.25</td><td class="price">1,256.21</td><td>7-14 يوم</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sg-section">
+      <h2>الحقول</h2>
+      <form class="card" onsubmit="return false">
+        <div class="field">
+          <label for="sg-username">اسم المستخدم</label>
+          <input class="input" id="sg-username" type="text" placeholder="مثلاً ali_99">
+          <span class="field-hint">من 3 إلى 20 حرف، إنجليزي وأرقام و _</span>
+        </div>
+        <div class="field">
+          <label for="sg-email">الإيميل</label>
+          <input class="input" id="sg-email" type="email" aria-invalid="true" aria-describedby="sg-email-error">
+          <span class="field-error" id="sg-email-error">هذا الإيميل مسجل من قبل</span>
+        </div>
+        <div class="field">
+          <label for="sg-category">الفئة</label>
+          <select class="select" id="sg-category">
+            <option>كرت الشاشة</option>
+            <option>المعالج</option>
+          </select>
+        </div>
+        <label class="checkbox"><input type="checkbox" checked> المتوافقة فقط</label>
+      </form>
+    </section>
+
+    <section class="sg-section">
+      <h2>حالات القوائم</h2>
+      <div class="card-grid">
+        <div class="card state"><div class="spinner" aria-hidden="true"></div><p>جاري التحميل...</p></div>
+        <div class="card state"><p>ما فيه قطع تطابق البحث.</p></div>
+        <div class="card state"><p>صار خطأ، حاول مرة ثانية.</p><button class="btn btn-secondary btn-sm" type="button">إعادة المحاولة</button></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
