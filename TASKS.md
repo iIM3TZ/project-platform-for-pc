@@ -11,7 +11,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [x] Design the database and write `server/db/schema.sql`, then create the tables in PostgreSQL
 
 ## Phase 1: Foundation
-- [ ] Connect Express to PostgreSQL (`pg` Pool, `.env`)
+- [x] Connect Express to PostgreSQL (`pg` Pool, `.env`)
 - [ ] API for stores and categories
 - [ ] API for products and offers
 - [ ] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
