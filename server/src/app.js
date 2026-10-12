@@ -1,6 +1,9 @@
 const path = require('path');
 const express = require('express');
 const db = require('./config/db');
+const categoryRoutes = require('./routes/categoryRoutes');
+const storeRoutes = require('./routes/storeRoutes');
+const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -19,5 +22,11 @@ app.get('/api/health', async (req, res) => {
     res.status(503).json({ error: { message: 'Database is not reachable' } });
   }
 });
+
+app.use('/api/categories', categoryRoutes);
+app.use('/api/stores', storeRoutes);
+
+app.use('/api', notFound);
+app.use(errorHandler);
 
 module.exports = app;
