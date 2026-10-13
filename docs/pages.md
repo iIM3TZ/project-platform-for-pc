@@ -113,6 +113,8 @@ Later: price alerts and notifications (Phase 6).
 ## Admin
 
 - **Dashboard**: number of parts, offers, stores and users, and offers not updated for a long time.
+- Tabs, in this order: **Add a part manually**, **Add a part with AI**, **Offers**.
+- **Add a part with AI**: paste the product link from the maker's official site; the server reads the page and Claude fills the same part form (brand, name, model, specs), which the admin reviews and saves.
 - **Parts**: add or edit a part (category, brand, name, model, image, and the specs fields for that category; the specs form changes with the category).
 - **Offers**: add or edit an offer for a part (store, seller, official, rating, reviews, price, currency, shipping, delivery days, link, in stock).
   - If the seller is not official and is rated below 4.5 or has fewer than 100 reviews, the form shows a warning; the admin must tick "I checked this seller" to save.
