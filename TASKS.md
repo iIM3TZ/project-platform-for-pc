@@ -25,7 +25,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Parts listing page with search results (by name, brand or model)
 - [ ] Category-specific filters
 - [ ] Sort parts by newest or oldest, "Added" filter (today, last 2 days, last 3 days) and an "Added today" badge on parts added today
-- [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best place to buy
+- [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best offer
 
 ## Phase 3: Accounts
 - [ ] Sign-up and sign-in pages (username + email + password; sign in with username or email; show/hide password)
@@ -34,18 +34,18 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
-## Phase 4: Build your PC and shopping list
+## Phase 4: Build your PC and My list
 - [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it; clicking a circle or "Choose" opens a part picker dropdown for that category (scrollable list, search box, price filter, compatible parts only, and each part's prices in every store to pick the offer)
 - [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
 - [ ] Live build total (sticky bar) that updates instantly when a part is added, removed or changed; the cheapest offer is used unless the user picked another
 - [ ] Saving builds; guest builds in localStorage moved to the account after sign-in
-- [ ] Shopping list (separate from builds): add single offers from the part page or a whole build, links grouped by store, total cost, longest delivery time; guests in localStorage, moved to the account after sign-in
+- [ ] My list ("قائمتي", separate from builds): add single offers from the part page or a whole build, links grouped by store, total cost, longest delivery time; guests in localStorage, moved to the account after sign-in
 
 ## Deploy (right after Phase 4)
 - [ ] Test every page on mobile and fix responsive issues
 - [ ] Input validation, rate limiting, check all queries are parameterized
-- [ ] Deploy the server (Render or Railway) and the database (Neon or Supabase)
+- [ ] Deploy on free plans: the server on Render and the database on Neon or Supabase
 - [ ] README with screenshots, project description and how to run it
 - [ ] Add the project and its link to the CV and LinkedIn
 
@@ -62,7 +62,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] `price_history`, a price chart on the part page, and the lowest and highest price in the last 30 days for each store
 
 ## Public launch (after Phase 5)
-- [ ] Domain name (e.g. `.sa` or `.com`) pointed at the server
+- [ ] Free site address: the free Render subdomain (e.g. `site-name.onrender.com`) named after the site; no paid domain
 - [ ] Open Graph and Twitter card tags (title, description, image) so links show a preview card on X
 - [ ] Real data: enough parts with real prices and product links across the stores
 - [ ] Privacy policy, terms and a disclaimer (prices can change; not affiliated with the stores), and a contact page
@@ -77,10 +77,8 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] "Forgot password": email a reset link (one-time token that expires) with Nodemailer
 
 ## Phase 7: Smart features
-- [ ] AI fill in the admin page: paste the maker's product link and Claude fills the part form (needs an API key; decided later)
-- [ ] AI offer check: when the price job cannot read a page, Claude checks if the offer is still the same product (needs an API key)
-- [ ] Suggest a build from a budget and purpose
-- [ ] Store trust score with the reasons shown
+- [ ] Suggest a build from a budget and purpose (rules in code, no AI)
+- [ ] Store trust score with the reasons shown (rules in code)
 
 ## Phase 8: Tests and polish
 - [ ] Profile picture upload (square, small size limit), shown in the menu instead of the letter

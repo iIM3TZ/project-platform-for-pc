@@ -7,7 +7,7 @@
     "home": "الرئيسية",
     "parts": "القطع",
     "build": "جمّع جهازك",
-    "shoppingList": "قائمة الشراء",
+    "myList": "قائمتي",
     "myBuilds": "تجميعاتي",
     "admin": "لوحة الأدمن",
     "signIn": "دخول",
@@ -26,7 +26,7 @@
   },
   "actions": {
     "addToBuild": "أضف للتجميعة",
-    "addToShoppingList": "أضف لقائمة الشراء",
+    "addToMyList": "أضف لقائمتي",
     "goToStore": "اذهب للمتجر",
     "details": "التفاصيل",
     "retry": "إعادة المحاولة",

@@ -7,7 +7,7 @@
     "home": "Home",
     "parts": "Parts",
     "build": "Build your PC",
-    "shoppingList": "Shopping list",
+    "myList": "My list",
     "myBuilds": "My builds",
     "admin": "Admin",
     "signIn": "Sign in",
@@ -26,7 +26,7 @@
   },
   "actions": {
     "addToBuild": "Add to build",
-    "addToShoppingList": "Add to shopping list",
+    "addToMyList": "Add to My list",
     "goToStore": "Go to store",
     "details": "Details",
     "retry": "Try again",

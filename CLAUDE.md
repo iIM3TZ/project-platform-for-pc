@@ -6,7 +6,7 @@ A web platform for the Saudi market that compares prices of PC parts and periphe
 Main features:
 1. **Compare**: search a part and see offers from every store side by side: price in SAR, shipping cost, total (price + shipping), delivery time, and a store trust score. Each store can have up to two trusted sellers, so the page compares sellers inside the same store and across stores, and shows each store's price range (lowest to highest offer) and its best offer. Every part shows two picks: the **cheapest** offer and the **most trusted** offer (official seller first, then store trust score, then seller rating; rules in `docs/pages.md`). Later, with price history, it also shows the lowest and highest price in the last 30 days.
 2. **Build your PC**: pick core parts (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) with automatic compatibility checks, plus optional peripherals (monitor, mouse, keyboard, headset...). Later: a budget-based build suggestion.
-3. **Shopping list** (قائمة الشراء): separate from builds. Users add single parts with the offer they chose, or move a whole build into it. Parts are grouped by store, with total cost, each product link, and the longest delivery time. There is no payment on the site; users buy from the stores through the links.
+3. **My list** (قائمتي): separate from builds. Users add single parts with the offer they chose, or move a whole build into it. Parts are grouped by store, with total cost, each product link, and the longest delivery time. The site sells nothing and has no payment: users open the store links. UI text never uses buying words ("شراء", "buy"); the list is called "قائمتي" / "My list".
 4. **Accounts**: users sign in to save builds and continue where they left off. Guests can build too (saved in localStorage) and their build moves to their account after sign-up.
 5. **Price alerts** (later phase): notify a user in the site and by email when a part's price drops.
 
@@ -19,7 +19,7 @@ This is a portfolio (CV) project that will also launch publicly (teaser on X and
 - **Auth**: bcrypt for password hashing, JWT stored in an httpOnly cookie.
 - **Later phases**: node-cron (scheduled price updates), Cheerio (reading product pages), Chart.js (price history), Nodemailer (emails), Jest + Supertest (tests).
 
-Do not install a new dependency without asking first and explaining why it is needed.
+Do not install a new dependency without asking first and explaining why it is needed. Only free, open-source libraries and free hosting plans: nothing that needs payment or a paid API key (no AI APIs).
 
 ## Folder structure
 ```
@@ -65,9 +65,9 @@ Core tables:
 - `users`: id, username (unique, used to sign in and shown on the site), email (unique), password_hash, role (`user` or `admin`, default `user`), created_at
 - `builds`: id, user_id, name, budget, purpose, created_at, updated_at
 - `build_items`: id, build_id, product_id, offer_id, quantity
-- `shopping_list_items`: id, user_id, product_id, offer_id, quantity, added_at
+- `list_items` (My list): id, user_id, product_id, offer_id, quantity, added_at
 
-- `notifications`: id, user_id, message_ar, message_en, link, read_at, created_at (first used when an admin deletes a part or offer that is in a user's build or shopping list; price alerts reuse it later)
+- `notifications`: id, user_id, message_ar, message_en, link, read_at, created_at (first used when an admin deletes a part or offer that is in a user's build or list; price alerts reuse it later)
 
 Later: `price_alerts`.
 
