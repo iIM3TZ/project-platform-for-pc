@@ -4,6 +4,7 @@ const db = require('./config/db');
 const categoryRoutes = require('./routes/categoryRoutes');
 const storeRoutes = require('./routes/storeRoutes');
 const productRoutes = require('./routes/productRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -32,6 +33,7 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/categories', categoryRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use('/api', notFound);
 app.use(errorHandler);

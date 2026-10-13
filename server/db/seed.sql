@@ -54,7 +54,7 @@ FROM (VALUES
   ('cpu', 'AMD', 'Ryzen 5 7600X', '100-100000593WOF',
    '{"socket": "AM5", "cores": 6, "threads": 12, "base_clock_ghz": 4.7, "boost_clock_ghz": 5.3, "tdp_w": 105, "includes_cooler": false}'),
   ('gpu', 'ASUS', 'Dual GeForce RTX 4060 OC', 'DUAL-RTX4060-O8G',
-   '{"chip_brand": "NVIDIA", "chipset": "RTX 4060", "vram_gb": 8, "tdp_w": 115, "length_mm": 227, "slots": 2.5, "outputs": ["HDMI 2.1", "DP"], "performance_tier": 3, "recommended_psu_w": 550}'),
+   '{"chip_brand": "NVIDIA", "chipset": "RTX 4060", "vram_gb": 8, "tdp_w": 115, "length_mm": 227, "slots": 2.5, "outputs": ["HDMI 2.1", "DP"], "perf_1080p": "excellent", "perf_1440p": "good", "perf_4k": "weak", "recommended_psu_w": 550}'),
   ('ram', 'Corsair', 'Vengeance 32GB (2x16GB) DDR5 6000', 'CMK32GX5M2B6000C30',
    '{"ram_type": "DDR5", "capacity_gb": 32, "speed_mhz": 6000, "modules": 2, "cas_latency": 30}'),
   ('monitor', 'LG', 'UltraGear 27GP850-B', '27GP850-B',
@@ -64,6 +64,14 @@ JOIN categories c ON c.slug = v.category
 WHERE NOT EXISTS (
   SELECT 1 FROM products p WHERE p.brand = v.brand AND p.name = v.name
 );
+
+
+-- The GPU performance used to be one number (performance_tier); it is now one level per resolution.
+-- This updates a GPU that was added before that change.
+UPDATE products
+SET specs = (specs - 'performance_tier')
+            || '{"perf_1080p": "excellent", "perf_1440p": "good", "perf_4k": "weak"}'::jsonb
+WHERE name = 'Dual GeForce RTX 4060 OC' AND specs ? 'performance_tier';
 
 
 -- Product images (files in client/images/products, served at /images/products/...)

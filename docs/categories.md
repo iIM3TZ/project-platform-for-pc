@@ -58,7 +58,7 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 | field         | type    | required | example  | notes |
 |---------------|---------|----------|----------|-------|
 | `socket`      | string  | yes      | `"AM5"`  | |
-| `chipset`     | string  | no       | `"B650"` | |
+| `chipset`     | string  | no       | `"B650"` | one of the chipsets listed for its `socket` in `server/src/config/specFields.js` |
 | `ram_type`    | string  | yes      | `"DDR5"` | must match the RAM |
 | `form_factor` | string  | yes      | `"ATX"`  | must be supported by the case |
 | `ram_slots`   | integer | yes      | `4`      | RAM modules must fit |
@@ -85,8 +85,21 @@ HDMI keeps its version because it matters (for example, 4K at 120Hz or more need
 | `length_mm`          | integer  | yes      | `240`              | must fit the case |
 | `slots`              | number   | no       | `2.5`              | card thickness in expansion slots; must fit the case |
 | `outputs`            | string[] | yes      | `["HDMI 2.1", "DP"]`| video port list |
-| `performance_tier`   | integer  | yes      | `3`                | 1 (entry) to 5 (high end), set by the admin; used for the monitor warning |
+| `perf_1080p`         | string   | yes      | `"excellent"`      | performance in demanding games at Full HD; see levels below |
+| `perf_1440p`         | string   | yes      | `"good"`           | at 2K (1440p) |
+| `perf_4k`            | string   | yes      | `"weak"`           | at 4K; the three levels are set by the admin and used for the monitor warning |
 | `recommended_psu_w`  | integer  | no       | `550`              | |
+
+`chipset` must be one of the models listed for its `chip_brand` in `server/src/config/specFields.js` (e.g. `RTX 4070 SUPER` for NVIDIA, `RX 9070 XT` for AMD). New models are added to that list when they come out.
+
+Performance levels, from lowest to highest (shown on the site as words, e.g. ضعيف / مقبول / جيد / ممتاز):
+
+| value       | meaning in demanding games |
+|-------------|----------------------------|
+| `weak`      | struggles even on low settings |
+| `ok`        | playable, around 60 FPS on medium settings |
+| `good`      | around 60 FPS or more on high settings |
+| `excellent` | high frame rates (100+ FPS) on high settings |
 
 ### `storage`
 | field         | type    | required | example   | notes |

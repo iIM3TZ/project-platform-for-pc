@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/admin.css">
+  <script type="module" src="/js/pages/admin.js"></script>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container admin-header-inner">
+      <h1 class="admin-title" data-i18n="admin.title"></h1>
+      <div class="admin-header-actions">
+        <button class="btn btn-secondary btn-sm" type="button" id="language-toggle"
+                data-i18n="language.switchTo" data-i18n-aria-label="language.switchLabel"></button>
+        <button class="btn btn-secondary btn-sm" type="button" id="theme-toggle"></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+    <p class="alert alert-warning" data-i18n="admin.localOnly"></p>
+    <p class="alert alert-danger" id="load-error" role="alert" data-i18n="admin.loadFailed" hidden></p>
+
+    <div class="admin-tabs" role="tablist">
+      <button class="admin-tab" type="button" role="tab" id="tab-products" aria-controls="panel-products"
+              aria-selected="true" data-i18n="admin.productsTab"></button>
+      <button class="admin-tab" type="button" role="tab" id="tab-offers" aria-controls="panel-offers"
+              aria-selected="false" data-i18n="admin.offersTab"></button>
+    </div>
+
+    <!-- Parts -->
+    <section id="panel-products" role="tabpanel" aria-labelledby="tab-products" class="admin-panel">
+      <form id="product-form" class="card admin-form" novalidate>
+        <h2 class="card-title" id="product-form-title"></h2>
+
+        <div class="admin-grid">
+          <div class="field">
+            <label for="product-category" data-i18n="admin.category"></label>
+            <select class="select" id="product-category" name="category" required></select>
+          </div>
+          <div class="field">
+            <label for="product-brand" data-i18n="admin.brand"></label>
+            <input class="input" id="product-brand" name="brand" type="text" required maxlength="100">
+            <span class="field-hint" data-i18n="admin.brandHint"></span>
+          </div>
+          <div class="field">
+            <label for="product-name" data-i18n="admin.name"></label>
+            <input class="input" id="product-name" name="name" type="text" required maxlength="200">
+          </div>
+          <div class="field">
+            <label for="product-model" data-i18n="admin.model"></label>
+            <input class="input" id="product-model" name="model" type="text" maxlength="100">
+          </div>
+          <div class="field admin-grid-wide">
+            <label for="product-image" data-i18n="admin.imageUrl"></label>
+            <input class="input" id="product-image" name="image_url" type="text" dir="ltr">
+            <span class="field-hint" data-i18n="admin.imageHint"></span>
+          </div>
+        </div>
+
+        <fieldset class="admin-specs">
+          <legend data-i18n="admin.specs"></legend>
+          <div id="spec-fields" class="admin-grid"></div>
+        </fieldset>
+
+        <p class="admin-form-message" id="product-form-message" role="status"></p>
+        <div class="admin-actions">
+          <button class="btn btn-primary" type="submit" data-i18n="admin.save"></button>
+          <button class="btn btn-ghost" type="button" id="product-cancel" data-i18n="admin.cancelEdit" hidden></button>
+        </div>
+      </form>
+
+      <h2 data-i18n="admin.allProducts"></h2>
+      <div id="products-list"></div>
+    </section>
+
+    <!-- Offers -->
+    <section id="panel-offers" role="tabpanel" aria-labelledby="tab-offers" class="admin-panel" hidden>
+      <div class="field">
+        <label for="offers-product" data-i18n="admin.product"></label>
+        <select class="select" id="offers-product"></select>
+      </div>
+
+      <div id="offers-area" hidden>
+        <h2 data-i18n="admin.offersFor"></h2>
+        <div id="offers-list"></div>
+
+        <form id="offer-form" class="card admin-form" novalidate>
+          <h2 class="card-title" id="offer-form-title"></h2>
+
+          <div class="admin-grid">
+            <div class="field">
+              <label for="offer-store" data-i18n="admin.store"></label>
+              <select class="select" id="offer-store" name="store_id" required></select>
+            </div>
+            <div class="field">
+              <label for="offer-seller" data-i18n="admin.seller"></label>
+              <input class="input" id="offer-seller" name="seller_name" type="text" required maxlength="100">
+              <span class="field-hint" data-i18n="admin.sellerHint"></span>
+            </div>
+            <div class="field admin-grid-wide">
+              <label class="checkbox"><input type="checkbox" id="offer-official" name="is_official"> <span data-i18n="admin.official"></span></label>
+            </div>
+            <div class="field">
+              <label for="offer-rating" data-i18n="admin.sellerRating"></label>
+              <input class="input" id="offer-rating" name="seller_rating" type="number" min="0" max="5" step="0.1">
+            </div>
+            <div class="field">
+              <label for="offer-reviews" data-i18n="admin.sellerReviews"></label>
+              <input class="input" id="offer-reviews" name="seller_reviews" type="number" min="0" step="1">
+            </div>
+
+            <div class="admin-grid-wide" id="seller-warning" hidden>
+              <p class="alert alert-warning" id="seller-warning-text"></p>
+              <label class="checkbox"><input type="checkbox" id="offer-seller-checked" name="seller_checked"> <span data-i18n="admin.sellerChecked"></span></label>
+              <span class="field-error" data-error-for="seller_checked"></span>
+            </div>
+
+            <div class="field">
+              <label for="offer-price" data-i18n="admin.price"></label>
+              <input class="input" id="offer-price" name="price" type="number" min="0" step="0.01" required>
+            </div>
+            <div class="field">
+              <label for="offer-shipping" data-i18n="admin.shipping"></label>
+              <input class="input" id="offer-shipping" name="shipping_cost" type="number" min="0" step="0.01" value="0">
+            </div>
+            <div class="field">
+              <label for="offer-currency" data-i18n="admin.currency"></label>
+              <select class="select" id="offer-currency" name="currency">
+                <option value="SAR">SAR</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="offer-days-min" data-i18n="admin.deliveryMin"></label>
+              <input class="input" id="offer-days-min" name="delivery_days_min" type="number" min="0" step="1">
+            </div>
+            <div class="field">
+              <label for="offer-days-max" data-i18n="admin.deliveryMax"></label>
+              <input class="input" id="offer-days-max" name="delivery_days_max" type="number" min="0" step="1">
+            </div>
+            <div class="field admin-grid-wide">
+              <label for="offer-url" data-i18n="admin.url"></label>
+              <input class="input" id="offer-url" name="url" type="url" dir="ltr" required>
+              <span class="field-hint" data-i18n="admin.urlHint"></span>
+            </div>
+            <div class="field admin-grid-wide">
+              <label class="checkbox"><input type="checkbox" id="offer-in-stock" name="in_stock" checked> <span data-i18n="admin.inStock"></span></label>
+            </div>
+          </div>
+
+          <p class="admin-form-message" id="offer-form-message" role="status"></p>
+          <div class="admin-actions">
+            <button class="btn btn-primary" type="submit" data-i18n="admin.save"></button>
+            <button class="btn btn-ghost" type="button" id="offer-cancel" data-i18n="admin.cancelEdit" hidden></button>
+          </div>
+        </form>
+      </div>
+      <p class="text-muted" id="offers-empty-hint" data-i18n="admin.chooseProductForOffers"></p>
+    </section>
+  </main>
+</body>
+</html>

@@ -88,16 +88,18 @@ Field names come from [categories.md](categories.md).
 ## Peripherals (warnings)
 
 ### 13. Monitor and GPU power
-Each monitor gets a required GPU tier from its resolution and refresh rate:
+The GPU has a performance level for each resolution (`perf_1080p`, `perf_1440p`, `perf_4k`; levels in order: `weak`, `ok`, `good`, `excellent`). The rule reads the level for the monitor's resolution and compares it with the level the monitor needs:
 
-| resolution  | below 120 Hz | 120 Hz or more |
-|-------------|--------------|----------------|
-| `1920x1080` | 1            | 2              |
-| `2560x1440` | 2            | 3              |
-| `3440x1440` | 3            | 4              |
-| `3840x2160` | 3            | 5              |
+| monitor resolution | GPU field read | below 120 Hz needs | 120 Hz or more needs |
+|--------------------|----------------|--------------------|----------------------|
+| `1920x1080`        | `perf_1080p`   | `good`             | `excellent`          |
+| `2560x1440`        | `perf_1440p`   | `good`             | `excellent`          |
+| `3440x1440`        | `perf_1440p`   | `excellent`        | `excellent`          |
+| `3840x2160`        | `perf_4k`      | `good`             | `excellent`          |
 
-- **Check**: `gpu.performance_tier` is at least the required tier.
+Ultrawide (`3440x1440`) has about a third more pixels than 2K, so it needs the top level even below 120 Hz.
+
+- **Check**: the GPU level is at least the level the monitor needs.
 - **ar**: كرت الشاشة قد لا يستغل الشاشة بالكامل ({resolution} بتردد {refresh_hz} هرتز) في الألعاب الثقيلة.
 - **en**: The GPU may not get the most out of this monitor ({resolution} at {refresh_hz} Hz) in demanding games.
 
