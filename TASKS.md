@@ -21,13 +21,15 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Seed data: 30 to 50 parts from the stores in `seed.sql` (Amazon.sa, Noon, AliExpress, Newegg and local PC stores) (`server/db/seed.sql`)
 
 ## Phase 2: Compare
-- [ ] Home page and navigation bar (with the search bar, the language switch and the light/dark toggle)
+- [ ] Home page and navigation: top bar (page links, search bar, language switch, light/dark toggle) and a hamburger menu (account and the same page links)
 - [ ] Parts listing page with search results (by name, brand or model)
 - [ ] Category-specific filters
+- [ ] Sort parts by newest or oldest, "Added" filter (today, last 2 days, last 3 days) and an "Added today" badge on parts added today
 - [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best place to buy
 
 ## Phase 3: Accounts
 - [ ] Sign-up and sign-in pages (username + email + password; sign in with username or email; show/hide password)
+- [ ] Account in the menu: "Log in" for guests; for signed-in users a square profile picture (first letter of the username), the username, an "Admin" badge for admins, and the Admin link only for admins
 - [ ] bcrypt password hashing, JWT in an httpOnly cookie
 - [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
@@ -56,6 +58,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] "Paste link" tool in the admin page (read JSON-LD from the product page)
 - [ ] Scheduled update job with node-cron for at least one store, running every 3 days; plus an "update now" button in the admin page to refresh one offer or all offers manually
 - [ ] Mark an offer as "broken link" when the update job fails to read its price 3 times in a row; hide broken offers from users and list them in the admin page for review
+- [ ] Offer alerts in the admin page: old offers (not checked for 7+ days), changed offers (different product name or out of stock) and offers hidden automatically, with actions to clear, edit, show again or delete
 - [ ] `price_history`, a price chart on the part page, and the lowest and highest price in the last 30 days for each store
 
 ## Public launch (after Phase 5)
@@ -75,10 +78,12 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 
 ## Phase 7: Smart features
 - [ ] AI fill in the admin page: paste the maker's product link and Claude fills the part form (needs an API key; decided later)
+- [ ] AI offer check: when the price job cannot read a page, Claude checks if the offer is still the same product (needs an API key)
 - [ ] Suggest a build from a budget and purpose
 - [ ] Store trust score with the reasons shown
 
 ## Phase 8: Tests and polish
+- [ ] Profile picture upload (square, small size limit), shown in the menu instead of the letter
 - [ ] API tests with Jest and Supertest
 - [ ] Run tests automatically with GitHub Actions
 - [ ] Update README and CV with the new features

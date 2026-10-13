@@ -116,6 +116,7 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: 
 
 ## Design rules (frontend)
 - `client/css/base.css` defines all design tokens as CSS variables (colors, fonts, spacing, radius) and the shared components (buttons, cards, tables, form fields, badges). Pages never hardcode colors or font families.
+- **Navigation** on every page: a top bar (page links, search, language and theme toggles) and a hamburger menu with the account and the same page links (details in `docs/pages.md`).
 - **Search bar** in the navigation bar on every page: searches parts by name, brand or model and opens the parts listing page with the results.
 - **Light and dark mode**: colors are defined twice in `base.css`, once for light and once under `[data-theme="dark"]` on `<html>`. The first visit follows the system setting (`prefers-color-scheme`); a toggle in the navigation bar overrides it and the choice is saved in localStorage. Both themes must have readable contrast.
 - Mobile-first and responsive. Every page must work at 375px width without horizontal scrolling.
