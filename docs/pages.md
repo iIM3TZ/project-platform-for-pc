@@ -18,12 +18,27 @@ Design details come later (Phase 2); this file is about content and actions.
 
 Later: price alerts and notifications (Phase 6).
 
-## On every page: navigation bar
+## On every page: navigation
 
-- Logo (link to home), links to Parts, Build, Shopping list.
+Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) that has the account and the same page links.
+
+### Top bar (no account items)
+- Logo (link to home), links to Parts, Build your PC and Shopping list.
 - **Search bar**: searches parts by name, brand or model and opens Parts with the results.
-- Language switch (ar / en) and light/dark toggle.
-- Sign in / sign up, or the user's name with My builds and sign out. Admins also see Admin.
+- Language switch (ar / en) and light/dark toggle, as small icon buttons.
+- The hamburger button.
+- On phones (375px) the page links are hidden from the bar (they are in the menu) and the search bar takes a full row under the logo, so nothing scrolls sideways.
+
+### Menu (hamburger)
+- **Account** at the top:
+  - Guests: a **"تسجيل الدخول" / "Log in"** button, and Sign up under it.
+  - Signed in: a **square profile picture** with the username next to it; admins get an **"أدمن" / "Admin"** badge beside the name. Under it: My builds, Admin (shown only to admins, with the offer alerts count), and Sign out.
+  - Profile picture: for now a square with the first letter of the username (no upload). Uploading a real picture is a later task.
+  - The Admin link and badge are only hidden for others; the admin page and its API are still protected on the server by `requireAdmin`.
+- **Pages**: Home, Parts, Build your PC, Shopping list (the same links as the bar).
+- Opens as a side panel from the hamburger side (the inline end, so it flips between Arabic and English). Closes with the X button, the Escape key, or a click outside it.
+- Accessible: a real `<button>` with `aria-expanded` and a label ("القائمة" / "Menu"); focus moves into the panel when it opens and back to the button when it closes.
+- For admins with offer alerts, the hamburger button shows a small dot so the alert is seen without opening the menu.
 
 ## Home
 
@@ -40,7 +55,9 @@ Later: price alerts and notifications (Phase 6).
 - Results as cards: image, name, brand, in how many stores it is available, and two prices:
   - **Cheapest**: the lowest total price (price + shipping) and its store.
   - **Most trusted**: the best offer from the most trusted seller (see "Most trusted offer" below) and its store. If it is also the cheapest, the card shows one price with both labels.
-- Sort by lowest price or name.
+- Sort by lowest price, name, **newest** or **oldest** (by the date the part was added to our site, `products.created_at`).
+- **Added** filter: any time (default), today, last 2 days, last 3 days.
+- **"Added today" badge**: a small label at the top of the card ("أُضيف اليوم" / "Added today") on parts added to our site today. It shows on the day of adding only, by Saudi time (Asia/Riyadh), and also on the part page.
 - Loading, empty ("no parts match") and error states.
 
 ## Part
@@ -113,6 +130,11 @@ Later: price alerts and notifications (Phase 6).
 ## Admin
 
 - **Dashboard**: number of parts, offers, stores and users, and offers not updated for a long time.
+- **Offer alerts** (Phase 5): a list at the top of the admin page, with a count badge on the Admin link in the menu, of offers that need a look:
+  - **Old**: the offer was not checked successfully for more than 7 days.
+  - **Changed**: the last check found a different product name, or the item became out of stock.
+  - **Hidden automatically**: the check failed 3 times in a row (broken link or product removed), so the offer was hidden from users.
+  - Each alert has: open the link, "still correct" (clears the alert), edit, show again, or delete. Offers are hidden automatically, never deleted, so builds and shopping lists keep working (see Hide or delete below).
 - Tabs: **Parts** (add or edit manually) and **Offers**. Parts can also be added in bulk through `seed.sql` from maker links (see CLAUDE.md); AI fill inside this page is a later idea (Phase 7).
 - **Parts**: add or edit a part (category, brand, name, model, image, and the specs fields for that category; the specs form changes with the category).
 - **Offers**: add or edit an offer for a part (store, seller, official, rating, reviews, price, currency, shipping, delivery days, link, in stock).
@@ -124,7 +146,8 @@ Later: price alerts and notifications (Phase 6).
   - Guests (build in localStorage): when the build loads and a part no longer exists, the page removes it and shows the same kind of banner.
 - **Stores**: add or edit a store (name, website, ships from, delivery, warranty, returns, trust score).
 - **Users**: list of users; give or remove admin access (an admin cannot remove their own).
-- Later (Phase 5): "paste link" tool, "update now" button, and the list of broken links.
+- Later (Phase 5): "paste link" tool, "update now" button, and the offer alerts above.
+- **Offer checks** (Phase 5): every 3 days a job opens each offer link and reads the price and stock from the page (JSON-LD, free, no AI). A new price updates the offer (normal, no alert); the cases above create alerts. Checking with AI is a Phase 7 idea (costs money per check).
 
 ## Most trusted offer
 
