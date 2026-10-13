@@ -32,10 +32,10 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
 ## Phase 4: Build your PC and shopping list
-- [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it; clicking a circle or "Choose" opens a part picker dropdown for that category (scrollable list, search box, price filter, compatible parts only)
+- [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it; clicking a circle or "Choose" opens a part picker dropdown for that category (scrollable list, search box, price filter, compatible parts only, and each part's prices in every store to pick the offer)
 - [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
-- [ ] Totals and the cheapest offer for each part
+- [ ] Live build total (sticky bar) that updates instantly when a part is added, removed or changed; the cheapest offer is used unless the user picked another
 - [ ] Saving builds; guest builds in localStorage moved to the account after sign-in
 - [ ] Shopping list (separate from builds): add single offers from the part page or a whole build, links grouped by store, total cost, longest delivery time; guests in localStorage, moved to the account after sign-in
 

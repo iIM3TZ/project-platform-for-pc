@@ -66,15 +66,18 @@ Later: price alerts and notifications (Phase 6).
 - Under the drawing, the same parts as a list (always shown, and the main view on small phones). One row per category: core parts first (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler), then peripherals.
 - Each row: the chosen part with its best total price, or a "Choose" button that opens the part picker for that category; buttons to change or remove.
 - **Part picker** (a dropdown panel next to the circle or row, without leaving the page; full width on phones):
-  - A scrollable list of parts of that category only (e.g. all GPUs). Each item: image, name, brand and best total price.
+  - A scrollable list of parts of that category only (e.g. all GPUs). Each item: image, name, brand, and its cheapest and most trusted price.
   - A search box at the top to find a part by name, brand or model.
   - A price filter (min and max).
   - Shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Show all" switch.
-  - Clicking a part shows two buttons: **"Add to build"** (puts it in the build with its cheapest offer and closes the panel) and **"Add to shopping list"** (adds only this part to the shopping list, without changing the build). A small "Details" link opens its part page.
+  - Clicking a part expands it **inside the same panel** to show its **prices in every store**: one row per store with its best total price (cheapest and most trusted badges), and the store's sellers when the row is opened.
+  - The user picks the store and seller they want (the cheapest is selected by default), then: **"Add to build"** (puts the part in the build with that offer and closes the panel) or **"Add to shopping list"** (adds only this offer to the shopping list, without changing the build). A small "Details" link opens its part page.
   - Closes with Escape, a close button, or a click outside; works with the keyboard.
 - **Compatibility results** at the top: errors in red, warnings in yellow, each linked to the parts involved.
 - Estimated power draw next to the PSU.
-- Total price and build status: ready, or what is missing or not compatible.
+- **Live build total**: a bar that stays visible while scrolling (at the bottom on phones, beside the parts on wide screens) with the total price of the build (price + shipping of each chosen offer, in SAR), the number of parts, and the build status (ready, or what is missing or not compatible).
+  - It updates **instantly** when a part is added, removed, or changed to another part or another store; the new total briefly highlights so the change is noticed.
+  - The total is also announced to screen readers when it changes.
 - **Budget bar** when the build has a budget: spent and remaining, and a warning when the total goes over the budget.
 - **"Share"** button: copies a link to the build. The link holds the chosen parts and offers (e.g. `build.html?parts=12:40,15:52`), so it works for guests too and opens a read-only copy that the visitor can save as their own.
 - Save button: guests save in localStorage; signed-in users save to their account (name, budget, purpose).
