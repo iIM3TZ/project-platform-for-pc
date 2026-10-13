@@ -44,7 +44,7 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 
 - Short intro: what the site does (compare prices, build a PC).
 - Two main buttons: "Compare prices" (Parts) and "Build your PC" (Build).
-- Category shortcuts: one card per category (CPU, GPU, monitor, prebuilt PCs...), opens Parts filtered by that category.
+- Category shortcuts: one card per category (CPU, GPU, monitor, prebuilt PCs...) with a picture on top and the name under it; opens Parts filtered by that category. The pictures are line icons in `client/images/categories/<slug>.svg` (one file per category slug); a file can be replaced by a photo with the same name.
 - **Most searched parts**: the parts people search for most. Needs search tracking (a count per part when it appears in search results or is opened), so it comes after the parts listing works.
 - **Biggest price drops**: parts whose price fell the most recently. Needs `price_history`, so it comes in Phase 5.
 
@@ -55,6 +55,7 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 - Results as cards: image, name, brand, in how many stores it is available, and two prices:
   - **Cheapest**: the lowest total price (price + shipping) and its store.
   - **Most trusted**: the best offer from the most trusted seller (see "Most trusted offer" below) and its store. If it is also the cheapest, the card shows one price with both labels.
+- **Filters from a link**: the page reads its filters from the address (`category`, `q`, and the category filters such as `cpu_name` and `gpu_chipset`), so a link from the Build suggestion opens the Prebuilt PCs list already filtered. The chosen filters are shown as small chips above the results (e.g. "Ryzen 7 7800X3D", "RTX 4060"), each with an X to remove it, and a "Clear all filters" button, so the user can widen the list if there is no match.
 - Sort by lowest price, name, **newest** or **oldest** (by the date the part was added to our site, `products.created_at`).
 - **Added** filter: any time (default), today, last 2 days, last 3 days.
 - **"Added today" badge**: a small label at the top of the card ("أُضيف اليوم" / "Added today") on parts added to our site today. It shows on the day of adding only, by Saudi time (Asia/Riyadh), and also on the part page.
@@ -95,6 +96,13 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 - **Live build total**: a bar that stays visible while scrolling (at the bottom on phones, beside the parts on wide screens) with the total price of the build (price + shipping of each chosen offer, in SAR), the number of parts, and the build status (ready, or what is missing or not compatible).
   - It updates **instantly** when a part is added, removed, or changed to another part or another store; the new total briefly highlights so the change is noticed.
   - The total is also announced to screen readers when it changes.
+- **Ready-made PC suggestion**: when the build has a **CPU and a GPU**, a card under the compatibility results says a store sells a ready-made PC with the same CPU and GPU (e.g. "Amazon.sa sells a PC with the same Ryzen 7 7800X3D and RTX 4060 for 3,899 SAR"), so the user can compare it with building their own. Rules:
+  - It looks in the `prebuilt` parts that have a visible offer in stock. A prebuilt matches when its `gpu_chipset` equals the build GPU's `chipset` **and** its `cpu_name` equals the build CPU's name (same text, ignoring case, spaces and the brand word "AMD" or "Intel").
+  - If the build also has RAM or storage, the prebuilt must have at least as much (`ram_gb` and `storage_gb` are compared with the build's RAM total and storage total).
+  - The card shows the **cheapest matching price** (price + shipping, in SAR) and its store, and how many matching PCs there are, e.g. "from 3,899 SAR at Amazon.sa, 3 PCs". When the whole build has a total, it also shows the difference: "X SAR cheaper than your build" or "X SAR more than your build".
+  - **Clicking the card opens the Parts page on the Prebuilt PCs category, already filtered** by the build's CPU and GPU (e.g. `parts.html?category=prebuilt&cpu_name=Ryzen%207%207800X3D&gpu_chipset=RTX%204060`), not the store or one product. The user sees all the matching PCs and picks one, and an offer that was removed in the meantime does not lead to a dead page.
+  - A note under it: the ready-made PC comes with its own case, power supply and motherboard, which can be different from the parts the user picked.
+  - Nothing shows when no prebuilt matches. The card can be closed and stays closed until the build's CPU or GPU changes.
 - **Budget bar** when the build has a budget: spent and remaining, and a warning when the total goes over the budget.
 - **"Share"** button: copies a link to the build. The link holds the chosen parts and offers (e.g. `build.html?parts=12:40,15:52`), so it works for guests too and opens a read-only copy that the visitor can save as their own.
 - Save button: guests save in localStorage; signed-in users save to their account (name, budget, purpose).

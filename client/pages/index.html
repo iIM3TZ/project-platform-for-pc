@@ -3,12 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مقارنة أسعار قطع الكمبيوتر</title>
+  <title>قطعتي</title>
   <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/home.css">
+  <script type="module" src="/js/pages/home.js"></script>
 </head>
 <body>
-  <main>
-    <h1>مقارنة أسعار قطع الكمبيوتر</h1>
+  <header id="site-header"></header>
+
+  <main class="container home">
+    <section class="home-hero">
+      <h1 data-i18n="home.title"></h1>
+      <p class="home-intro" data-i18n="home.intro"></p>
+      <div class="home-actions">
+        <a class="btn btn-primary" href="/pages/parts.html" data-i18n="home.compare"></a>
+        <a class="btn btn-secondary" href="/pages/build.html" data-i18n="nav.build"></a>
+      </div>
+    </section>
+
+    <section class="home-section" aria-labelledby="categories-title">
+      <h2 id="categories-title" data-i18n="home.categories"></h2>
+      <p id="category-state" class="state"></p>
+      <div id="category-grid" class="card-grid category-grid"></div>
+    </section>
   </main>
 </body>
 </html>

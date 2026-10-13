@@ -1,0 +1,49 @@
+.home {
+  padding-block: var(--space-6);
+}
+
+.home-hero {
+  padding-block: var(--space-6) var(--space-7);
+}
+
+.home-intro {
+  max-inline-size: 60ch;
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+/* Category cards: the picture on top, the name under it */
+.category-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-5) var(--space-4);
+  text-align: center;
+  text-decoration: none;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.category-card img {
+  inline-size: 72px;
+  block-size: 72px;
+  object-fit: contain;
+}
+
+.category-card:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-text);
+}

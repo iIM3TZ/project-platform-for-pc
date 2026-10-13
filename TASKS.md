@@ -21,9 +21,9 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Seed data: 30 to 50 parts from the stores in `seed.sql` (Amazon.sa, Noon, AliExpress, Newegg and local PC stores) (`server/db/seed.sql`)
 
 ## Phase 2: Compare
-- [ ] Home page and navigation: top bar (page links, search bar, language switch, light/dark toggle) and a hamburger menu (account and the same page links)
+- [x] Home page and navigation: top bar (page links, search bar, language switch, light/dark toggle) and a hamburger menu (account and the same page links)
 - [ ] Parts listing page with search results (by name, brand or model)
-- [ ] Category-specific filters
+- [ ] Category-specific filters (Prebuilt PCs: CPU name, GPU chipset, RAM and storage, also set from the link `parts.html?category=prebuilt&cpu_name=...&gpu_chipset=...`)
 - [ ] Sort parts by newest or oldest, "Added" filter (today, last 2 days, last 3 days) and an "Added today" badge on parts added today
 - [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best offer
 
@@ -38,6 +38,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] UI for picking core parts: interactive SVG PC case (a line and a clickable circle for each part, colored by status) and the parts list under it; clicking a circle or "Choose" opens a part picker dropdown for that category (scrollable list, search box, price filter, compatible parts only, and each part's prices in every store to pick the offer)
 - [ ] Compatibility checks (`server/src/services/compatibility.js`) and showing errors and warnings
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
+- [ ] Ready-made PC suggestion in the Build page: when the build has a CPU and a GPU, show a card with the cheapest prebuilt PC price with the same CPU and GPU (and at least the same RAM and storage) and the difference from the build total; clicking it opens the Parts page on the Prebuilt PCs category filtered by that CPU and GPU
 - [ ] Live build total (sticky bar) that updates instantly when a part is added, removed or changed; the cheapest offer is used unless the user picked another
 - [ ] Saving builds; guest builds in localStorage moved to the account after sign-in
 - [ ] My list ("قائمتي", separate from builds): add single offers from the part page or a whole build, links grouped by store, total cost, longest delivery time; guests in localStorage, moved to the account after sign-in

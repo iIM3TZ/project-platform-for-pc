@@ -518,3 +518,163 @@ img {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ---------- Navigation: top bar and side menu (client/js/components/navbar.js) ---------- */
+
+.site-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  background: var(--color-surface);
+  border-block-end: 1px solid var(--color-border);
+}
+
+/* Phones: logo and buttons on the first row, search on its own row under them */
+.nav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  padding-block: var(--space-3);
+}
+
+.nav-logo {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--color-primary-text);
+}
+
+.nav-links {
+  display: none;
+  gap: var(--space-4);
+}
+
+.nav-links a,
+.menu-links a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links a:hover,
+.menu-links a:hover,
+.nav-links a[aria-current="page"],
+.menu-links a[aria-current="page"] {
+  color: var(--color-primary-text);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+  order: 2;
+}
+
+.nav-search {
+  display: flex;
+  gap: var(--space-2);
+  order: 3;
+  inline-size: 100%;
+}
+
+.nav-search .input {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 40px;
+  block-size: 40px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.nav-icon-btn:hover {
+  border-color: var(--color-primary);
+}
+
+@media (min-width: 900px) {
+  .nav-inner {
+    flex-wrap: nowrap;
+  }
+  .nav-links {
+    display: flex;
+  }
+  .nav-search {
+    flex: 1;
+    order: 0;
+    inline-size: auto;
+    max-inline-size: 480px;
+    margin-inline: auto;
+  }
+  .nav-actions {
+    margin-inline-start: 0;
+    order: 0;
+  }
+}
+
+/* The menu opens from the inline end, so it flips between Arabic and English */
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.menu-panel {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  inline-size: min(320px, 88vw);
+  padding: var(--space-4);
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-inline-start: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-lg);
+}
+
+.menu-section {
+  display: grid;
+  gap: var(--space-3);
+  padding-block-end: var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.menu-links {
+  border-block-end: 0;
+}
+
+.menu-links a {
+  padding-block: var(--space-2);
+}
+
+.menu-secondary-link {
+  text-align: center;
+}
+
+/* The page behind the open menu does not scroll */
+.menu-is-open {
+  overflow: hidden;
+}
