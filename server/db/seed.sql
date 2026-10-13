@@ -18,7 +18,8 @@ INSERT INTO categories (slug, name_en, name_ar, kind) VALUES
   ('monitor',     'Monitor',      'الشاشة',        'peripheral'),
   ('mouse',       'Mouse',        'الماوس',        'peripheral'),
   ('keyboard',    'Keyboard',     'لوحة المفاتيح', 'peripheral'),
-  ('headset',     'Headset',      'السماعة',       'peripheral')
+  ('headset',     'Headset',      'السماعة',       'peripheral'),
+  ('prebuilt',    'Prebuilt PC',  'جهاز جاهز',     'prebuilt')    -- needs migrations/001_prebuilt_category.sql on an older database
 ON CONFLICT (slug) DO NOTHING;
 
 

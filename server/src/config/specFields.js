@@ -129,6 +129,18 @@ const SPEC_FIELDS = {
     { key: 'microphone', type: 'boolean', required: true },
     { key: 'surround', type: 'boolean', required: false },
   ],
+  // A ready-made PC sold by a store: only the main parts, by name, without their details
+  prebuilt: [
+    { key: 'cpu_name', type: 'string', required: true },
+    { key: 'gpu_brand', type: 'string', required: true, options: ['NVIDIA', 'AMD'] },
+    { key: 'gpu_chipset', type: 'string', required: true, optionsBy: 'gpu_brand', optionGroups: GPU_CHIPSETS },
+    { key: 'ram_gb', type: 'integer', required: true, min: 1 },
+    { key: 'ram_type', type: 'string', required: false, options: RAM_TYPES },
+    { key: 'storage_gb', type: 'integer', required: true, min: 1 },
+    { key: 'storage_type', type: 'string', required: false, options: ['nvme', 'sata_ssd', 'hdd'] },
+    { key: 'psu_w', type: 'integer', required: false, min: 1 },
+    { key: 'wifi', type: 'boolean', required: false },
+  ],
 };
 
 module.exports = { SPEC_FIELDS, PERFORMANCE_LEVELS };

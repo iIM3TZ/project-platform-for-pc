@@ -13,7 +13,7 @@ CREATE TABLE categories (
   slug    TEXT NOT NULL UNIQUE,                 -- 'cpu', 'gpu', 'monitor'...
   name_ar TEXT NOT NULL,
   name_en TEXT NOT NULL,
-  kind    TEXT NOT NULL CHECK (kind IN ('core', 'peripheral'))
+  kind    TEXT NOT NULL CHECK (kind IN ('core', 'peripheral', 'prebuilt'))
 );
 
 CREATE TABLE stores (
