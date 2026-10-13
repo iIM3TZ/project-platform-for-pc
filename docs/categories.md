@@ -191,7 +191,7 @@ A ready-made PC sold by a store. Only the main parts are stored, by name, withou
 
 | field          | type    | required | example              | notes |
 |----------------|---------|----------|----------------------|-------|
-| `cpu_name`     | string  | yes      | `"Ryzen 7 7800X3D"`  | free text, as the store writes it |
+| `cpu_name`     | string  | yes      | `"Ryzen 7 7800X3D"`  | write it exactly like the CPU part's name in our catalog (e.g. `Ryzen 7 7800X3D`), because the Build page uses it to suggest this PC when a user picks the same CPU |
 | `gpu_brand`    | string  | yes      | `"NVIDIA"`           | `NVIDIA`, `AMD` |
 | `gpu_chipset`  | string  | yes      | `"RTX 4060"`         | same list as the GPU `chipset` for that brand |
 | `ram_gb`       | integer | yes      | `32`                 | total |

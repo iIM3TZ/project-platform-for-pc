@@ -1,7 +1,7 @@
 {
   "site": {
     "name": "Qitati",
-    "tagline": "Compare PC part prices across Saudi stores"
+    "tagline": "Compare PC part prices across stores"
   },
   "nav": {
     "home": "Home",
@@ -10,11 +10,20 @@
     "myList": "My list",
     "myBuilds": "My builds",
     "admin": "Admin",
-    "signIn": "Sign in",
+    "signIn": "Log in",
     "signUp": "Sign up",
     "signOut": "Sign out",
     "searchPlaceholder": "Search parts by name, brand or model",
-    "searchLabel": "Search"
+    "searchLabel": "Search",
+    "menu": "Menu",
+    "account": "Account",
+    "pagesLabel": "Site pages"
+  },
+  "home": {
+    "title": "Compare PC part prices across stores",
+    "intro": "See each store's price, shipping and delivery in one place, and build your PC with compatibility checks between the parts.",
+    "compare": "Compare prices",
+    "categories": "Browse by category"
   },
   "language": {
     "switchTo": "العربية",

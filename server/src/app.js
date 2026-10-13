@@ -16,6 +16,11 @@ if (process.env.NODE_ENV === 'production') {
   app.get('/pages/styleguide.html', (req, res) => res.status(404).end());
 }
 
+// The home page is served at / (the file lives in client/pages)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'client', 'pages', 'index.html'));
+});
+
 // Static frontend
 app.use(express.static(path.join(__dirname, '..', '..', 'client')));
 
