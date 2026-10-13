@@ -16,8 +16,8 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [x] API for products and offers
 - [x] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
 - [x] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
-- [ ] Simple admin page to add parts and offers
-- [ ] AI fill for new parts, as its own tab in the admin page (tabs: add a part manually, add a part with AI, offers): paste the product link from the maker's official site (msi.com, asus.com, amd.com...), the server reads the page and Claude fills the part form (brand, name, model, specs for the category); the admin reviews and saves. Offers stay manual
+- [x] Simple admin page to add parts and offers
+- [x] Prebuilt PCs category: ready-made PCs sold by stores, with short specs (CPU, GPU, RAM, storage) and offers like any part
 - [ ] Seed data: 30 to 50 parts from the stores in `seed.sql` (Amazon.sa, Noon, AliExpress, Newegg and local PC stores) (`server/db/seed.sql`)
 
 ## Phase 2: Compare
@@ -74,7 +74,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] "Forgot password": email a reset link (one-time token that expires) with Nodemailer
 
 ## Phase 7: Smart features
-- [ ] Extend AI fill: suggest the image and catch spec mistakes when editing a part
+- [ ] AI fill in the admin page: paste the maker's product link and Claude fills the part form (needs an API key; decided later)
 - [ ] Suggest a build from a budget and purpose
 - [ ] Store trust score with the reasons shown
 

@@ -29,7 +29,7 @@ Later: price alerts and notifications (Phase 6).
 
 - Short intro: what the site does (compare prices, build a PC).
 - Two main buttons: "Compare prices" (Parts) and "Build your PC" (Build).
-- Category shortcuts: one card per category (CPU, GPU, monitor...), opens Parts filtered by that category.
+- Category shortcuts: one card per category (CPU, GPU, monitor, prebuilt PCs...), opens Parts filtered by that category.
 - **Most searched parts**: the parts people search for most. Needs search tracking (a count per part when it appears in search results or is opened), so it comes after the parts listing works.
 - **Biggest price drops**: parts whose price fell the most recently. Needs `price_history`, so it comes in Phase 5.
 
@@ -56,7 +56,7 @@ Later: price alerts and notifications (Phase 6).
 - Sort offers by total price, delivery time or store trust score; the cheapest and the most trusted offers each get a badge.
 - International stores (e.g. Newegg, AliExpress) show the customs/VAT note.
 - A quick **"Add to build"** button outside the list adds the part with the cheapest offer.
-- Adding to the build replaces the part in that category, except storage which can have several.
+- Adding to the build replaces the part in that category, except storage which can have several. Prebuilt PCs have no "Add to build" button (only the shopping list).
 - The build and the shopping list are **separate**: the build is for a full PC with compatibility checks; the shopping list is any parts the user wants to buy, with or without a build.
 - Later: price chart and the lowest and highest price in the last 30 days (Phase 5).
 
@@ -113,8 +113,7 @@ Later: price alerts and notifications (Phase 6).
 ## Admin
 
 - **Dashboard**: number of parts, offers, stores and users, and offers not updated for a long time.
-- Tabs, in this order: **Add a part manually**, **Add a part with AI**, **Offers**.
-- **Add a part with AI**: paste the product link from the maker's official site; the server reads the page and Claude fills the same part form (brand, name, model, specs), which the admin reviews and saves.
+- Tabs: **Parts** (add or edit manually) and **Offers**. Parts can also be added in bulk through `seed.sql` from maker links (see CLAUDE.md); AI fill inside this page is a later idea (Phase 7).
 - **Parts**: add or edit a part (category, brand, name, model, image, and the specs fields for that category; the specs form changes with the category).
 - **Offers**: add or edit an offer for a part (store, seller, official, rating, reviews, price, currency, shipping, delivery days, link, in stock).
   - If the seller is not official and is rated below 4.5 or has fewer than 100 reviews, the form shows a warning; the admin must tick "I checked this seller" to save.

@@ -164,7 +164,14 @@
     "arabic_letters": "حروف عربية على الأزرار",
     "connection": "طريقة التوصيل",
     "microphone": "مايكروفون",
-    "surround": "صوت محيطي"
+    "surround": "صوت محيطي",
+    "cpu_name": "المعالج (مثل Ryzen 7 7800X3D)",
+    "gpu_brand": "شركة كرت الشاشة",
+    "gpu_chipset": "كرت الشاشة",
+    "ram_gb": "الرام (جيجا)",
+    "storage_gb": "التخزين (جيجا)",
+    "storage_type": "نوع التخزين",
+    "psu_w": "مزود الطاقة (واط)"
   },
   "specOptions": {
     "weak": "ضعيف",

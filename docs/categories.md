@@ -19,9 +19,11 @@ The schema, seed data, filters and compatibility checks all follow these definit
 | `mouse`       | Mouse       | الماوس         | `peripheral` |
 | `keyboard`    | Keyboard    | لوحة المفاتيح  | `peripheral` |
 | `headset`     | Headset     | السماعة        | `peripheral` |
+| `prebuilt`    | Prebuilt PC | جهاز جاهز      | `prebuilt`   |
 
 A build needs one of each core part, except storage (one or more) and the cooler (optional, because some CPUs come with one).
 Peripherals are all optional.
+Prebuilt PCs are not part of a build: they are listed and compared like any part, but the Build your PC page does not show them.
 
 ## Rules for `specs`
 
@@ -181,3 +183,22 @@ Panel types, shown as help text next to the panel filter and on the part page:
 | `connection` | string[] | yes      | `["USB", "Bluetooth"]`  | `USB`, `3.5mm`, `Bluetooth` |
 | `microphone` | boolean  | yes      | `true`                  | |
 | `surround`   | boolean  | no       | `false`                 | |
+
+## Prebuilt PCs
+
+### `prebuilt`
+A ready-made PC sold by a store. Only the main parts are stored, by name, without their details (no compatibility rules use them).
+
+| field          | type    | required | example              | notes |
+|----------------|---------|----------|----------------------|-------|
+| `cpu_name`     | string  | yes      | `"Ryzen 7 7800X3D"`  | free text, as the store writes it |
+| `gpu_brand`    | string  | yes      | `"NVIDIA"`           | `NVIDIA`, `AMD` |
+| `gpu_chipset`  | string  | yes      | `"RTX 4060"`         | same list as the GPU `chipset` for that brand |
+| `ram_gb`       | integer | yes      | `32`                 | total |
+| `ram_type`     | string  | no       | `"DDR5"`             | |
+| `storage_gb`   | integer | yes      | `1000`               | total |
+| `storage_type` | string  | no       | `"nvme"`             | `nvme`, `sata_ssd`, `hdd` |
+| `psu_w`        | integer | no       | `650`                | |
+| `wifi`         | boolean | no       | `true`               | |
+
+`brand` is the PC maker (e.g. MSI) or the store's own PC line.

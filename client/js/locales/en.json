@@ -164,7 +164,14 @@
     "arabic_letters": "Arabic letters on the keys",
     "connection": "Connection",
     "microphone": "Microphone",
-    "surround": "Surround sound"
+    "surround": "Surround sound",
+    "cpu_name": "Processor (e.g. Ryzen 7 7800X3D)",
+    "gpu_brand": "GPU brand",
+    "gpu_chipset": "GPU",
+    "ram_gb": "RAM (GB)",
+    "storage_gb": "Storage (GB)",
+    "storage_type": "Storage type",
+    "psu_w": "Power supply (W)"
   },
   "specOptions": {
     "weak": "Weak",

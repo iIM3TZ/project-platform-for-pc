@@ -17,7 +17,6 @@ This is a portfolio (CV) project that will also launch publicly (teaser on X and
 - **Backend**: Node.js + Express, REST API returning JSON.
 - **Database**: PostgreSQL using the `pg` library with raw SQL. No ORM.
 - **Auth**: bcrypt for password hashing, JWT stored in an httpOnly cookie.
-- **AI**: the Claude API (`@anthropic-ai/sdk`) for filling part specs from the maker's product page. The API key lives in `.env`.
 - **Later phases**: node-cron (scheduled price updates), Cheerio (reading product pages), Chart.js (price history), Nodemailer (emails), Jest + Supertest (tests).
 
 Do not install a new dependency without asking first and explaining why it is needed.
@@ -56,7 +55,7 @@ Do not install a new dependency without asking first and explaining why it is ne
 
 ## Database (PostgreSQL)
 Core tables:
-- `categories`: id, name_ar, name_en, slug, kind (`core` or `peripheral`)
+- `categories`: id, name_ar, name_en, slug, kind (`core`, `peripheral` or `prebuilt`)
 - `stores`: id, name, website, logo_url, ships_from (country code, `SA` = local), avg_delivery_days, has_warranty, return_policy_ar, return_policy_en, trust_score (0 to 10)
 - `products`: id, category_id, brand, name, model, image_url, specs (JSONB, fields depend on category), view_count, is_hidden, created_at
 - `offers`: id, product_id, store_id, seller_name, is_official, seller_rating, seller_reviews, price, shipping_cost, currency, delivery_days_min, delivery_days_max, url, in_stock, is_hidden, updated_at
@@ -137,6 +136,11 @@ Each rule returns `{ level: "error" | "warning", message_ar: "...", message_en: 
 - `npm test`: run tests (later phase)
 - Create tables: run `server/db/schema.sql` in pgAdmin
 - Sample data: run `server/db/seed.sql` in pgAdmin after the schema (safe to run again)
+
+## Adding parts from links
+- The project owner sends product links from the maker's official site (msi.com, asus.com, amd.com...). Claude reads the page and adds the part to `server/db/seed.sql`: brand, name, model, image path, and every specs field for its category from `docs/categories.md` (allowed values from `server/src/config/specFields.js`). Fields the page does not state are left out if optional, or flagged to the owner if required (e.g. GPU performance levels are an estimate the owner confirms).
+- Prebuilt PCs come from a store's product page (the store sells the whole PC). Only the main parts are stored, by name (`prebuilt` fields in `docs/categories.md`); `brand` is the PC maker or the store's own line.
+- Inserts must stay safe to re-run (skip a part that already exists). The owner runs `seed.sql` in pgAdmin and adds offers by hand in the admin page.
 
 ## Database access
 - Do not connect to the database or run any database commands (`psql`, `pg_isready`, scripts that query the database). Write the SQL in files (e.g. `server/db/schema.sql`, `server/db/seed.sql`) and the project owner runs them in pgAdmin.
