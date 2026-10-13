@@ -17,6 +17,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [x] `client/css/base.css`: design tokens (colors, fonts, spacing) for light and dark mode, and shared components (buttons, cards, tables, form fields)
 - [x] Language and theme: `i18n.js` with `ar.json` / `en.json` (RTL/LTR switching) and `theme.js` (light/dark), both saved in localStorage
 - [ ] Simple admin page to add parts and offers
+- [ ] AI fill for new parts: paste the product link from the maker's official site (msi.com, asus.com, amd.com...), the server reads the page and Claude fills the part form (brand, name, model, specs for the category); the admin reviews and saves. Offers stay manual
 - [ ] Seed data: 30 to 50 parts from the stores in `seed.sql` (Amazon.sa, Noon, AliExpress, Newegg and local PC stores) (`server/db/seed.sql`)
 
 ## Phase 2: Compare
@@ -73,7 +74,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] "Forgot password": email a reset link (one-time token that expires) with Nodemailer
 
 ## Phase 7: Smart features
-- [ ] Extract specs from product descriptions with AI, reviewed before saving
+- [ ] Extend AI fill: suggest the image and catch spec mistakes when editing a part
 - [ ] Suggest a build from a budget and purpose
 - [ ] Store trust score with the reasons shown
 

@@ -32,4 +32,53 @@ async function findById(id) {
   return result.rows[0] || null;
 }
 
-module.exports = { findAll, findById };
+// ---------- Admin: includes hidden products ----------
+
+const ADMIN_COLUMNS = `
+  p.id, p.brand, p.name, p.model, p.image_url, p.specs, p.is_hidden, p.created_at,
+  c.slug AS category
+`;
+
+async function findAllForAdmin() {
+  const result = await db.query(
+    `SELECT ${ADMIN_COLUMNS}
+     FROM products p
+     JOIN categories c ON c.id = p.category_id
+     ORDER BY p.created_at DESC`
+  );
+  return result.rows;
+}
+
+async function findByIdForAdmin(id) {
+  const result = await db.query(
+    `SELECT ${ADMIN_COLUMNS}
+     FROM products p
+     JOIN categories c ON c.id = p.category_id
+     WHERE p.id = $1`,
+    [id]
+  );
+  return result.rows[0] || null;
+}
+
+async function create({ categoryId, brand, name, model, image_url, specs }) {
+  const result = await db.query(
+    `INSERT INTO products (category_id, brand, name, model, image_url, specs)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING id`,
+    [categoryId, brand, name, model, image_url, specs]
+  );
+  return findByIdForAdmin(result.rows[0].id);
+}
+
+async function update(id, { categoryId, brand, name, model, image_url, specs }) {
+  const result = await db.query(
+    `UPDATE products
+     SET category_id = $2, brand = $3, name = $4, model = $5, image_url = $6, specs = $7
+     WHERE id = $1
+     RETURNING id`,
+    [id, categoryId, brand, name, model, image_url, specs]
+  );
+  return result.rowCount === 0 ? null : findByIdForAdmin(id);
+}
+
+module.exports = { findAll, findById, findAllForAdmin, findByIdForAdmin, create, update };

@@ -17,6 +17,7 @@ This is a portfolio (CV) project that will also launch publicly (teaser on X and
 - **Backend**: Node.js + Express, REST API returning JSON.
 - **Database**: PostgreSQL using the `pg` library with raw SQL. No ORM.
 - **Auth**: bcrypt for password hashing, JWT stored in an httpOnly cookie.
+- **AI**: the Claude API (`@anthropic-ai/sdk`) for filling part specs from the maker's product page. The API key lives in `.env`.
 - **Later phases**: node-cron (scheduled price updates), Cheerio (reading product pages), Chart.js (price history), Nodemailer (emails), Jest + Supertest (tests).
 
 Do not install a new dependency without asking first and explaining why it is needed.

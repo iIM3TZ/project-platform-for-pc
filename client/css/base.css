@@ -185,6 +185,11 @@ img {
   outline-offset: 2px;
 }
 
+/* The hidden attribute always hides, even when a class sets display (e.g. display: grid) */
+[hidden] {
+  display: none !important;
+}
+
 /* Hidden on screen but read by screen readers */
 .visually-hidden {
   position: absolute;
