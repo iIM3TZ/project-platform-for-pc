@@ -81,7 +81,7 @@ CREATE INDEX price_history_offer_idx ON price_history (offer_id, recorded_at);
 
 
 -- ============================================================
--- Users, builds, shopping list, notifications
+-- Users, builds, My list, notifications
 -- ============================================================
 
 CREATE TABLE users (
@@ -119,7 +119,7 @@ CREATE TABLE build_items (
 
 CREATE INDEX build_items_build_idx ON build_items (build_id);
 
-CREATE TABLE shopping_list_items (
+CREATE TABLE list_items (                 -- My list (قائمتي)
   id         SERIAL PRIMARY KEY,
   user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -128,7 +128,7 @@ CREATE TABLE shopping_list_items (
   added_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX shopping_list_items_user_idx ON shopping_list_items (user_id);
+CREATE INDEX list_items_user_idx ON list_items (user_id);
 
 CREATE TABLE notifications (
   id         SERIAL PRIMARY KEY,
