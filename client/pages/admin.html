@@ -56,7 +56,13 @@
           </div>
           <div class="field admin-grid-wide">
             <label for="product-image" data-i18n="admin.imageUrl"></label>
-            <input class="input" id="product-image" name="image_url" type="text" dir="ltr">
+            <div class="admin-image-row">
+              <div class="admin-image-preview" id="product-image-preview"></div>
+              <div class="admin-image-inputs">
+                <select class="select" id="product-image-pick" data-i18n-aria-label="admin.imagePick"></select>
+                <input class="input" id="product-image" name="image_url" type="text" dir="ltr">
+              </div>
+            </div>
             <span class="field-hint" data-i18n="admin.imageHint"></span>
           </div>
         </div>

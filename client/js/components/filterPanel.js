@@ -3,7 +3,10 @@
 
 import { t, formatPrice } from '/js/i18n.js';
 import { el } from '/js/components/dom.js';
-import { optionValues, isSelected, listActive, removeActive } from '/js/filtering.js';
+import { optionValues, isSelected, listActive, removeActive, ADDED_DAYS } from '/js/filtering.js';
+
+// The words for each "Added" choice: 1 = today, 2 = last 2 days, 3 = last 3 days
+const ADDED_LABELS = { 1: 'filters.addedToday', 2: 'filters.added2', 3: 'filters.added3' };
 
 function filterLabel(def) {
   return def.labelKey ? t(def.labelKey) : t(`specs.${def.key}`);
@@ -49,6 +52,19 @@ function yesNoField(def, filters, onChange) {
   return el('div', { class: 'field' }, el('label', { text: filterLabel(def) }, select));
 }
 
+function addedField(filters, onChange) {
+  const select = el('select', { class: 'select' },
+    el('option', { value: '', text: t('filters.addedAny') }),
+    ...ADDED_DAYS.map((days) => el('option', {
+      value: String(days), text: t(ADDED_LABELS[days]), selected: filters.addedDays === days,
+    })));
+  select.addEventListener('change', () => {
+    filters.addedDays = select.value === '' ? null : Number(select.value);
+    onChange();
+  });
+  return el('div', { class: 'field' }, el('label', { text: t('filters.added') }, select));
+}
+
 function specFilter(def, products, filters, onChange) {
   if (def.type === 'bool') return yesNoField(def, filters, onChange);
 
@@ -87,6 +103,8 @@ export function renderFilterPanel(container, { definitions, products, stores, fi
     .map((store) => ({ value: store.id, label: store.name }));
 
   const groups = [
+    addedField(filters, onChange),
+
     brands.length > 0 && checkboxGroup(
       t('filters.brand'),
       brands.map((brand) => ({ value: brand, label: brand })),
@@ -118,6 +136,7 @@ function chipText(item, definitions, stores) {
   if (item.kind === 'store') return `${t('filters.store')}: ${stores.find((store) => store.id === item.value)?.name ?? item.value}`;
   if (item.kind === 'priceMin') return t('filters.chipPriceMin', { value: formatPrice(item.value) });
   if (item.kind === 'priceMax') return t('filters.chipPriceMax', { value: formatPrice(item.value) });
+  if (item.kind === 'added') return `${t('filters.added')}: ${t(ADDED_LABELS[item.value])}`;
 
   const label = filterLabel(definitions.find((def) => def.key === item.key));
   if (typeof item.value === 'boolean') return `${label}: ${t(item.value ? 'filters.yes' : 'filters.no')}`;

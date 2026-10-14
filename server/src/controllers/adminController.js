@@ -3,6 +3,7 @@ const categoryModel = require('../models/categoryModel');
 const productModel = require('../models/productModel');
 const offerModel = require('../models/offerModel');
 const storeModel = require('../models/storeModel');
+const { listProductImages } = require('../services/productImages');
 const { validateProduct, validateOffer, TRUSTED_MIN_RATING, TRUSTED_MIN_REVIEWS } = require('../services/adminValidation');
 
 const MAX_SELLERS_PER_STORE = 2;
@@ -20,6 +21,11 @@ function getSpecFields(req, res) {
       trusted_seller: { min_rating: TRUSTED_MIN_RATING, min_reviews: TRUSTED_MIN_REVIEWS },
     },
   });
+}
+
+// GET /api/admin/product-images: the pictures in client/images/products, to pick one in the part form
+async function listImages(req, res) {
+  res.json({ data: await listProductImages() });
 }
 
 // ---------- Products ----------
@@ -139,6 +145,7 @@ async function updateOffer(req, res) {
 
 module.exports = {
   getSpecFields,
+  listImages,
   listProducts,
   getProduct,
   createProduct,

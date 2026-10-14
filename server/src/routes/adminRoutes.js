@@ -7,6 +7,7 @@ const { validateIdParam } = require('../middleware/validation');
 const router = express.Router();
 
 router.get('/spec-fields', admin.getSpecFields);
+router.get('/product-images', admin.listImages);
 
 router.get('/products', admin.listProducts);
 router.post('/products', admin.createProduct);

@@ -2,17 +2,22 @@
 // writing them back, and checking whether a part matches.
 //
 // The filters object:
-// { brand: ['ASUS'], store: [2], priceMin: null, priceMax: 1500, specs: { socket: ['AM5'], cores: 6, wifi: true } }
+// { brand: ['ASUS'], store: [2], priceMin: null, priceMax: 1500, addedDays: 3,
+//   specs: { socket: ['AM5'], cores: 6, wifi: true } }
 // specs: a list of values for a `multi` filter, a number for `min`, true/false for `bool`.
+// addedDays: added in the last 1 (today), 2 or 3 days, in Saudi time; null for any time.
 
 import { SPEC_FILTERS } from '/js/filterConfig.js';
+import { daysSinceAdded } from '/js/addedDate.js';
+
+export const ADDED_DAYS = [1, 2, 3];
 
 export function definitionsFor(category) {
   return SPEC_FILTERS[category] || [];
 }
 
 export function emptyFilters() {
-  return { brand: [], store: [], priceMin: null, priceMax: null, specs: {} };
+  return { brand: [], store: [], priceMin: null, priceMax: null, addedDays: null, specs: {} };
 }
 
 // Text compared without case and spaces. 'cpu' also drops the brand word at the start.
@@ -29,13 +34,15 @@ function positiveNumber(text) {
 
 // ---------- The address ----------
 
-// Reads the filters from the address, e.g. ?brand=ASUS&socket=AM5&cores=6&wifi=true&price_max=1500
+// Reads the filters from the address, e.g. ?brand=ASUS&socket=AM5&cores=6&wifi=true&price_max=1500&added=3
 export function readFilters(params, definitions) {
   const filters = emptyFilters();
   filters.brand = params.getAll('brand');
   filters.store = params.getAll('store').map(Number).filter(Number.isInteger);
   filters.priceMin = positiveNumber(params.get('price_min'));
   filters.priceMax = positiveNumber(params.get('price_max'));
+  const added = Number(params.get('added'));
+  filters.addedDays = ADDED_DAYS.includes(added) ? added : null;
 
   for (const def of definitions) {
     if (def.type === 'multi') {
@@ -57,6 +64,7 @@ export function writeFilters(filters, params) {
   filters.store.forEach((id) => params.append('store', id));
   if (filters.priceMin !== null) params.set('price_min', filters.priceMin);
   if (filters.priceMax !== null) params.set('price_max', filters.priceMax);
+  if (filters.addedDays !== null) params.set('added', filters.addedDays);
 
   for (const [key, value] of Object.entries(filters.specs)) {
     if (Array.isArray(value)) value.forEach((item) => params.append(key, item));
@@ -66,7 +74,7 @@ export function writeFilters(filters, params) {
 
 // ---------- The active filters (shown as chips) ----------
 
-// One item per chosen value: { kind: 'brand' | 'store' | 'priceMin' | 'priceMax' | 'spec', key, value }
+// One item per chosen value: { kind: 'brand' | 'store' | 'priceMin' | 'priceMax' | 'added' | 'spec', key, value }
 export function listActive(filters) {
   const items = [
     ...filters.brand.map((value) => ({ kind: 'brand', value })),
@@ -74,6 +82,7 @@ export function listActive(filters) {
   ];
   if (filters.priceMin !== null) items.push({ kind: 'priceMin', value: filters.priceMin });
   if (filters.priceMax !== null) items.push({ kind: 'priceMax', value: filters.priceMax });
+  if (filters.addedDays !== null) items.push({ kind: 'added', value: filters.addedDays });
 
   for (const [key, value] of Object.entries(filters.specs)) {
     if (Array.isArray(value)) value.forEach((item) => items.push({ kind: 'spec', key, value: item }));
@@ -87,6 +96,7 @@ export function removeActive(filters, item) {
   else if (item.kind === 'store') filters.store = filters.store.filter((value) => value !== item.value);
   else if (item.kind === 'priceMin') filters.priceMin = null;
   else if (item.kind === 'priceMax') filters.priceMax = null;
+  else if (item.kind === 'added') filters.addedDays = null;
   else if (Array.isArray(filters.specs[item.key])) {
     const rest = filters.specs[item.key].filter((value) => value !== item.value);
     if (rest.length > 0) filters.specs[item.key] = rest;
@@ -137,7 +147,8 @@ function matchesSpec(product, def, wanted) {
   return value === wanted;
 }
 
-export function matches(product, filters, definitions) {
+// `now` is only passed by tests, to check the "Added" filter on a fixed day
+export function matches(product, filters, definitions, now = new Date()) {
   if (filters.brand.length > 0 && !isSelected(filters.brand, product.brand)) return false;
   if (filters.store.length > 0 && !product.store_ids.some((id) => filters.store.includes(id))) return false;
 
@@ -146,6 +157,11 @@ export function matches(product, filters, definitions) {
     if (price === undefined) return false;
     if (filters.priceMin !== null && price < filters.priceMin) return false;
     if (filters.priceMax !== null && price > filters.priceMax) return false;
+  }
+
+  if (filters.addedDays !== null) {
+    const days = daysSinceAdded(product.created_at, now);
+    if (days === null || days >= filters.addedDays) return false;
   }
 
   return definitions.every((def) => {

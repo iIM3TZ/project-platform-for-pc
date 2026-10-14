@@ -8,7 +8,7 @@ function toLikePattern(text) {
 // Visible products, optionally filtered by category slug and a search text
 async function findAll({ category = null, q = null } = {}) {
   const result = await db.query(
-    `SELECT p.id, p.brand, p.name, p.model, p.image_url, p.specs, c.slug AS category
+    `SELECT p.id, p.brand, p.name, p.model, p.image_url, p.specs, p.created_at, c.slug AS category
      FROM products p
      JOIN categories c ON c.id = p.category_id
      WHERE p.is_hidden = false

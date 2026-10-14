@@ -683,6 +683,7 @@ img {
 /* ---------- Part card (Parts page, and the part picker in Build) ---------- */
 
 .part-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -704,4 +705,12 @@ img {
   align-items: center;
   gap: var(--space-2);
   margin: 0 0 var(--space-2);
+}
+
+/* "Added today" sits on the corner of the picture */
+.part-card-new {
+  position: absolute;
+  inset-block-start: var(--space-5);
+  inset-inline-start: var(--space-5);
+  z-index: 1;
 }

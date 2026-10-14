@@ -7,6 +7,7 @@ const state = {
   trustedSeller: null,   // { min_rating, min_reviews }
   categories: [],
   stores: [],
+  images: [],            // paths of the pictures in client/images/products
   products: [],
   offers: [],
   editingProductId: null,
@@ -225,6 +226,45 @@ function renderCategoryOptions() {
     ...state.categories.map((c) => el('option', { value: c.slug, text: categoryName(c.slug), selected: c.slug === current })));
 }
 
+// ---------- Product picture: pick one from the folder, or type a link ----------
+
+function renderImageOptions() {
+  const current = $('product-image').value;
+  $('product-image-pick').replaceChildren(
+    el('option', { value: '', text: state.images.length ? t('admin.imagePick') : t('admin.imageNone') }),
+    ...state.images.map((path) => el('option', {
+      value: path, text: path.split('/').pop(), selected: path === current,
+    })));
+}
+
+// A small preview of the picture in the field (nothing when the field is empty)
+function renderImagePreview() {
+  const url = $('product-image').value.trim();
+  const preview = $('product-image-preview');
+  if (!url) {
+    preview.replaceChildren();
+    return;
+  }
+  const image = el('img', { src: url, alt: t('admin.imagePreview') });
+  image.addEventListener('error', () => preview.replaceChildren(el('span', { text: '?' })));
+  preview.replaceChildren(image);
+}
+
+// The list is read when the page opens: a picture added to the folder later needs a page reload
+async function loadImages() {
+  try {
+    state.images = await api.getProductImages();
+  } catch {
+    state.images = []; // typing the path still works
+  }
+  renderImageOptions();
+}
+
+function syncImageField() {
+  renderImageOptions();
+  renderImagePreview();
+}
+
 function renderProductFormTitle() {
   const product = state.products.find((p) => p.id === state.editingProductId);
   $('product-form-title').textContent = product
@@ -238,6 +278,7 @@ function resetProductForm() {
   const form = $('product-form');
   form.reset();
   clearErrors(form);
+  syncImageField();
   renderSpecFields('');
   renderProductFormTitle();
 }
@@ -252,6 +293,7 @@ function startEditingProduct(product) {
   $('product-name').value = product.name;
   $('product-model').value = product.model ?? '';
   $('product-image').value = product.image_url ?? '';
+  syncImageField();
   renderSpecFields(product.category, product.specs);
   renderProductFormTitle();
   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -519,6 +561,7 @@ function rerenderForLanguage() {
   renderOffersList();
   renderOfferFormTitle();
   updateSellerWarning();
+  renderImageOptions();
   renderThemeButton();
 }
 
@@ -563,6 +606,13 @@ async function start() {
     clearErrors($('product-form'));
     renderSpecFields(e.target.value);
   });
+  $('product-image-pick').addEventListener('change', (e) => {
+    if (!e.target.value) return;
+    $('product-image').value = e.target.value;
+    renderImagePreview();
+  });
+  $('product-image').addEventListener('input', syncImageField);
+  loadImages();
   $('product-form').addEventListener('submit', saveProduct);
   $('product-cancel').addEventListener('click', () => {
     resetProductForm();
