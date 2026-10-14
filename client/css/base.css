@@ -678,3 +678,30 @@ img {
 .menu-is-open {
   overflow: hidden;
 }
+
+
+/* ---------- Part card (Parts page, and the part picker in Build) ---------- */
+
+.part-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.part-card:hover {
+  border-color: var(--color-primary);
+}
+
+.part-card-brand {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.part-card-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+}
