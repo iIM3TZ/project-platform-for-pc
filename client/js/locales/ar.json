@@ -39,6 +39,27 @@
     "noImage": "بدون صورة",
     "notAvailable": "غير متوفرة حالياً"
   },
+  "filters": {
+    "title": "الفلاتر",
+    "chosen": "الفلاتر المختارة",
+    "brand": "الشركة",
+    "store": "المتجر",
+    "price": "السعر (ريال)",
+    "priceMin": "من",
+    "priceMax": "إلى",
+    "atLeast": "على الأقل",
+    "any": "الكل",
+    "yes": "نعم",
+    "no": "لا",
+    "chipset": "الشريحة",
+    "cpuName": "المعالج",
+    "chipMin": "{label}: {value} أو أكثر",
+    "chipPriceMin": "السعر: من {value}",
+    "chipPriceMax": "السعر: إلى {value}",
+    "remove": "إزالة الفلتر: {filter}",
+    "clearAll": "مسح كل الفلاتر",
+    "noMatch": "ما فيه قطع تطابق هذي الفلاتر."
+  },
   "language": {
     "switchTo": "English",
     "switchLabel": "تغيير اللغة إلى الإنجليزية"

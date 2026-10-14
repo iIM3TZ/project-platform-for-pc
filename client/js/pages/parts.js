@@ -3,18 +3,26 @@ import { initLanguage, getLanguage, t } from '/js/i18n.js';
 import { initTheme } from '/js/theme.js';
 import { initNavbar } from '/js/components/navbar.js';
 import { createPartCard } from '/js/components/partCard.js';
+import { renderFilterPanel, renderChips } from '/js/components/filterPanel.js';
 import { el } from '/js/components/dom.js';
+import {
+  definitionsFor, emptyFilters, readFilters, writeFilters, matches, hasActive, listActive,
+} from '/js/filtering.js';
 
 const $ = (id) => document.getElementById(id);
 
-// The category and the search text come from the address, e.g. parts.html?category=gpu&q=4060
+// The category, the search text and the filters come from the address,
+// e.g. parts.html?category=gpu&q=4060&brand=ASUS&vram_gb=8
 const params = new URLSearchParams(location.search);
+const initialCategory = params.get('category') || '';
 
 const state = {
-  category: params.get('category') || '',
+  category: initialCategory,
   q: (params.get('q') || '').trim(),
   sort: 'price',
+  filters: readFilters(params, definitionsFor(initialCategory)),
   categories: [],
+  stores: [],
   products: [],
   status: 'loading', // 'loading' | 'ready' | 'error'
 };
@@ -33,10 +41,24 @@ function pageTitle() {
   return t('parts.allParts');
 }
 
+// Cheapest first (parts with no available offer last), or by name
+function sortedProducts(products) {
+  const byName = (a, b) => a.name.localeCompare(b.name, getLanguage());
+  if (state.sort === 'name') return products.sort(byName);
+
+  const price = (product) => product.cheapest?.total_sar ?? Infinity;
+  return products.sort((a, b) => (price(a) === price(b) ? byName(a, b) : price(a) - price(b)));
+}
+
+function visibleProducts() {
+  const definitions = definitionsFor(state.category);
+  return sortedProducts(state.products.filter((product) => matches(product, state.filters, definitions)));
+}
+
 function renderHeading() {
   const title = pageTitle();
   $('parts-title').textContent = title;
-  $('parts-count').textContent = state.status === 'ready' ? t('parts.count', { count: state.products.length }) : '';
+  $('parts-count').textContent = state.status === 'ready' ? t('parts.count', { count: visibleProducts().length }) : '';
   document.title = `${title} | ${t('site.name')}`;
 }
 
@@ -49,15 +71,35 @@ function renderCategorySelect() {
   $('category-select').value = state.category;
 }
 
-// Cheapest first (parts with no available offer last), or by name
-function sortedProducts() {
-  const products = [...state.products];
-  const byName = (a, b) => a.name.localeCompare(b.name, getLanguage());
+// The filter panel is only redrawn when the list of parts, the category or the language changes,
+// not on every click, so the checkbox the user is using keeps its focus
+function renderPanel() {
+  renderPanelSummary();
 
-  if (state.sort === 'name') return products.sort(byName);
+  if (state.status !== 'ready') {
+    $('filters-body').replaceChildren();
+    return;
+  }
+  renderFilterPanel($('filters-body'), {
+    definitions: definitionsFor(state.category),
+    products: state.products,
+    stores: state.stores,
+    filters: state.filters,
+    onChange: onFiltersChanged,
+  });
+}
 
-  const price = (product) => product.cheapest?.total_sar ?? Infinity;
-  return products.sort((a, b) => (price(a) === price(b) ? byName(a, b) : price(a) - price(b)));
+function renderChipList() {
+  renderChips($('chips'), {
+    definitions: definitionsFor(state.category),
+    stores: state.stores,
+    filters: state.filters,
+    onRemove: onFiltersReset,
+    onClear: () => {
+      state.filters = emptyFilters();
+      onFiltersReset();
+    },
+  });
 }
 
 function renderList() {
@@ -69,45 +111,89 @@ function renderList() {
   if (state.status === 'loading') {
     box.className = 'state';
     box.replaceChildren(el('span', { class: 'spinner', 'aria-hidden': 'true' }), t('states.loading'));
-  } else if (state.status === 'error') {
+    return;
+  }
+
+  if (state.status === 'error') {
     box.className = 'state alert alert-danger';
-    box.replaceChildren(
-      t('states.error'),
-      el('button', { class: 'btn btn-secondary btn-sm', type: 'button', id: 'retry', text: t('actions.retry') }));
-    $('retry').addEventListener('click', loadProducts);
-  } else if (state.products.length === 0) {
-    box.className = 'state';
-    box.replaceChildren(t('parts.noMatch'), el('a', { href: '/pages/parts.html', text: t('parts.showAll') }));
-  } else {
+    const retry = el('button', { class: 'btn btn-secondary btn-sm', type: 'button', text: t('actions.retry') });
+    retry.addEventListener('click', loadProducts);
+    box.replaceChildren(t('states.error'), retry);
+    return;
+  }
+
+  const products = visibleProducts();
+  if (products.length > 0) {
     box.hidden = true;
-    grid.replaceChildren(...sortedProducts().map((product) => createPartCard(product)));
+    grid.replaceChildren(...products.map((product) => createPartCard(product)));
+    return;
+  }
+
+  box.className = 'state';
+  if (hasActive(state.filters)) {
+    const clear = el('button', { class: 'btn btn-secondary btn-sm', type: 'button', text: t('filters.clearAll') });
+    clear.addEventListener('click', () => {
+      state.filters = emptyFilters();
+      onFiltersReset();
+    });
+    box.replaceChildren(t('filters.noMatch'), clear);
+  } else {
+    box.replaceChildren(t('parts.noMatch'), el('a', { href: '/pages/parts.html', text: t('parts.showAll') }));
   }
 }
 
-function renderAll() {
+function renderResults() {
   renderHeading();
-  renderCategorySelect();
+  renderChipList();
   renderList();
+  renderPanelSummary();
 }
 
-// ---------- Data ----------
+function renderPanelSummary() {
+  const count = listActive(state.filters).length;
+  $('filters-summary').textContent = count > 0 ? `${t('filters.title')} (${count})` : t('filters.title');
+}
 
-// Keeps the address in sync with the chosen category, so the page can be shared or reloaded
+function renderAll() {
+  renderCategorySelect();
+  renderPanel();
+  renderResults();
+}
+
+// ---------- Changes ----------
+
+// Keeps the address in sync, so the page can be shared or reloaded as it is
 function updateAddress() {
   const next = new URLSearchParams();
   if (state.category) next.set('category', state.category);
   if (state.q) next.set('q', state.q);
+  writeFilters(state.filters, next);
   const query = next.toString();
   history.replaceState(null, '', query ? `?${query}` : location.pathname);
 }
+
+// A checkbox, a field or a select in the panel changed
+function onFiltersChanged() {
+  updateAddress();
+  renderResults();
+}
+
+// A chip was removed, or "clear all": the panel must show the new choices too
+function onFiltersReset() {
+  updateAddress();
+  renderPanel();
+  renderResults();
+}
+
+// ---------- Data ----------
 
 let latestRequest = 0;
 
 async function loadProducts() {
   const request = ++latestRequest;
   state.status = 'loading';
-  renderHeading();
-  renderList();
+  renderPanel();
+  renderResults();
 
   let products = [];
   let status = 'ready';
@@ -121,18 +207,16 @@ async function loadProducts() {
   if (request !== latestRequest) return;
   state.products = products;
   state.status = status;
-  renderHeading();
-  renderList();
+  renderPanel();
+  renderResults();
 }
 
-async function loadCategories() {
-  try {
-    state.categories = await api.getCategories();
-  } catch {
-    // The list still works without the category names; the select just shows "All"
-  }
-  renderCategorySelect();
-  renderHeading();
+// The category names and the store names are only labels: the list still works without them
+async function loadLabels() {
+  const [categories, stores] = await Promise.allSettled([api.getCategories(), api.getStores()]);
+  if (categories.status === 'fulfilled') state.categories = categories.value;
+  if (stores.status === 'fulfilled') state.stores = stores.value;
+  renderAll();
 }
 
 // ---------- Start ----------
@@ -142,8 +226,12 @@ await initLanguage();
 initNavbar();
 renderAll();
 
+// The panel is open on wide screens and closed on phones
+$('filters').open = matchMedia('(min-width: 900px)').matches;
+
 $('category-select').addEventListener('change', (event) => {
   state.category = event.target.value;
+  state.filters = emptyFilters(); // the filters of the old category do not apply
   updateAddress();
   loadProducts();
 });
@@ -153,5 +241,5 @@ $('sort-select').addEventListener('change', (event) => {
 });
 document.addEventListener('languagechange', renderAll);
 
-loadCategories();
+loadLabels();
 loadProducts();
