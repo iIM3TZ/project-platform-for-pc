@@ -39,6 +39,27 @@
     "noImage": "No image",
     "notAvailable": "Not available right now"
   },
+  "filters": {
+    "title": "Filters",
+    "chosen": "Chosen filters",
+    "brand": "Brand",
+    "store": "Store",
+    "price": "Price (SAR)",
+    "priceMin": "From",
+    "priceMax": "To",
+    "atLeast": "At least",
+    "any": "Any",
+    "yes": "Yes",
+    "no": "No",
+    "chipset": "Chipset",
+    "cpuName": "Processor",
+    "chipMin": "{label}: {value} or more",
+    "chipPriceMin": "Price: from {value}",
+    "chipPriceMax": "Price: up to {value}",
+    "remove": "Remove filter: {filter}",
+    "clearAll": "Clear all filters",
+    "noMatch": "No parts match these filters."
+  },
   "language": {
     "switchTo": "العربية",
     "switchLabel": "Switch language to Arabic"

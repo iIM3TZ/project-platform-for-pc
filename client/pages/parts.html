@@ -29,8 +29,20 @@
       </div>
     </div>
 
-    <div id="parts-state" class="state" role="status"></div>
-    <div id="parts-grid" class="card-grid"></div>
+    <div class="parts-layout">
+      <aside>
+        <details class="filters-box" id="filters">
+          <summary id="filters-summary"></summary>
+          <div class="filters-body" id="filters-body"></div>
+        </details>
+      </aside>
+
+      <section class="parts-results" data-i18n-aria-label="filters.title">
+        <ul class="chips" id="chips" data-i18n-aria-label="filters.chosen" hidden></ul>
+        <div id="parts-state" class="state" role="status"></div>
+        <div id="parts-grid" class="card-grid"></div>
+      </section>
+    </div>
   </main>
 </body>
 </html>

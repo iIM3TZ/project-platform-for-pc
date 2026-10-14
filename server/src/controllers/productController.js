@@ -20,6 +20,8 @@ function readListFilters(query) {
 }
 
 // GET /api/products?category=gpu&q=4060
+// Each part comes with its specs and the ids of the stores that have it in stock,
+// so the Parts page can filter in the browser.
 async function listProducts(req, res) {
   const { filters, error } = readListFilters(req.query);
   if (error) {
@@ -39,6 +41,7 @@ async function listProducts(req, res) {
     return {
       ...product,
       store_count: storesInStock.size,
+      store_ids: [...storesInStock],
       cheapest: pricing.summarizeOffer(pricing.pickCheapest(productOffers)),
       most_trusted: pricing.summarizeOffer(pricing.pickMostTrusted(productOffers)),
     };

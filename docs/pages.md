@@ -52,6 +52,11 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 
 - Category tabs or select, filters for the chosen category (e.g. socket for CPUs, `chip_brand` and VRAM for GPUs, resolution and panel for monitors), and price range.
 - Filters for every category: **brand** (ASUS, MSI, Gigabyte..., from the brands of the parts in that category) and **store** (show only parts with an offer in the chosen stores).
+- **How the filters work**: a panel next to the results (a collapsible "Filters" box above them on phones). The API sends each part with its specs and the ids of the stores that have it in stock, and the page filters in the browser, so results change instantly. Options are the values found in the parts of the chosen category, so the list never offers something with no parts.
+  - Every category: brand, store and price range (on the cheapest total).
+  - By category (`client/js/filterConfig.js`): a pick-list for fields with fixed values (socket, chipset, RAM type, resolution, panel...), "at least" for numbers (cores, VRAM, RAM, capacity, refresh rate...), and yes/no for flags (Wi-Fi, wireless, microphone...). Prebuilt PCs: CPU, GPU chipset, RAM and storage. CPU names are compared ignoring case, spaces and the brand word.
+  - A part that does not have a field cannot match a filter on it.
+  - Changing the category clears the filters.
 - Results as cards: image, name, brand, in how many stores it is available, and two prices:
   - **Cheapest**: the lowest total price (price + shipping) and its store.
   - **Most trusted**: the best offer from the most trusted seller (see "Most trusted offer" below) and its store. If it is also the cheapest, the card shows one price with both labels.

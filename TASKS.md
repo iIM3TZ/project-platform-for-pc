@@ -23,7 +23,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 ## Phase 2: Compare
 - [x] Home page and navigation: top bar (page links, search bar, language switch, light/dark toggle) and a hamburger menu (account and the same page links)
 - [x] Parts listing page with search results (by name, brand or model)
-- [ ] Category-specific filters (Prebuilt PCs: CPU name, GPU chipset, RAM and storage, also set from the link `parts.html?category=prebuilt&cpu_name=...&gpu_chipset=...`)
+- [x] Category-specific filters (Prebuilt PCs: CPU name, GPU chipset, RAM and storage, also set from the link `parts.html?category=prebuilt&cpu_name=...&gpu_chipset=...`)
 - [ ] Sort parts by newest or oldest, "Added" filter (today, last 2 days, last 3 days) and an "Added today" badge on parts added today
 - [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best offer
 
