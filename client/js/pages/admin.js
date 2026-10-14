@@ -260,6 +260,31 @@ async function loadImages() {
   renderImageOptions();
 }
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // the same limit as the server
+
+// A picture chosen from anywhere on the computer is copied into the folder by the server
+async function uploadImage(file) {
+  const message = $('product-image-message');
+  if (file.size > MAX_IMAGE_BYTES) {
+    showMessage(message, t('admin.imageTooBig'), 'error');
+    return;
+  }
+
+  showMessage(message, t('admin.imageUploading'));
+  $('product-image-upload').disabled = true;
+  try {
+    const { path } = await api.uploadProductImage(file);
+    $('product-image').value = path;
+    await loadImages();
+    syncImageField();
+    showMessage(message, t('admin.imageUploaded'), 'success');
+  } catch (err) {
+    showMessage(message, err.status === 413 ? t('admin.imageTooBig') : t('admin.imageUploadFailed'), 'error');
+  } finally {
+    $('product-image-upload').disabled = false;
+  }
+}
+
 function syncImageField() {
   renderImageOptions();
   renderImagePreview();
@@ -278,6 +303,7 @@ function resetProductForm() {
   const form = $('product-form');
   form.reset();
   clearErrors(form);
+  showMessage($('product-image-message'), '');
   syncImageField();
   renderSpecFields('');
   renderProductFormTitle();
@@ -612,6 +638,12 @@ async function start() {
     renderImagePreview();
   });
   $('product-image').addEventListener('input', syncImageField);
+  $('product-image-upload').addEventListener('click', () => $('product-image-file').click());
+  $('product-image-file').addEventListener('change', (e) => {
+    const [file] = e.target.files;
+    e.target.value = ''; // so choosing the same file again still works
+    if (file) uploadImage(file);
+  });
   loadImages();
   $('product-form').addEventListener('submit', saveProduct);
   $('product-cancel').addEventListener('click', () => {

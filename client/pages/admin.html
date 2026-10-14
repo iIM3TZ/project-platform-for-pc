@@ -59,11 +59,17 @@
             <div class="admin-image-row">
               <div class="admin-image-preview" id="product-image-preview"></div>
               <div class="admin-image-inputs">
-                <select class="select" id="product-image-pick" data-i18n-aria-label="admin.imagePick"></select>
+                <div class="admin-image-pickers">
+                  <select class="select" id="product-image-pick" data-i18n-aria-label="admin.imagePick"></select>
+                  <button class="btn btn-secondary" type="button" id="product-image-upload" data-i18n="admin.imageUpload"></button>
+                  <input class="visually-hidden" id="product-image-file" type="file" tabindex="-1"
+                         accept="image/jpeg,image/png,image/webp,image/avif,image/gif">
+                </div>
                 <input class="input" id="product-image" name="image_url" type="text" dir="ltr">
               </div>
             </div>
             <span class="field-hint" data-i18n="admin.imageHint"></span>
+            <span class="admin-form-message" id="product-image-message" role="status"></span>
           </div>
         </div>
 

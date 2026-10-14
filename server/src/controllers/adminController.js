@@ -3,7 +3,7 @@ const categoryModel = require('../models/categoryModel');
 const productModel = require('../models/productModel');
 const offerModel = require('../models/offerModel');
 const storeModel = require('../models/storeModel');
-const { listProductImages } = require('../services/productImages');
+const { listProductImages, saveProductImage } = require('../services/productImages');
 const { validateProduct, validateOffer, TRUSTED_MIN_RATING, TRUSTED_MIN_REVIEWS } = require('../services/adminValidation');
 
 const MAX_SELLERS_PER_STORE = 2;
@@ -26,6 +26,16 @@ function getSpecFields(req, res) {
 // GET /api/admin/product-images: the pictures in client/images/products, to pick one in the part form
 async function listImages(req, res) {
   res.json({ data: await listProductImages() });
+}
+
+// POST /api/admin/product-images?name=photo.jpg with the picture itself as the body.
+// The picture is copied into client/images/products and its path is returned.
+async function uploadImage(req, res) {
+  const { path: imagePath, error } = await saveProductImage(req.query.name, req.body);
+  if (error) {
+    return res.status(400).json({ error: { message: error } });
+  }
+  res.status(201).json({ data: { path: imagePath } });
 }
 
 // ---------- Products ----------
@@ -146,6 +156,7 @@ async function updateOffer(req, res) {
 module.exports = {
   getSpecFields,
   listImages,
+  uploadImage,
   listProducts,
   getProduct,
   createProduct,
