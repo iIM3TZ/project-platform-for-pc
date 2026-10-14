@@ -174,3 +174,14 @@
   gap: var(--space-2);
   min-inline-size: 0;
 }
+
+.admin-image-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.admin-image-pickers .select {
+  flex: 1;
+  min-inline-size: min(100%, 200px);
+}

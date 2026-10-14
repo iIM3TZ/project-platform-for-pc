@@ -9,9 +9,13 @@ export class ApiError extends Error {
   }
 }
 
-async function request(path, { method = 'GET', body } = {}) {
+// body: an object sent as JSON. file: a File sent as it is (for picture uploads).
+async function request(path, { method = 'GET', body, file } = {}) {
   const options = { method, headers: {} };
-  if (body !== undefined) {
+  if (file) {
+    options.headers['Content-Type'] = file.type;
+    options.body = file;
+  } else if (body !== undefined) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);
   }
@@ -50,6 +54,8 @@ export function getProducts(filters = {}) {
 
 export const getSpecFields = () => request('/admin/spec-fields');
 export const getProductImages = () => request('/admin/product-images');
+export const uploadProductImage = (file) =>
+  request(`/admin/product-images?name=${encodeURIComponent(file.name)}`, { method: 'POST', file });
 export const getAdminProducts = () => request('/admin/products');
 export const createProduct = (product) => request('/admin/products', { method: 'POST', body: product });
 export const updateProduct = (id, product) => request(`/admin/products/${id}`, { method: 'PUT', body: product });
