@@ -41,10 +41,16 @@ function pageTitle() {
   return t('parts.allParts');
 }
 
-// Cheapest first (parts with no available offer last), or by name
+// Cheapest first (parts with no available offer last), by name, or by the date added to the site
 function sortedProducts(products) {
   const byName = (a, b) => a.name.localeCompare(b.name, getLanguage());
   if (state.sort === 'name') return products.sort(byName);
+
+  if (state.sort === 'newest' || state.sort === 'oldest') {
+    const added = (product) => new Date(product.created_at).getTime() || 0;
+    const direction = state.sort === 'newest' ? -1 : 1;
+    return products.sort((a, b) => (added(a) === added(b) ? byName(a, b) : direction * (added(a) - added(b))));
+  }
 
   const price = (product) => product.cheapest?.total_sar ?? Infinity;
   return products.sort((a, b) => (price(a) === price(b) ? byName(a, b) : price(a) - price(b)));

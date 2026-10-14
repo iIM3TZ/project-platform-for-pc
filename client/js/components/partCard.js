@@ -3,6 +3,7 @@
 
 import { t, formatPrice } from '/js/i18n.js';
 import { el } from '/js/components/dom.js';
+import { isAddedToday } from '/js/addedDate.js';
 
 function priceLine(badges, offer) {
   return el('p', { class: 'part-card-price' },
@@ -35,6 +36,7 @@ export function createPartCard(product) {
   }
 
   return el('a', { class: 'card part-card', href: `/pages/part.html?id=${product.id}` },
+    isAddedToday(product.created_at) && el('span', { class: 'badge badge-warning part-card-new', text: t('parts.addedToday') }),
     media,
     el('p', { class: 'part-card-brand text-muted', text: product.brand }),
     el('h3', { class: 'card-title', text: product.name }),

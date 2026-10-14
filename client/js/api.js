@@ -49,6 +49,7 @@ export function getProducts(filters = {}) {
 // ---------- Admin ----------
 
 export const getSpecFields = () => request('/admin/spec-fields');
+export const getProductImages = () => request('/admin/product-images');
 export const getAdminProducts = () => request('/admin/products');
 export const createProduct = (product) => request('/admin/products', { method: 'POST', body: product });
 export const updateProduct = (id, product) => request(`/admin/products/${id}`, { method: 'PUT', body: product });
