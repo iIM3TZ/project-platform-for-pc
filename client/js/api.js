@@ -36,6 +36,16 @@ async function request(path, { method = 'GET', body } = {}) {
 export const getCategories = () => request('/categories');
 export const getStores = () => request('/stores');
 
+// filters: { category: 'gpu', q: '4060' }; empty values are left out
+export function getProducts(filters = {}) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) query.set(key, value);
+  }
+  const text = query.toString();
+  return request(text ? `/products?${text}` : '/products');
+}
+
 // ---------- Admin ----------
 
 export const getSpecFields = () => request('/admin/spec-fields');

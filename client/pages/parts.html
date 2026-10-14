@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>القطع</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/parts.css">
+  <script type="module" src="/js/pages/parts.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container parts">
+    <h1 id="parts-title"></h1>
+    <p class="text-muted" id="parts-count" aria-live="polite"></p>
+
+    <div class="parts-toolbar">
+      <div class="field">
+        <label for="category-select" data-i18n="parts.category"></label>
+        <select class="select" id="category-select"></select>
+      </div>
+      <div class="field">
+        <label for="sort-select" data-i18n="parts.sort"></label>
+        <select class="select" id="sort-select">
+          <option value="price" data-i18n="parts.sortPrice"></option>
+          <option value="name" data-i18n="parts.sortName"></option>
+        </select>
+      </div>
+    </div>
+
+    <div id="parts-state" class="state" role="status"></div>
+    <div id="parts-grid" class="card-grid"></div>
+  </main>
+</body>
+</html>

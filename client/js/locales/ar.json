@@ -25,6 +25,20 @@
     "compare": "قارن الأسعار",
     "categories": "تصفح حسب القسم"
   },
+  "parts": {
+    "allParts": "كل القطع",
+    "resultsFor": "نتائج البحث عن «{q}»",
+    "count": "{count} قطعة",
+    "category": "القسم",
+    "allCategories": "كل الأقسام",
+    "sort": "الترتيب",
+    "sortPrice": "الأرخص أولاً",
+    "sortName": "الاسم",
+    "noMatch": "ما لقينا قطع مطابقة.",
+    "showAll": "عرض كل القطع",
+    "noImage": "بدون صورة",
+    "notAvailable": "غير متوفرة حالياً"
+  },
   "language": {
     "switchTo": "English",
     "switchLabel": "تغيير اللغة إلى الإنجليزية"

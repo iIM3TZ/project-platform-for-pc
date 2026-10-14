@@ -1,0 +1,14 @@
+.parts {
+  padding-block: var(--space-6);
+}
+
+.parts-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-block: var(--space-4) var(--space-5);
+}
+
+.parts-toolbar .field {
+  min-inline-size: min(100%, 200px);
+}
