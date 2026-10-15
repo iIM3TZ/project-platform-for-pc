@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>القطعة</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/part.css">
+  <script type="module" src="/js/pages/part.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container part">
+    <div id="part-state" class="state" role="status"></div>
+
+    <article id="part" hidden>
+      <nav class="part-crumbs" data-i18n-aria-label="part.crumbs">
+        <a href="/pages/parts.html" data-i18n="nav.parts"></a>
+        <span aria-hidden="true">/</span>
+        <a id="part-category"></a>
+      </nav>
+
+      <div class="part-top">
+        <div class="card-media part-media" id="part-media"></div>
+
+        <div class="part-info">
+          <span class="badge badge-warning" id="part-new" data-i18n="parts.addedToday" hidden></span>
+          <p class="text-muted part-brand" id="part-brand"></p>
+          <h1 id="part-name"></h1>
+          <p class="text-muted" id="part-model"></p>
+
+          <div class="part-picks" id="part-picks"></div>
+
+          <button class="btn btn-secondary" type="button" id="stores-toggle"
+                  aria-expanded="false" aria-controls="stores-panel"></button>
+        </div>
+      </div>
+
+      <section class="part-stores" id="stores-panel" hidden aria-labelledby="stores-title">
+        <div class="part-stores-head">
+          <h2 id="stores-title" data-i18n="part.storesTitle"></h2>
+          <div class="field">
+            <label for="stores-sort" data-i18n="part.sortBy"></label>
+            <select class="select" id="stores-sort">
+              <option value="total" data-i18n="part.sortTotal"></option>
+              <option value="delivery" data-i18n="part.sortDelivery"></option>
+              <option value="trust" data-i18n="part.sortTrust"></option>
+            </select>
+          </div>
+        </div>
+        <div class="store-list" id="store-list"></div>
+      </section>
+
+      <section class="part-specs" aria-labelledby="specs-title">
+        <h2 id="specs-title" data-i18n="part.specs"></h2>
+        <div class="table-wrap">
+          <table class="table">
+            <tbody id="specs-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </article>
+  </main>
+</body>
+</html>

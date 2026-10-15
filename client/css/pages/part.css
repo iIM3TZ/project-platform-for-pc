@@ -1,0 +1,188 @@
+.part {
+  padding-block: var(--space-5) var(--space-7);
+}
+
+.part-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-end: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Phones: picture on top; wide screens: picture beside the details */
+.part-top {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 800px) {
+  .part-top {
+    grid-template-columns: minmax(240px, 380px) 1fr;
+    align-items: start;
+  }
+}
+
+.part-media {
+  margin: 0;
+}
+
+.part-info {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  justify-items: start;
+}
+
+.part-info h1,
+.part-info p {
+  margin: 0;
+}
+
+.part-brand {
+  font-weight: 600;
+}
+
+.part-picks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: var(--space-3);
+  justify-self: stretch;
+  margin-block: var(--space-3);
+}
+
+.part-pick {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.part-pick p {
+  margin: 0;
+}
+
+.part-pick-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.part-pick-price {
+  font-size: var(--text-2xl);
+}
+
+/* ---------- Stores ---------- */
+
+.part-stores,
+.part-specs {
+  margin-block-start: var(--space-6);
+}
+
+.part-stores-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-end: var(--space-3);
+}
+
+.part-stores-head h2 {
+  margin: 0;
+}
+
+.store-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.store-row {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+/* The store with the cheapest offer stands out */
+.store-row.is-best {
+  border-color: var(--color-success);
+  border-width: 2px;
+}
+
+.store-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+}
+
+.store-name {
+  font-weight: 700;
+}
+
+.store-price {
+  margin-inline-start: auto;
+}
+
+.store-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.store-body .alert {
+  margin: 0;
+}
+
+.offer-row {
+  display: grid;
+  gap: var(--space-3);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.offer-row.is-out-of-stock {
+  opacity: 0.7;
+}
+
+.offer-seller,
+.offer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.offer-actions {
+  justify-content: space-between;
+}
+
+.offer-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.offer-fact dt {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.offer-fact dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Specs ---------- */
+
+.part-specs th {
+  inline-size: 40%;
+}
+
+.part-specs td .field-hint {
+  margin: var(--space-1) 0 0;
+}

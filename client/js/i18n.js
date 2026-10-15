@@ -92,6 +92,13 @@ export function initLanguage() {
   return setLanguage(LANGUAGES[stored] ? stored : DEFAULT_LANGUAGE);
 }
 
+// A date such as "15 Oct 2026", in the current language
+export function formatDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(LANGUAGES[currentLanguage].locale, { dateStyle: 'medium' }).format(date);
+}
+
 // Prices are shown in SAR, formatted for the current language
 export function formatPrice(amount) {
   return new Intl.NumberFormat(LANGUAGES[currentLanguage].locale, {

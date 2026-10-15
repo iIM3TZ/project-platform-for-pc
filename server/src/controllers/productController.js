@@ -1,6 +1,7 @@
 const productModel = require('../models/productModel');
 const offerModel = require('../models/offerModel');
 const pricing = require('../services/pricing');
+const { SPEC_FIELDS } = require('../config/specFields');
 
 const MAX_SEARCH_LENGTH = 100;
 
@@ -50,13 +51,23 @@ async function listProducts(req, res) {
   res.json({ data });
 }
 
+// The specs as a list in the order of the category's fields (docs/categories.md), only the
+// fields that have a value. PostgreSQL stores JSONB keys in its own order, so the page
+// cannot rely on the order of `specs`.
+// translate: the value is a word to translate on the page (e.g. "excellent" -> "ممتاز")
+function specRows(category, specs) {
+  return (SPEC_FIELDS[category] || [])
+    .filter((field) => specs[field.key] !== undefined && specs[field.key] !== null)
+    .map((field) => ({ key: field.key, value: specs[field.key], translate: Boolean(field.translateOptions) }));
+}
+
 // GET /api/products/:id
 async function getProduct(req, res) {
   const product = await productModel.findById(req.id);
   if (!product) {
     return res.status(404).json({ error: { message: 'Product not found' } });
   }
-  res.json({ data: product });
+  res.json({ data: { ...product, spec_rows: specRows(product.category, product.specs) } });
 }
 
 // Groups offers by store. Each store gets its price range, its cheapest and most trusted

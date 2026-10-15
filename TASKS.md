@@ -25,12 +25,12 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [x] Parts listing page with search results (by name, brand or model)
 - [x] Category-specific filters (Prebuilt PCs: CPU name, GPU chipset, RAM and storage, also set from the link `parts.html?category=prebuilt&cpu_name=...&gpu_chipset=...`)
 - [x] Sort parts by newest or oldest, "Added" filter (today, last 2 days, last 3 days) and an "Added today" badge on parts added today
-- [ ] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best offer
+- [x] Part page: offers from all stores grouped by store (up to two trusted sellers per store, price range and best offer per store, total with shipping), sortable by total price, delivery time or trust score; highlight the best offer
 
 ## Phase 3: Accounts
-- [ ] Sign-up and sign-in pages (username + email + password; sign in with username or email; show/hide password)
+- [x] Sign-up and sign-in pages (username + email + password; sign in with username or email; show/hide password)
 - [ ] Account in the menu: "Log in" for guests; for signed-in users a square profile picture (first letter of the username), the username, an "Admin" badge for admins, and the Admin link only for admins
-- [ ] bcrypt password hashing, JWT in an httpOnly cookie
+- [x] bcrypt password hashing, JWT in an httpOnly cookie
 - [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
 
