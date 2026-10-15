@@ -11,7 +11,7 @@ const form = document.getElementById('auth-form');
 
 // The same rules as the server (server/src/services/authValidation.js), checked here first
 // so the user sees the problem without waiting
-const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
+const USERNAME_PATTERN = /^[A-Za-z0-9_]{2,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function checkForm({ username, email, password }) {

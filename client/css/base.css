@@ -674,6 +674,36 @@ img {
   text-align: center;
 }
 
+/* Signed in: a square with the first letter, the full username and the Admin badge */
+.menu-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.menu-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.menu-username {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: isolate;
+}
+
 /* The page behind the open menu does not scroll */
 .menu-is-open {
   overflow: hidden;

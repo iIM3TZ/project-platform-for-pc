@@ -86,7 +86,7 @@ CREATE INDEX price_history_offer_idx ON price_history (offer_id, recorded_at);
 
 CREATE TABLE users (
   id            SERIAL PRIMARY KEY,
-  username      TEXT NOT NULL CHECK (username ~ '^[A-Za-z0-9_]{3,20}$'),
+  username      TEXT NOT NULL CHECK (username ~ '^[A-Za-z0-9_]{2,20}$'),
   email         TEXT NOT NULL,
   password_hash TEXT NOT NULL,                  -- bcrypt hash, never the password itself
   role          TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
