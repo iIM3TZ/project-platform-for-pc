@@ -39,6 +39,8 @@ async function request(path, { method = 'GET', body, file } = {}) {
 
 export const getCategories = () => request('/categories');
 export const getStores = () => request('/stores');
+export const getProduct = (id) => request(`/products/${id}`);
+export const getProductOffers = (id) => request(`/products/${id}/offers`);
 
 // filters: { category: 'gpu', q: '4060' }; empty values are left out
 export function getProducts(filters = {}) {
@@ -49,6 +51,14 @@ export function getProducts(filters = {}) {
   const text = query.toString();
   return request(text ? `/products?${text}` : '/products');
 }
+
+// ---------- Accounts ----------
+
+export const signUp = (values) => request('/auth/register', { method: 'POST', body: values });
+export const signIn = (values) => request('/auth/login', { method: 'POST', body: values });
+export const signOut = () => request('/auth/logout', { method: 'POST' });
+// The signed-in user ({ id, username, email, role }), or null for a guest
+export const getMe = () => request('/auth/me');
 
 // ---------- Admin ----------
 

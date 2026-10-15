@@ -1,15 +1,18 @@
 const path = require('path');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const db = require('./config/db');
 const categoryRoutes = require('./routes/categoryRoutes');
 const storeRoutes = require('./routes/storeRoutes');
 const productRoutes = require('./routes/productRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const authRoutes = require('./routes/authRoutes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser()); // fills req.cookies (the sign-in token)
 
 // The style guide is a developer page: hide it on the live site
 if (process.env.NODE_ENV === 'production') {
@@ -39,6 +42,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use('/api', notFound);
 app.use(errorHandler);

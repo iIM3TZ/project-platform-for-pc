@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إنشاء حساب</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/auth.css">
+  <script type="module" src="/js/pages/signup.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container auth">
+    <div class="card auth-card">
+      <h1 data-i18n="auth.signUpTitle"></h1>
+
+      <div class="auth-signed-in" id="signed-in" hidden>
+        <p id="signed-in-text"></p>
+        <div class="auth-signed-in-actions">
+          <button class="btn btn-secondary" type="button" id="sign-out" data-i18n="nav.signOut"></button>
+          <a class="btn btn-ghost" href="/" data-i18n="auth.goHome"></a>
+        </div>
+      </div>
+
+      <form class="auth-form" id="auth-form" novalidate>
+        <p class="alert alert-danger auth-message" role="alert" hidden></p>
+
+        <div class="field">
+          <label for="username" data-i18n="auth.username"></label>
+          <input class="input" id="username" name="username" type="text" dir="ltr" maxlength="20"
+                 autocomplete="username" required aria-describedby="username-hint username-error">
+          <span class="field-hint" id="username-hint" data-i18n="auth.usernameHint"></span>
+          <span class="field-error" id="username-error" data-error-for="username"></span>
+        </div>
+
+        <div class="field">
+          <label for="email" data-i18n="auth.email"></label>
+          <input class="input" id="email" name="email" type="email" dir="ltr" maxlength="254"
+                 autocomplete="email" required aria-describedby="email-hint email-error">
+          <span class="field-hint" id="email-hint" data-i18n="auth.emailHint"></span>
+          <span class="field-error" id="email-error" data-error-for="email"></span>
+        </div>
+
+        <div class="field">
+          <label for="password" data-i18n="auth.password"></label>
+          <div class="password-field">
+            <input class="input" id="password" name="password" type="password" dir="ltr"
+                   autocomplete="new-password" required aria-describedby="password-hint password-error">
+            <button class="password-toggle" type="button"></button>
+          </div>
+          <span class="field-hint" id="password-hint" data-i18n="auth.passwordHint"></span>
+          <span class="field-error" id="password-error" data-error-for="password"></span>
+        </div>
+
+        <button class="btn btn-primary auth-submit" type="submit" data-i18n="auth.signUpButton"></button>
+      </form>
+
+      <p class="auth-switch" id="auth-switch">
+        <span data-i18n="auth.haveAccount"></span>
+        <a id="switch-link" href="/pages/signin.html" data-i18n="nav.signIn"></a>
+      </p>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/auth.css">
+  <script type="module" src="/js/pages/signin.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container auth">
+    <div class="card auth-card">
+      <h1 data-i18n="auth.signInTitle"></h1>
+
+      <div class="auth-signed-in" id="signed-in" hidden>
+        <p id="signed-in-text"></p>
+        <div class="auth-signed-in-actions">
+          <button class="btn btn-secondary" type="button" id="sign-out" data-i18n="nav.signOut"></button>
+          <a class="btn btn-ghost" href="/" data-i18n="auth.goHome"></a>
+        </div>
+      </div>
+
+      <form class="auth-form" id="auth-form" novalidate>
+        <p class="alert alert-danger auth-message" role="alert" hidden></p>
+
+        <div class="field">
+          <label for="login" data-i18n="auth.login"></label>
+          <input class="input" id="login" name="login" type="text" dir="ltr" maxlength="254"
+                 autocomplete="username" required aria-describedby="login-error">
+          <span class="field-error" id="login-error" data-error-for="login"></span>
+        </div>
+
+        <div class="field">
+          <label for="password" data-i18n="auth.password"></label>
+          <div class="password-field">
+            <input class="input" id="password" name="password" type="password" dir="ltr"
+                   autocomplete="current-password" required aria-describedby="password-error">
+            <button class="password-toggle" type="button"></button>
+          </div>
+          <span class="field-error" id="password-error" data-error-for="password"></span>
+        </div>
+
+        <button class="btn btn-primary auth-submit" type="submit" data-i18n="auth.signInButton"></button>
+      </form>
+
+      <p class="auth-switch" id="auth-switch">
+        <span data-i18n="auth.noAccount"></span>
+        <a id="switch-link" href="/pages/signup.html" data-i18n="nav.signUp"></a>
+      </p>
+    </div>
+  </main>
+</body>
+</html>

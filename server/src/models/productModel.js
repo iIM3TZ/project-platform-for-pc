@@ -22,7 +22,7 @@ async function findAll({ category = null, q = null } = {}) {
 
 async function findById(id) {
   const result = await db.query(
-    `SELECT p.id, p.brand, p.name, p.model, p.image_url, p.specs,
+    `SELECT p.id, p.brand, p.name, p.model, p.image_url, p.specs, p.created_at,
             c.slug AS category, c.name_ar AS category_name_ar, c.name_en AS category_name_en
      FROM products p
      JOIN categories c ON c.id = p.category_id
