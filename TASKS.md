@@ -29,7 +29,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 
 ## Phase 3: Accounts
 - [x] Sign-up and sign-in pages (username + email + password; sign in with username or email; show/hide password)
-- [ ] Account in the menu: "Log in" for guests; for signed-in users a square profile picture (first letter of the username), the username, an "Admin" badge for admins, and the Admin link only for admins
+- [x] Account in the menu: "Log in" for guests; for signed-in users a square profile picture (first letter of the username), the username, an "Admin" badge for admins, and the Admin link only for admins
 - [x] bcrypt password hashing, JWT in an httpOnly cookie
 - [ ] Auth middleware to protect routes, and `requireAdmin` for admin-only routes (user roles: `user` / `admin`)
 - [ ] Protect the admin page and all admin API routes with `requireAdmin`; users list in the admin page to give or remove admin access
@@ -40,7 +40,7 @@ Deployment happens right after Phase 4. Later phases are improvements on a live 
 - [ ] Peripherals section and its warnings (monitor vs GPU, ports)
 - [ ] Ready-made PC suggestion in the Build page: when the build has a CPU and a GPU, show a card with the cheapest prebuilt PC price with the same CPU and GPU (and at least the same RAM and storage) and the difference from the build total; clicking it opens the Parts page on the Prebuilt PCs category filtered by that CPU and GPU
 - [ ] Live build total (sticky bar) that updates instantly when a part is added, removed or changed; the cheapest offer is used unless the user picked another
-- [ ] Saving builds; guest builds in localStorage moved to the account after sign-in
+- [ ] Builds bar in the Build page (no separate "My builds" page): a tab per build, "+" for a new build, rename, duplicate and delete (only by the user, with a confirmation); every change saved right away, guests in localStorage moved to the account after sign-in
 - [ ] My list ("قائمتي", separate from builds): add single offers from the part page or a whole build, links grouped by store, total cost, longest delivery time; guests in localStorage, moved to the account after sign-in
 
 ## Deploy (right after Phase 4)

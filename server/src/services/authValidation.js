@@ -1,6 +1,6 @@
 // Checks the sign-up and sign-in forms. Returns { value } with clean values, or { errors } by field.
 
-const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/; // the same rule as the users table
+const USERNAME_PATTERN = /^[A-Za-z0-9_]{2,20}$/; // the same rule as the users table
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 8;
 const MAX_PASSWORD_BYTES = 72; // bcrypt ignores anything after 72 bytes
@@ -14,7 +14,7 @@ function validateSignUp(input = {}) {
   const errors = {};
 
   if (!USERNAME_PATTERN.test(username)) {
-    errors.username = 'must be 3 to 20 English letters, numbers or _';
+    errors.username = 'must be 2 to 20 English letters, numbers or _';
   }
   if (email.length > 254 || !EMAIL_PATTERN.test(email)) {
     errors.email = 'must be a valid email';

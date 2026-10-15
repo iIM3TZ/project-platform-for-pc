@@ -13,7 +13,6 @@ Design details come later (Phase 2); this file is about content and actions.
 | Build         | جمّع جهازك            | `build.html`          | everyone (guests save in localStorage) |
 | My list       | قائمتي                | `my-list.html`        | everyone |
 | Sign up / in  | التسجيل / الدخول      | `signup.html`, `signin.html` | everyone |
-| My builds     | تجميعاتي              | `my-builds.html`      | signed-in users |
 | Admin         | لوحة الأدمن           | `admin.html`          | admins only |
 
 Later: price alerts and notifications (Phase 6).
@@ -32,7 +31,7 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 ### Menu (hamburger)
 - **Account** at the top:
   - Guests: a **"تسجيل الدخول" / "Log in"** button, and Sign up under it.
-  - Signed in: a **square profile picture** with the username next to it; admins get an **"أدمن" / "Admin"** badge beside the name. Under it: My builds, Admin (shown only to admins, with the offer alerts count), and Sign out.
+  - Signed in: a **square profile picture** with the username next to it; admins get an **"أدمن" / "Admin"** badge beside the name. Under it: Admin (shown only to admins, with the offer alerts count), and Sign out.
   - Profile picture: for now a square with the first letter of the username (no upload). Uploading a real picture is a later task.
   - The Admin link and badge are only hidden for others; the admin page and its API are still protected on the server by `requireAdmin`.
 - **Pages**: Home, Parts, Build your PC, My list (the same links as the bar).
@@ -110,7 +109,12 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
   - Nothing shows when no prebuilt matches. The card can be closed and stays closed until the build's CPU or GPU changes.
 - **Budget bar** when the build has a budget: spent and remaining, and a warning when the total goes over the budget.
 - **"Share"** button: copies a link to the build. The link holds the chosen parts and offers (e.g. `build.html?parts=12:40,15:52`), so it works for guests too and opens a read-only copy that the visitor can save as their own.
-- Save button: guests save in localStorage; signed-in users save to their account (name, budget, purpose).
+- **Builds bar** at the top of the page (there is no separate "My builds" page): one tab per build the user has, e.g. "Gaming PC", "Cheaper version".
+  - The open tab is the **current build**; clicking another tab opens that build.
+  - A **"+"** button starts a new, empty build in a new tab. The other builds stay as they are.
+  - Each tab can be **renamed** (e.g. "Build 1" -> "Gaming PC"), **duplicated** (a copy in a new tab, to try other parts without changing the original) and **deleted**. A build is never removed by the site: it stays until the user deletes it, and deleting asks for confirmation first.
+  - Every change is saved to the current build right away (no save button): guests in localStorage, signed-in users in their account (name, budget, purpose, parts). After sign-in, a guest's builds move to the account.
+  - Each tab shows a small status dot: green when the build is ready, red when it has a compatibility error.
 - **"Add all to My list"** button: adds every part in the build, with its chosen offer, to My list. Works for a full build or a partial one (only the parts chosen so far).
 
 ## My list
@@ -126,19 +130,13 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 ## Sign up / Sign in
 
 - Sign up: **username**, email, password (with password rules shown, e.g. at least 8 characters).
-  - Username: unique, 3 to 20 characters, English letters, numbers and `_` only. It is the name shown on the site.
+  - Username: unique, 2 to 20 characters, English letters, numbers and `_` only. It is the name shown on the site.
   - Email is still needed for password reset and price alert emails.
 - Sign in: username **or** email, and password.
 - Show/hide password button (eye icon) on every password field.
 - Clear error messages: username already taken, email already used, and one message for a wrong sign-in ("wrong username/email or password"), without saying which part was wrong.
 - After sign-in, a guest build and My list in localStorage move to the account.
 - Later (Phase 6): "Forgot password" link that emails a reset link.
-
-## My builds
-
-- List of saved builds: name, purpose, total price, status (ready or not), last updated.
-- Open a build (goes to Build), rename it, **duplicate it** (a copy to try other parts without changing the original), or delete it.
-- Empty state with a link to Build.
 
 ## Admin
 
