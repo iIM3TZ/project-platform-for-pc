@@ -38,6 +38,8 @@
   --color-media-text: #5b6472;
   --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
   --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08);
+  --shadow-lift: 0 18px 40px -12px rgb(16 24 40 / 0.28);  /* a card that floats above the page */
+  --color-floor-shadow: rgb(16 24 40 / 0.25);             /* under a product on its white stage */
 
   /* Typography */
   --font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, 'Noto Sans Arabic', Arial, sans-serif;
@@ -97,6 +99,7 @@
   --color-focus: #ff9a5c;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+  --shadow-lift: 0 22px 50px -14px rgb(0 0 0 / 0.75);
   color-scheme: dark;
 }
 
@@ -126,6 +129,7 @@
     --color-focus: #ff9a5c;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+    --shadow-lift: 0 22px 50px -14px rgb(0 0 0 / 0.75);
     color-scheme: dark;
   }
 }

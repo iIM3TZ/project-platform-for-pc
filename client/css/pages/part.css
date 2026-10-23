@@ -15,6 +15,16 @@
 .part-top {
   display: grid;
   gap: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+@media (min-width: 600px) {
+  .part-top {
+    padding: var(--space-6);
+  }
 }
 
 @media (min-width: 800px) {
@@ -24,8 +34,49 @@
   }
 }
 
+/* The product stands on a white stage (photos come on white), the stage floats above the page,
+   and a soft oval shadow on the stage floor sits under the product */
+.part-stage {
+  padding: var(--space-3);
+}
+
 .part-media {
-  margin: 0;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  padding: var(--space-5) var(--space-5) 14%;
+  border-radius: var(--radius-lg);
+  background: var(--color-media-bg);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+}
+
+.part-media::after {
+  content: '';
+  position: absolute;
+  inset-inline: 16%;
+  inset-block-end: 7%;
+  block-size: 9%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--color-floor-shadow), transparent 70%);
+}
+
+.part-media img {
+  position: relative;
+  z-index: 1;
+  max-block-size: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.part-stage:hover .part-media img {
+  transform: translateY(-6px);
+}
+
+.part-media .card-media-empty {
+  align-self: center;
 }
 
 .part-info {
@@ -41,7 +92,34 @@
 }
 
 .part-brand {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--color-primary-text);
+}
+
+/* Key specs under the name: small label, value under it, an orange line at the start */
+.key-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+}
+
+.key-spec {
+  padding: var(--space-1) var(--space-3);
+  border-inline-start: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+}
+
+.key-spec dt {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.key-spec dd {
+  margin: 0;
+  font-weight: 700;
+  unicode-bidi: isolate;
 }
 
 .part-picks {
@@ -177,12 +255,43 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Specs ---------- */
+/* ---------- Specs: a grid of tiles ---------- */
 
-.part-specs th {
-  inline-size: 40%;
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-3);
+  margin: 0;
 }
 
-.part-specs td .field-hint {
+.spec-tile {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color 0.2s ease;
+}
+
+.spec-tile:hover {
+  border-color: var(--color-primary);
+}
+
+.spec-tile dt {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.spec-tile dd {
   margin: var(--space-1) 0 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  unicode-bidi: isolate;
+}
+
+.spec-tile .field-hint {
+  display: block;
+  margin-block-start: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 400;
 }

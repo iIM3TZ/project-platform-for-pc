@@ -22,13 +22,16 @@
       </nav>
 
       <div class="part-top">
-        <div class="card-media part-media" id="part-media"></div>
+        <div class="part-stage">
+          <div class="part-media" id="part-media"></div>
+        </div>
 
         <div class="part-info">
           <span class="badge badge-warning" id="part-new" data-i18n="parts.addedToday" hidden></span>
           <p class="text-muted part-brand" id="part-brand"></p>
           <h1 id="part-name"></h1>
           <p class="text-muted" id="part-model"></p>
+          <dl class="key-specs" id="key-specs"></dl>
 
           <div class="part-picks" id="part-picks"></div>
 
@@ -54,11 +57,7 @@
 
       <section class="part-specs" aria-labelledby="specs-title">
         <h2 id="specs-title" data-i18n="part.specs"></h2>
-        <div class="table-wrap">
-          <table class="table">
-            <tbody id="specs-body"></tbody>
-          </table>
-        </div>
+        <dl class="spec-grid" id="specs-body"></dl>
       </section>
     </article>
   </main>

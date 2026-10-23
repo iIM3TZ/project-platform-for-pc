@@ -22,6 +22,23 @@ const state = {
 // Labels in `specs` that carry examples for the admin form get a shorter label here
 const SHORT_LABELS = { chipset: 'filters.chipset', cpu_name: 'filters.cpuName' };
 
+// The few specs shown as chips under the name, by category (only the ones the part has)
+const KEY_SPECS = {
+  cpu: ['socket', 'cores', 'boost_clock_ghz', 'tdp_w'],
+  motherboard: ['socket', 'chipset', 'ram_type', 'form_factor'],
+  ram: ['capacity_gb', 'speed_mhz', 'ram_type'],
+  gpu: ['chipset', 'vram_gb', 'tdp_w', 'length_mm'],
+  storage: ['capacity_gb', 'type', 'read_mb_s'],
+  psu: ['wattage', 'rating', 'modular'],
+  case: ['supported_form_factors', 'max_gpu_length_mm'],
+  cooler: ['type', 'supported_sockets'],
+  monitor: ['size_in', 'resolution', 'refresh_hz', 'panel'],
+  mouse: ['wireless', 'weight_g', 'dpi'],
+  keyboard: ['layout', 'switch_type', 'wireless'],
+  headset: ['wireless', 'connection', 'microphone'],
+  prebuilt: ['cpu_name', 'gpu_chipset', 'ram_gb', 'storage_gb'],
+};
+
 // ---------- Rendering ----------
 
 function renderState() {
@@ -114,20 +131,36 @@ function specValue(row) {
   return String(row.value);
 }
 
+function specLabel(row) {
+  return t(SHORT_LABELS[row.key] || `specs.${row.key}`);
+}
+
+// One tile per spec: the name small, the value big
 function renderSpecs() {
-  const rows = state.product.spec_rows.map((row) => {
-    const value = el('td', {}, specValue(row));
+  const tiles = state.product.spec_rows.map((row) => {
+    const value = el('dd', {}, specValue(row));
     // Monitor panel types come with a short explanation (docs/categories.md)
-    if (row.key === 'panel') value.append(el('p', { class: 'field-hint', text: t(`panelHelp.${row.value}`) }));
-    return el('tr', {}, el('th', { scope: 'row', text: t(SHORT_LABELS[row.key] || `specs.${row.key}`) }), value);
+    if (row.key === 'panel') value.append(el('span', { class: 'field-hint', text: t(`panelHelp.${row.value}`) }));
+    return el('div', { class: 'spec-tile' }, el('dt', { text: specLabel(row) }), value);
   });
-  $('specs-body').replaceChildren(...rows);
+  $('specs-body').replaceChildren(...tiles);
+}
+
+function renderKeySpecs() {
+  const keys = KEY_SPECS[state.product.category] || [];
+  const chips = keys
+    .map((key) => state.product.spec_rows.find((row) => row.key === key))
+    .filter(Boolean)
+    .map((row) => el('div', { class: 'key-spec' }, el('dt', { text: specLabel(row) }), el('dd', { text: specValue(row) })));
+  $('key-specs').hidden = chips.length === 0;
+  $('key-specs').replaceChildren(...chips);
 }
 
 function renderAll() {
   renderState();
   if (state.status !== 'ready') return;
   renderHeader();
+  renderKeySpecs();
   renderPicks();
   renderStores();
   renderSpecs();
