@@ -128,6 +128,10 @@
     "signedInAs": "You are logged in as {username}.",
     "goHome": "Home"
   },
+  "forbidden": {
+    "title": "No access",
+    "text": "This page is for admins only."
+  },
   "language": {
     "switchTo": "العربية",
     "switchLabel": "Switch language to Arabic"
@@ -159,7 +163,23 @@
   },
   "admin": {
     "title": "Admin",
-    "localOnly": "This page is not protected yet. Sign-in protection comes in Phase 3, so only use it on your own computer.",
+    "usersTab": "Users",
+    "usersTitle": "Users and roles",
+    "usersHint": "Give or remove admin access. You cannot remove your own, so the site never ends up with no admin.",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "joined": "Joined",
+    "roleAdmin": "Admin",
+    "roleUser": "User",
+    "makeAdmin": "Make admin",
+    "removeAdmin": "Remove admin",
+    "you": "(you)",
+    "noUsers": "No users yet.",
+    "confirmMakeAdmin": "Give {username} admin access? They can add and edit parts and offers and change user roles.",
+    "confirmRemoveAdmin": "Remove admin access from {username}?",
+    "roleSaved": "{username}'s role was updated.",
+    "roleFailed": "Not updated. Reload the page and try again.",
     "productsTab": "Parts",
     "offersTab": "Offers",
     "newProduct": "Add a part",

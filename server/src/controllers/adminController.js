@@ -3,6 +3,7 @@ const categoryModel = require('../models/categoryModel');
 const productModel = require('../models/productModel');
 const offerModel = require('../models/offerModel');
 const storeModel = require('../models/storeModel');
+const userModel = require('../models/userModel');
 const { listProductImages, saveProductImage } = require('../services/productImages');
 const { validateProduct, validateOffer, TRUSTED_MIN_RATING, TRUSTED_MIN_REVIEWS } = require('../services/adminValidation');
 
@@ -153,6 +154,33 @@ async function updateOffer(req, res) {
   }
 }
 
+// ---------- Users ----------
+
+const ROLES = ['user', 'admin'];
+
+// GET /api/admin/users
+async function listUsers(req, res) {
+  res.json({ data: await userModel.findAllForAdmin() });
+}
+
+// PUT /api/admin/users/:id/role { role: 'admin' | 'user' }
+// An admin cannot remove their own admin role, so the site never ends up with no admin.
+async function updateUserRole(req, res) {
+  const { role } = req.body || {};
+  if (!ROLES.includes(role)) {
+    return sendValidationErrors(res, { role: 'must be user or admin' });
+  }
+  if (req.id === req.user.id && role !== 'admin') {
+    return res.status(400).json({ error: { message: 'You cannot remove your own admin role' } });
+  }
+
+  const user = await userModel.updateRole(req.id, role);
+  if (!user) {
+    return res.status(404).json({ error: { message: 'User not found' } });
+  }
+  res.json({ data: user });
+}
+
 module.exports = {
   getSpecFields,
   listImages,
@@ -164,4 +192,6 @@ module.exports = {
   listProductOffers,
   createOffer,
   updateOffer,
+  listUsers,
+  updateUserRole,
 };

@@ -72,3 +72,5 @@ export const updateProduct = (id, product) => request(`/admin/products/${id}`, {
 export const getAdminProductOffers = (productId) => request(`/admin/products/${productId}/offers`);
 export const createOffer = (offer) => request('/admin/offers', { method: 'POST', body: offer });
 export const updateOffer = (id, offer) => request(`/admin/offers/${id}`, { method: 'PUT', body: offer });
+export const getAdminUsers = () => request('/admin/users');
+export const setUserRole = (id, role) => request(`/admin/users/${id}/role`, { method: 'PUT', body: { role } });

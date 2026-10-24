@@ -1,12 +1,15 @@
 import * as api from '/js/api.js';
-import { initLanguage, toggleLanguage, getLanguage, t } from '/js/i18n.js';
-import { initTheme, toggleTheme, getTheme } from '/js/theme.js';
+import { initLanguage, getLanguage, t, formatDate } from '/js/i18n.js';
+import { initTheme } from '/js/theme.js';
+import { initNavbar } from '/js/components/navbar.js';
 
 const state = {
   specFields: {},        // category slug -> list of field definitions (from the server)
   trustedSeller: null,   // { min_rating, min_reviews }
   categories: [],
   stores: [],
+  users: [],
+  me: null,              // the signed-in admin (an admin cannot remove their own role)
   images: [],            // paths of the pictures in client/images/products
   products: [],
   offers: [],
@@ -85,7 +88,7 @@ function addErrorSlots(form) {
 // ---------- Tabs ----------
 
 function selectTab(name) {
-  for (const tab of ['products', 'offers']) {
+  for (const tab of ['products', 'offers', 'users']) {
     const selected = tab === name;
     $(`tab-${tab}`).setAttribute('aria-selected', String(selected));
     $(`panel-${tab}`).hidden = !selected;
@@ -397,6 +400,69 @@ async function loadProducts() {
   renderOfferProductOptions();
 }
 
+// ---------- Users ----------
+
+function roleButton(user) {
+  if (state.me && user.id === state.me.id) {
+    return el('span', { class: 'text-muted', text: t('admin.you') });
+  }
+  const makeAdmin = user.role !== 'admin';
+  return el('button', {
+    class: makeAdmin ? 'btn btn-secondary btn-sm' : 'btn btn-danger btn-sm',
+    type: 'button',
+    text: t(makeAdmin ? 'admin.makeAdmin' : 'admin.removeAdmin'),
+    onclick: () => changeRole(user, makeAdmin ? 'admin' : 'user'),
+  });
+}
+
+function renderUsersList() {
+  const container = $('users-list');
+  if (state.users.length === 0) {
+    container.replaceChildren(el('p', { class: 'state', text: t('admin.noUsers') }));
+    return;
+  }
+
+  const rows = state.users.map((user) => el('tr', {},
+    el('td', {}, el('bdi', { text: user.username })),
+    el('td', {}, el('bdi', { text: user.email })),
+    el('td', {}, el('span', {
+      class: user.role === 'admin' ? 'badge badge-primary' : 'badge',
+      text: t(user.role === 'admin' ? 'admin.roleAdmin' : 'admin.roleUser'),
+    })),
+    el('td', { text: formatDate(user.created_at) }),
+    el('td', { class: 'admin-row-actions' }, roleButton(user))));
+
+  container.replaceChildren(el('div', { class: 'table-wrap' },
+    el('table', { class: 'table' },
+      el('thead', {}, el('tr', {},
+        el('th', { text: t('admin.username') }),
+        el('th', { text: t('admin.email') }),
+        el('th', { text: t('admin.role') }),
+        el('th', { text: t('admin.joined') }),
+        el('th', {}, el('span', { class: 'visually-hidden', text: t('admin.role') })))),
+      el('tbody', {}, ...rows))));
+}
+
+async function changeRole(user, role) {
+  const question = role === 'admin' ? 'admin.confirmMakeAdmin' : 'admin.confirmRemoveAdmin';
+  if (!window.confirm(t(question, { username: user.username }))) return;
+
+  const message = $('users-message');
+  try {
+    const updated = await api.setUserRole(user.id, role);
+    state.users = state.users.map((item) => (item.id === updated.id ? updated : item));
+    renderUsersList();
+    showMessage(message, t('admin.roleSaved', { username: updated.username }), 'success');
+  } catch {
+    showMessage(message, t('admin.roleFailed'), 'error');
+  }
+}
+
+async function loadUsers() {
+  state.users = await api.getAdminUsers();
+  renderUsersList();
+}
+
 // ---------- Offers ----------
 
 function renderOfferProductOptions() {
@@ -568,11 +634,7 @@ async function onOfferProductChange() {
   if (productId) await loadOffers(productId);
 }
 
-// ---------- Language and theme ----------
-
-function renderThemeButton() {
-  $('theme-toggle').textContent = getTheme() === 'dark' ? t('theme.toLight') : t('theme.toDark');
-}
+// ---------- Language ----------
 
 // Text built in code is redrawn after a language change; spec values the admin typed are kept
 function rerenderForLanguage() {
@@ -588,7 +650,7 @@ function rerenderForLanguage() {
   renderOfferFormTitle();
   updateSellerWarning();
   renderImageOptions();
-  renderThemeButton();
+  renderUsersList();
 }
 
 // ---------- Start ----------
@@ -596,14 +658,11 @@ function rerenderForLanguage() {
 async function start() {
   initTheme();
   await initLanguage();
-  renderThemeButton();
-
-  $('language-toggle').addEventListener('click', toggleLanguage);
-  $('theme-toggle').addEventListener('click', toggleTheme);
+  initNavbar(); // the same top bar and menu as the rest of the site (language and theme are in it)
   document.addEventListener('languagechange', rerenderForLanguage);
-  document.addEventListener('themechange', renderThemeButton);
   $('tab-products').addEventListener('click', () => selectTab('products'));
   $('tab-offers').addEventListener('click', () => selectTab('offers'));
+  $('tab-users').addEventListener('click', () => selectTab('users'));
 
   try {
     const [specData, categories, stores] = await Promise.all([api.getSpecFields(), api.getCategories(), api.getStores()]);
@@ -611,7 +670,8 @@ async function start() {
     state.trustedSeller = specData.trusted_seller;
     state.categories = categories;
     state.stores = stores;
-    await loadProducts();
+    state.me = await api.getMe();
+    await Promise.all([loadProducts(), loadUsers()]);
   } catch {
     $('load-error').hidden = false;
     return;

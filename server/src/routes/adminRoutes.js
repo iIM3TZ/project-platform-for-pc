@@ -1,11 +1,13 @@
 const express = require('express');
 const admin = require('../controllers/adminController');
 const { validateIdParam } = require('../middleware/validation');
+const { requireAdmin } = require('../middleware/auth');
 const { MAX_UPLOAD_BYTES } = require('../services/productImages');
 
-// Admin-only routes. Phase 3 adds requireAdmin here (router.use(requireAdmin));
-// until then they are only used on the local machine.
+// Admin-only routes: every one of them goes through requireAdmin first
+// (401 for guests, 403 for users who are not admins)
 const router = express.Router();
+router.use(requireAdmin);
 
 router.get('/spec-fields', admin.getSpecFields);
 router.get('/product-images', admin.listImages);
@@ -20,5 +22,8 @@ router.get('/products/:id/offers', validateIdParam, admin.listProductOffers);
 
 router.post('/offers', admin.createOffer);
 router.put('/offers/:id', validateIdParam, admin.updateOffer);
+
+router.get('/users', admin.listUsers);
+router.put('/users/:id/role', validateIdParam, admin.updateUserRole);
 
 module.exports = router;

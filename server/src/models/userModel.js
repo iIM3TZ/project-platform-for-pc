@@ -30,4 +30,22 @@ async function findById(id) {
   return result.rows[0] || null;
 }
 
-module.exports = { create, findForSignIn, findById };
+// ---------- Admin ----------
+
+async function findAllForAdmin() {
+  const result = await db.query(
+    `SELECT ${PUBLIC_COLUMNS}, created_at FROM users ORDER BY created_at`
+  );
+  return result.rows;
+}
+
+// Returns the updated user, or null when there is no user with this id
+async function updateRole(id, role) {
+  const result = await db.query(
+    `UPDATE users SET role = $2 WHERE id = $1 RETURNING ${PUBLIC_COLUMNS}, created_at`,
+    [id, role]
+  );
+  return result.rows[0] || null;
+}
+
+module.exports = { create, findForSignIn, findById, findAllForAdmin, updateRole };

@@ -122,7 +122,8 @@ function userAccount(user) {
 }
 
 function renderAccount(section, user) {
-  section.replaceChildren(...(user ? userAccount(user) : guestAccount()));
+  // filter(Boolean) drops the parts that are not shown (e.g. the Admin link for a non-admin is `false`)
+  section.replaceChildren(...(user ? userAccount(user) : guestAccount()).filter(Boolean));
   section.querySelectorAll('a[href]').forEach((link) => {
     if (new URL(link.href).pathname === location.pathname) link.setAttribute('aria-current', 'page');
   });
