@@ -40,9 +40,9 @@
   --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08);
   --shadow-lift: 0 18px 40px -12px rgb(16 24 40 / 0.28);  /* a card that floats above the page */
   --color-floor-shadow: rgb(16 24 40 / 0.25);             /* under a product on its white stage */
-  /* Decorative orange dots and glow behind the home page hero */
-  --color-dots: rgb(196 60 0 / 0.16);
-  --color-page-glow: rgb(196 60 0 / 0.08);
+  /* Decorative orange dots and glow at the top of some pages (.page-decor) */
+  --color-dots: rgb(196 60 0 / 0.14);
+  --color-page-glow: rgb(196 60 0 / 0.065);
   /* Build page 3D stage: dark in both themes, like a showroom */
   --color-stage-bg: #0b0d12;
   --color-stage-glow: rgb(255 122 41 / 0.22);
@@ -108,8 +108,8 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
   --shadow-lift: 0 22px 50px -14px rgb(0 0 0 / 0.75);
-  --color-dots: rgb(255 122 41 / 0.32);
-  --color-page-glow: rgb(255 122 41 / 0.12);
+  --color-dots: rgb(255 122 41 / 0.27);
+  --color-page-glow: rgb(255 122 41 / 0.095);
   color-scheme: dark;
 }
 
@@ -140,8 +140,8 @@
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
     --shadow-lift: 0 22px 50px -14px rgb(0 0 0 / 0.75);
-    --color-dots: rgb(255 122 41 / 0.32);
-    --color-page-glow: rgb(255 122 41 / 0.12);
+    --color-dots: rgb(255 122 41 / 0.27);
+    --color-page-glow: rgb(255 122 41 / 0.095);
     color-scheme: dark;
   }
 }
@@ -160,6 +160,9 @@ html {
 }
 
 body {
+  position: relative;
+  isolation: isolate; /* the dot band below stays behind the content */
+  min-block-size: 100vh;
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
@@ -736,8 +739,15 @@ img {
   color: var(--color-text);
 }
 
+.part-card {
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* The card lifts a little under the pointer */
 .part-card:hover {
   border-color: var(--color-primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
 }
 
 .part-card-brand {
@@ -759,4 +769,67 @@ img {
   inset-block-start: var(--space-5);
   inset-inline-start: var(--space-5);
   z-index: 1;
+}
+
+
+/* ---------- Page decoration (.page-decor on <main>) ----------
+   A field of small orange dots that fades out from the edge of the screen, and a soft orange glow,
+   behind the top of the page. Fainter in the light theme (tokens --color-dots, --color-page-glow).
+   The text side is the inline start: the right in Arabic, the left in English. */
+
+.page-decor {
+  position: relative;
+  isolation: isolate; /* keeps the decoration behind the content */
+}
+
+.page-decor::before,
+.page-decor::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(50% - 50vw); /* from the edge of the screen, not of the container */
+  z-index: -1;
+  inline-size: min(70vw, 900px);
+  block-size: 760px;
+  pointer-events: none;
+}
+
+.page-decor::before {
+  background-image: radial-gradient(var(--color-dots) 1px, transparent 1.2px);
+  background-size: 13px 13px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 0% 30%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 75% 65% at 0% 30%, #000 0%, transparent 72%);
+}
+
+.page-decor::after {
+  background: radial-gradient(ellipse 55% 50% at 8% 30%, var(--color-page-glow), transparent 70%);
+}
+
+:root[dir="rtl"] .page-decor::before {
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 100% 30%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 75% 65% at 100% 30%, #000 0%, transparent 72%);
+}
+
+:root[dir="rtl"] .page-decor::after {
+  background: radial-gradient(ellipse 55% 50% at 92% 30%, var(--color-page-glow), transparent 70%);
+}
+
+/* A band of orange dots along the bottom of every page, fading out towards the top.
+   Two layers: a dense grid of small dots, and a sparser grid of bigger dots on top of it, so some
+   dots look brighter than others, like LED lights. */
+body::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: -1;
+  block-size: 280px;
+  background-image:
+    radial-gradient(var(--color-dots) 1.5px, transparent 1.7px),
+    radial-gradient(var(--color-dots) 1px, transparent 1.2px);
+  background-size: 39px 26px, 13px 13px;
+  background-position: 0 6.5px, 0 0; /* each bigger dot sits exactly on a small one */
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  pointer-events: none;
 }

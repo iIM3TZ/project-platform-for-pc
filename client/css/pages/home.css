@@ -1,43 +1,5 @@
 .home {
-  position: relative;
-  isolation: isolate; /* keeps the decoration below behind the content */
   padding-block: var(--space-6);
-}
-
-/* Decoration behind the hero, on the text side: a field of small orange dots that fades out,
-   and a soft orange glow. Both use tokens that are fainter in the light theme. */
-.home::before,
-.home::after {
-  content: '';
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: calc(50% - 50vw); /* from the edge of the screen, not of the container */
-  z-index: -1;
-  inline-size: min(70vw, 900px);
-  block-size: 820px;
-  pointer-events: none;
-}
-
-.home::before {
-  background-image: radial-gradient(var(--color-dots) 1.4px, transparent 1.6px);
-  background-size: 16px 16px;
-  /* Strongest at the edge of the screen, gone towards the middle and the bottom */
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 0% 35%, #000 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 80% 70% at 0% 35%, #000 0%, transparent 75%);
-}
-
-.home::after {
-  background: radial-gradient(ellipse 60% 55% at 10% 35%, var(--color-page-glow), transparent 70%);
-}
-
-/* In Arabic the text side is on the right, so the fade starts from the right edge */
-:root[dir="rtl"] .home::before {
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 100% 35%, #000 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 80% 70% at 100% 35%, #000 0%, transparent 75%);
-}
-
-:root[dir="rtl"] .home::after {
-  background: radial-gradient(ellipse 60% 55% at 90% 35%, var(--color-page-glow), transparent 70%);
 }
 
 /* ---------- Hero: text on one side, the 3D case and the sample build card on the other ---------- */
