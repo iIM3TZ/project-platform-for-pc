@@ -40,6 +40,14 @@
   --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08);
   --shadow-lift: 0 18px 40px -12px rgb(16 24 40 / 0.28);  /* a card that floats above the page */
   --color-floor-shadow: rgb(16 24 40 / 0.25);             /* under a product on its white stage */
+  /* Decorative orange dots and glow behind the home page hero */
+  --color-dots: rgb(196 60 0 / 0.16);
+  --color-page-glow: rgb(196 60 0 / 0.08);
+  /* Build page 3D stage: dark in both themes, like a showroom */
+  --color-stage-bg: #0b0d12;
+  --color-stage-glow: rgb(255 122 41 / 0.22);
+  --color-stage-accent: #ff7a29;
+  --color-stage-text: #e8ebf0;
 
   /* Typography */
   --font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, 'Noto Sans Arabic', Arial, sans-serif;
@@ -100,6 +108,8 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
   --shadow-lift: 0 22px 50px -14px rgb(0 0 0 / 0.75);
+  --color-dots: rgb(255 122 41 / 0.32);
+  --color-page-glow: rgb(255 122 41 / 0.12);
   color-scheme: dark;
 }
 
@@ -130,6 +140,8 @@
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
     --shadow-lift: 0 22px 50px -14px rgb(0 0 0 / 0.75);
+    --color-dots: rgb(255 122 41 / 0.32);
+    --color-page-glow: rgb(255 122 41 / 0.12);
     color-scheme: dark;
   }
 }

@@ -41,8 +41,8 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 
 ## Home
 
-- Short intro: what the site does (compare prices, build a PC).
-- Two main buttons: "Compare prices" (Parts) and "Build your PC" (Build).
+- **Hero** (like BuildCores): on one side a big title, a short intro, four features with icons (compare prices, build in 3D, compatibility checks, prices in SAR with shipping), the buttons "Start building" (Build) and "Compare prices" (Parts).
+- On the other side the 3D case from the Build page with every part in place, turning slowly (drag to turn; no zoom, so the wheel scrolls the page), and a **sample build card** leaning over it: the cheapest part (in stock) of each core category with its price and the total. It is real data, labelled as a sample; it links to Build. On phones the card sits flat under the case. No "compatible" badge until the compatibility checks exist.
 - Category shortcuts: one card per category (CPU, GPU, monitor, prebuilt PCs...) with a picture on top and the name under it; opens Parts filtered by that category. The pictures are line icons in `client/images/categories/<slug>.svg` (one file per category slug); a file can be replaced by a photo with the same name.
 - **Most searched parts**: the parts people search for most. Needs search tracking (a count per part when it appears in search results or is opened), so it comes after the parts listing works.
 - **Biggest price drops**: parts whose price fell the most recently. Needs `price_history`, so it comes in Phase 5.
@@ -84,14 +84,19 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 
 ## Build
 
-- **Interactive PC case** at the top: an SVG drawing of an open case in a 3D-looking (isometric) view, no libraries. A line comes out of each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and ends in a small circle. **Hovering** a circle (or focusing it with the keyboard) shows a small tooltip with the category name, e.g. "GPU / كرت الشاشة", and the chosen part if there is one, e.g. "GPU: RTX 4060 Dual". **Clicking** it opens the **part picker** for that category. On touch screens there is no hover, so a tap opens the picker directly. Circle color: grey = not chosen, green = chosen, red = has a compatibility error. Circles are real `<button>` elements with labels, so they work with the keyboard and screen readers.
-- Under the drawing, the same parts as a list (always shown, and the main view on small phones). One row per category: core parts first (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler), then peripherals.
+- **Interactive 3D PC case** (three.js, `client/js/components/pcCase3d.js`): a big dark "showroom" stage with a floor grid, an open case with a glass side, fans that spin and orange RGB light. The parts are simple shapes made in code, not a model per product.
+  - Drag to turn it around (it turns slowly by itself until the user touches it; no turning when the system asks for reduced motion).
+  - A part that is not chosen is a see-through "ghost"; once chosen it becomes solid and lit, so the user watches the PC being built.
+  - A small circle sits on each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and follows it as the case turns. Circles are real `<button>` elements. **Hovering** or focusing one shows a tooltip with the chosen part's picture, its category and its name; it also lights the part up in orange. **Clicking** it opens the part picker for that category (a tap on phones).
+  - Circle color: grey = not chosen, green = chosen, red = has a compatibility error.
+  - When the browser cannot draw 3D (no WebGL), the page shows a flat SVG drawing with the same circles (`pcCase.js`).
+- **Parts column** beside the case, at the inline end (left in Arabic, right in English; under the case on small screens), like BuildCores: one row per core part with its picture, name, price and store, and small change and remove buttons; an empty part has a "+ Choose" button. Pointing at a row lights its part up in the 3D case. A counter above shows how many parts are chosen.
 - Each row: the chosen part with its best total price, or a "Choose" button that opens the part picker for that category; buttons to change or remove.
-- **Part picker** (a dropdown panel next to the circle or row, without leaving the page; full width on phones):
+- **Part picker** (a panel over the page, a `<dialog>`, without leaving it; the whole screen on phones):
   - A scrollable list of parts of that category only (e.g. all GPUs). Each item: image, name, brand, and its cheapest and most trusted price.
   - A search box at the top to find a part by name, brand or model.
   - A price filter (min and max).
-  - Shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Show all" switch.
+  - Shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Show all" switch. (Added with the compatibility checks task.)
   - Clicking a part expands it **inside the same panel** to show its **prices in every store**: one row per store with its best total price (cheapest and most trusted badges), and the store's sellers when the row is opened.
   - The user picks the store and seller they want (the cheapest is selected by default), then: **"Add to build"** (puts the part in the build with that offer and closes the panel) or **"Add to My list"** (adds only this offer to My list, without changing the build). A small "Details" link opens its part page.
   - Closes with Escape, a close button, or a click outside; works with the keyboard.

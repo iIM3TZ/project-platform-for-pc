@@ -23,7 +23,15 @@
     "title": "Compare PC part prices across stores",
     "intro": "See each store's price, shipping and delivery in one place, and build your PC with compatibility checks between the parts.",
     "compare": "Compare prices",
-    "categories": "Browse by category"
+    "categories": "Browse by category",
+    "start": "Start building",
+    "featureCompare": "Compare prices across Saudi stores",
+    "feature3d": "Build your PC in 3D",
+    "featureCompat": "Compatibility checks between parts",
+    "featureShipping": "Prices in SAR with shipping",
+    "sampleBuild": "Sample build at the lowest prices",
+    "partsCount": "{count} parts",
+    "total": "Total"
   },
   "parts": {
     "allParts": "All parts",
@@ -131,6 +139,29 @@
   "forbidden": {
     "title": "No access",
     "text": "This page is for admins only."
+  },
+  "build": {
+    "title": "Build your PC",
+    "intro": "Pick your parts from the drawing or from the list under it: press any circle or the Choose button.",
+    "drawingLabel": "Case drawing: each circle opens the picker for a part",
+    "partsTitle": "Parts",
+    "hotspot": "{category}: {part}",
+    "notChosen": "Not chosen yet",
+    "choose": "Choose",
+    "change": "Change",
+    "remove": "Remove",
+    "addDrive": "Add another drive",
+    "atStore": "at {store}",
+    "savedHere": "Your choices are saved in this browser.",
+    "count": "{count} of {total} parts chosen",
+    "dragHint": "Drag to turn the PC, press any circle to choose its part",
+    "creditsTitle": "3D model credits",
+    "creditBy": "by {author}, {license} license",
+    "pickerTitle": "Choose a {category}",
+    "search": "Search by name, brand or model",
+    "noParts": "No parts match the search or the price.",
+    "pickOffer": "Pick the store and seller",
+    "noOffers": "No offer in stock for this part right now."
   },
   "language": {
     "switchTo": "العربية",

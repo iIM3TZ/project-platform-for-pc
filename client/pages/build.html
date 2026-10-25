@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جمّع جهازك</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/build.css">
+  <!-- three.js is served by our own server from node_modules (see app.js), no CDN -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/vendor/three/build/three.module.js",
+        "three/addons/": "/vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="/js/pages/build.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container build">
+    <div class="build-head">
+      <h1 data-i18n="build.title"></h1>
+      <p class="build-count" id="build-count" aria-live="polite"></p>
+    </div>
+    <p class="alert alert-danger" id="build-error" role="alert" data-i18n="states.error" hidden></p>
+
+    <div class="build-layout">
+      <!-- The 3D case (or the flat drawing when 3D is not available). The circles are buttons. -->
+      <div class="build-stage-wrap">
+        <section class="pc-stage" id="pc-stage" dir="ltr" data-i18n-aria-label="build.drawingLabel">
+          <p class="pc-hint" data-i18n="build.dragHint"></p>
+        </section>
+        <details class="model-credits" id="model-credits" hidden>
+          <summary data-i18n="build.creditsTitle"></summary>
+          <ul id="model-credits-list"></ul>
+        </details>
+      </div>
+
+      <aside class="build-side" aria-labelledby="parts-title">
+        <h2 id="parts-title" data-i18n="build.partsTitle"></h2>
+        <ul class="build-list" id="build-list"></ul>
+        <p class="text-muted build-note" data-i18n="build.savedHere"></p>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Part picker. The inner box holds everything, so a click on the dialog itself is a click outside -->
+  <dialog class="picker" id="picker" aria-labelledby="picker-title">
+    <div class="picker-box">
+      <div class="picker-head">
+        <h2 id="picker-title"></h2>
+        <button class="nav-icon-btn" type="button" id="picker-close" data-i18n-aria-label="actions.close">×</button>
+      </div>
+
+      <div class="picker-tools">
+        <div class="field picker-search">
+          <label for="picker-search" data-i18n="nav.searchLabel"></label>
+          <input class="input" id="picker-search" type="search" autocomplete="off" data-i18n-placeholder="build.search">
+        </div>
+        <div class="field">
+          <label for="picker-min" data-i18n="filters.priceMin"></label>
+          <input class="input" id="picker-min" type="number" min="0" step="any" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="picker-max" data-i18n="filters.priceMax"></label>
+          <input class="input" id="picker-max" type="number" min="0" step="any" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="picker-scroll">
+        <div class="state" id="picker-state" role="status"></div>
+        <ul class="picker-list" id="picker-list"></ul>
+      </div>
+    </div>
+  </dialog>
+</body>
+</html>

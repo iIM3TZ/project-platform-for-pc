@@ -6,18 +6,66 @@
   <title>قطعتي</title>
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/pages/home.css">
+  <!-- three.js for the 3D case in the hero, served by our server from node_modules -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/vendor/three/build/three.module.js",
+        "three/addons/": "/vendor/three/examples/jsm/"
+      }
+    }
+  </script>
   <script type="module" src="/js/pages/home.js"></script>
 </head>
 <body>
   <header id="site-header"></header>
 
   <main class="container home">
-    <section class="home-hero">
-      <h1 data-i18n="home.title"></h1>
-      <p class="home-intro" data-i18n="home.intro"></p>
-      <div class="home-actions">
-        <a class="btn btn-primary" href="/pages/parts.html" data-i18n="home.compare"></a>
-        <a class="btn btn-secondary" href="/pages/build.html" data-i18n="nav.build"></a>
+    <section class="hero">
+      <div class="hero-text">
+        <h1 data-i18n="home.title"></h1>
+        <p class="home-intro" data-i18n="home.intro"></p>
+
+        <ul class="hero-features">
+          <li>
+            <svg class="hero-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l9-9h8v8l-9 9z"/><circle cx="16" cy="8" r="1.5"/></svg>
+            <span data-i18n="home.featureCompare"></span>
+          </li>
+          <li>
+            <svg class="hero-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>
+            <span data-i18n="home.feature3d"></span>
+          </li>
+          <li>
+            <svg class="hero-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+            <span data-i18n="home.featureCompat"></span>
+          </li>
+          <li>
+            <svg class="hero-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 7h13v10H2zM15 10h4l3 3v4h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+            <span data-i18n="home.featureShipping"></span>
+          </li>
+        </ul>
+
+        <div class="home-actions">
+          <a class="btn btn-primary hero-start" href="/pages/build.html" data-i18n="home.start"></a>
+          <a class="btn btn-secondary" href="/pages/parts.html" data-i18n="home.compare"></a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-stage" id="hero-stage" dir="ltr" aria-hidden="true"></div>
+
+        <!-- A real sample build: the cheapest part of each category, with its price -->
+        <a class="hero-card" id="hero-card" href="/pages/build.html" hidden>
+          <span class="hero-card-head">
+            <strong data-i18n="home.sampleBuild"></strong>
+            <span class="text-muted" id="hero-count"></span>
+          </span>
+          <span class="hero-card-list" id="hero-card-list"></span>
+          <span class="hero-card-total">
+            <span data-i18n="home.total"></span>
+            <strong class="price" id="hero-total"></strong>
+          </span>
+        </a>
       </div>
     </section>
 

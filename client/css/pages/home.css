@@ -1,9 +1,64 @@
 .home {
+  position: relative;
+  isolation: isolate; /* keeps the decoration below behind the content */
   padding-block: var(--space-6);
 }
 
-.home-hero {
-  padding-block: var(--space-6) var(--space-7);
+/* Decoration behind the hero, on the text side: a field of small orange dots that fades out,
+   and a soft orange glow. Both use tokens that are fainter in the light theme. */
+.home::before,
+.home::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(50% - 50vw); /* from the edge of the screen, not of the container */
+  z-index: -1;
+  inline-size: min(70vw, 900px);
+  block-size: 820px;
+  pointer-events: none;
+}
+
+.home::before {
+  background-image: radial-gradient(var(--color-dots) 1.4px, transparent 1.6px);
+  background-size: 16px 16px;
+  /* Strongest at the edge of the screen, gone towards the middle and the bottom */
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 0% 35%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 70% at 0% 35%, #000 0%, transparent 75%);
+}
+
+.home::after {
+  background: radial-gradient(ellipse 60% 55% at 10% 35%, var(--color-page-glow), transparent 70%);
+}
+
+/* In Arabic the text side is on the right, so the fade starts from the right edge */
+:root[dir="rtl"] .home::before {
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 100% 35%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 70% at 100% 35%, #000 0%, transparent 75%);
+}
+
+:root[dir="rtl"] .home::after {
+  background: radial-gradient(ellipse 60% 55% at 90% 35%, var(--color-page-glow), transparent 70%);
+}
+
+/* ---------- Hero: text on one side, the 3D case and the sample build card on the other ---------- */
+
+.hero {
+  display: grid;
+  gap: var(--space-6);
+  align-items: center;
+  padding-block: var(--space-4) var(--space-7);
+}
+
+@media (min-width: 1000px) {
+  .hero {
+    grid-template-columns: 1fr 1.1fr;
+  }
+}
+
+.hero-text h1 {
+  margin: 0 0 var(--space-4);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.15;
 }
 
 .home-intro {
@@ -12,14 +67,177 @@
   color: var(--color-text-muted);
 }
 
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: var(--space-5) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-features li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 600;
+}
+
+.hero-icon {
+  flex-shrink: 0;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  fill: none;
+  stroke: var(--color-primary-text);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .home-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin-block-start: var(--space-4);
 }
 
-/* Category cards: the picture on top, the name under it */
+.hero-start {
+  padding-inline: var(--space-6);
+}
+
+/* The 3D case on its dark showroom stage */
+.hero-visual {
+  position: relative;
+  padding-block-end: var(--space-6);
+}
+
+.hero-stage {
+  position: relative;
+  block-size: clamp(340px, 55vh, 560px);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(ellipse at 50% 40%, var(--color-stage-glow), transparent 60%),
+    var(--color-stage-bg);
+}
+
+.hero-stage .pc-canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  cursor: grab;
+}
+
+/* The sample build: a card leaning over the bottom of the stage, like a floating screen.
+   On phones it sits flat under the stage. */
+.hero-card {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: calc(var(--space-6) * -1);
+  margin-inline: var(--space-3);
+  padding: var(--space-4);
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lift);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+@media (min-width: 1000px) {
+  .hero-card {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: calc(var(--space-6) * -1);
+    inline-size: min(480px, 90%);
+    margin: 0;
+    transform: perspective(1200px) rotateX(10deg) rotateY(12deg) rotate(-2deg);
+  }
+
+  .hero-card:hover {
+    transform: perspective(1200px) rotateX(4deg) rotateY(5deg) rotate(-1deg);
+  }
+
+  /* In English the card leans the other way, so it still points at the case */
+  :root[dir="ltr"] .hero-card {
+    transform: perspective(1200px) rotateX(10deg) rotateY(-12deg) rotate(2deg);
+  }
+
+  :root[dir="ltr"] .hero-card:hover {
+    transform: perspective(1200px) rotateX(4deg) rotateY(-5deg) rotate(1deg);
+  }
+}
+
+.hero-card-head,
+.hero-card-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.hero-card-head {
+  font-size: var(--text-sm);
+}
+
+.hero-card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: var(--space-2);
+}
+
+.hero-card-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  font-size: var(--text-sm);
+}
+
+.hero-card-item img,
+.hero-card-thumb {
+  flex-shrink: 0;
+  inline-size: 30px;
+  block-size: 30px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--color-media-bg);
+  object-fit: contain;
+}
+
+.hero-card-name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-card-item .price {
+  color: var(--color-success);
+}
+
+.hero-card-total {
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--color-border);
+  font-weight: 600;
+}
+
+.hero-card-total .price {
+  font-size: var(--text-xl);
+}
+
+/* ---------- Category cards: the picture on top, the name under it ---------- */
+
 .category-grid {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
 }

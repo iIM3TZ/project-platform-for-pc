@@ -41,6 +41,12 @@ app.get('/pages/admin.html', async (req, res, next) => {
   next(); // express.static below serves the file
 });
 
+// three.js for the 3D case on the Build page, served from node_modules (only its build and
+// examples/jsm folders), so the version is the one in package.json and no CDN is needed
+const THREE_DIR = path.join(__dirname, '..', '..', 'node_modules', 'three');
+app.use('/vendor/three/build', express.static(path.join(THREE_DIR, 'build')));
+app.use('/vendor/three/examples/jsm', express.static(path.join(THREE_DIR, 'examples', 'jsm')));
+
 // Static frontend
 app.use(express.static(path.join(__dirname, '..', '..', 'client')));
 
