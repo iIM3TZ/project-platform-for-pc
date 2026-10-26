@@ -161,7 +161,27 @@
     "search": "Search by name, brand or model",
     "noParts": "No parts match the search or the price.",
     "pickOffer": "Pick the store and seller",
-    "noOffers": "No offer in stock for this part right now."
+    "noOffers": "No offer in stock for this part right now.",
+    "compatibleOnly": "Compatible only",
+    "showingCompatible": "{shown} compatible parts out of {total}",
+    "showing": "{shown} of {total} parts"
+  },
+  "compat": {
+    "title": "Compatibility status",
+    "empty": "Pick parts to check compatibility",
+    "checking": "Checking...",
+    "compatible": "Compatible",
+    "warnings": "Compatible, with warnings",
+    "incompatible": "Not compatible",
+    "error": "Could not check compatibility",
+    "watts": "Estimated draw {watts} W",
+    "note": "We check the socket, the RAM type, sticks and size, M.2 drives, the motherboard and case size, the GPU length and thickness, the cooler and the power supply. Not checked yet: radiator size in the case, power supply size, SATA ports, and CPU support on older motherboards.",
+    "problems": "Errors and warnings",
+    "details": "Compatibility details",
+    "partOk": "Compatible",
+    "partWarning": "Warning",
+    "partError": "Not compatible",
+    "more": "(+{count} more)"
   },
   "language": {
     "switchTo": "العربية",

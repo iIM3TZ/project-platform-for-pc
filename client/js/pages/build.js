@@ -19,6 +19,8 @@ const state = {
   pending: null, // { category, replaceIndex } while the picker is open
   scene: null,   // the 3D case, or null when the flat drawing is used
   modelSlugs: [], // the parts shown with a real 3D model (their authors are credited)
+  check: null,     // the server's compatibility check: { status, estimate_w, results, parts }
+  checking: false,
 };
 
 function categoryName(slug) {
@@ -38,15 +40,107 @@ function partInfo(slug) {
   };
 }
 
-// Grey when nothing is chosen, green when it is. Red (a compatibility error) comes with the
-// compatibility checks task.
+// Grey when nothing is chosen, green when it fits, yellow with a warning, red with an error
 function status(slug) {
-  return itemsOf(state.build, slug).length > 0 ? 'chosen' : 'empty';
+  const items = itemsOf(state.build, slug);
+  if (items.length === 0) return 'empty';
+  const levels = items.map(({ item }) => state.check?.parts?.[item.product.id]);
+  if (levels.includes('error')) return 'error';
+  if (levels.includes('warning')) return 'warning';
+  return 'chosen';
 }
 
+// The picker gets the rest of the build (without the part being changed) to tell which parts fit
 function openPicker(category, replaceIndex = null) {
   state.pending = { category, replaceIndex };
-  picker.open(category, categoryName(category));
+  const others = state.build.items
+    .filter((item, index) => index !== replaceIndex && (MULTI_CATEGORIES.includes(category) || item.category !== category))
+    .map((item) => item.product.id);
+  picker.open(category, categoryName(category), others);
+}
+
+// ---------- Compatibility: the strip at the top and its details ----------
+
+const STATUS_ICONS = { compatible: '✓', warnings: '!', incompatible: '✕' };
+
+function overallStatus() {
+  if (state.build.items.length === 0) return 'empty';
+  if (state.checking && !state.check) return 'checking';
+  return state.check?.status ?? 'error';
+}
+
+function renderSummary() {
+  const overall = overallStatus();
+  const button = $('compat-status');
+  button.className = `build-pill is-${overall}`;
+  button.disabled = overall === 'empty' || overall === 'checking';
+  button.replaceChildren(
+    STATUS_ICONS[overall] ? el('span', { class: 'build-pill-icon', 'aria-hidden': 'true', text: STATUS_ICONS[overall] }) : null,
+    el('span', { text: t(`compat.${overall}`) }),
+    reasonText(overall));
+
+  const watts = state.check?.estimate_w;
+  $('build-watts').hidden = !watts;
+  if (watts) $('build-watts').textContent = `⚡ ${t('compat.watts', { watts })}`;
+}
+
+// The reason next to the status: the first error (or the first warning), and how many more there are
+function reasonText(overall) {
+  if (overall !== 'incompatible' && overall !== 'warnings') return null;
+  const results = state.check.results;
+  const first = results.find((item) => item.level === 'error') ?? results[0];
+  const message = getLanguage() === 'ar' ? first.message_ar : first.message_en;
+  const more = results.length > 1 ? ` ${t('compat.more', { count: results.length - 1 })}` : '';
+  return el('span', { class: 'build-pill-reason', text: `${message}${more}` });
+}
+
+const PART_LABELS = { ok: 'compat.partOk', warning: 'compat.partWarning', error: 'compat.partError' };
+
+function renderCompatDetails() {
+  const overall = overallStatus();
+  const results = state.check?.results ?? [];
+  const message = (item) => (getLanguage() === 'ar' ? item.message_ar : item.message_en);
+  $('compat-body').replaceChildren(
+    el('p', { class: `build-pill compat-big is-${overall}` },
+      STATUS_ICONS[overall] ? el('span', { class: 'build-pill-icon', 'aria-hidden': 'true', text: STATUS_ICONS[overall] }) : null,
+      t(`compat.${overall}`)),
+    el('p', { class: 'compat-note', text: t('compat.note') }),
+    results.length > 0 && el('h3', { class: 'compat-heading', text: t('compat.problems') }),
+    results.length > 0 && el('ul', { class: 'compat-results' },
+      ...results.map((item) => el('li', { class: `is-${item.level}`, text: message(item) }))),
+    el('h3', { class: 'compat-heading', text: t('compat.details') }),
+    el('ul', { class: 'compat-parts' },
+      ...state.build.items.map(({ product }) => {
+        const partStatus = state.check?.parts?.[product.id] ?? 'ok';
+        return el('li', {},
+          el('span', { text: `${product.brand} ${product.name}` }),
+          el('span', { class: `compat-part-status is-${partStatus}`, text: t(PART_LABELS[partStatus]) }));
+      })));
+}
+
+// Only the answer to the latest request is used (the build may change while one is on its way)
+let latestCheck = 0;
+
+async function runCheck() {
+  const request = ++latestCheck;
+  const ids = state.build.items.map((item) => item.product.id);
+  if (ids.length === 0) {
+    state.check = null;
+    render();
+    return;
+  }
+  state.checking = true;
+  renderSummary();
+  let check = null;
+  try {
+    check = await api.checkBuild(ids);
+  } catch {
+    // the strip says the check failed; the build itself still works
+  }
+  if (request !== latestCheck) return;
+  state.check = check;
+  state.checking = false;
+  render();
 }
 
 function slugsToShow() {
@@ -161,12 +255,15 @@ function render() {
   $('build-list').replaceChildren(...slugs.map((slug) => categoryRow(slug)));
   renderStage();
   renderCredits();
+  renderSummary();
+  if ($('compat-dialog').open) renderCompatDetails();
   document.title = `${t('build.title')} | ${t('site.name')}`;
 }
 
 function update() {
   saveBuild(state.build);
   render();
+  runCheck();
 }
 
 // ---------- Start ----------
@@ -190,4 +287,14 @@ try {
 }
 await setupStage();
 render();
+runCheck();
 document.addEventListener('languagechange', render);
+
+$('compat-status').addEventListener('click', () => {
+  renderCompatDetails();
+  $('compat-dialog').showModal();
+});
+$('compat-close').addEventListener('click', () => $('compat-dialog').close());
+$('compat-dialog').addEventListener('click', (event) => {
+  if (event.target === $('compat-dialog')) $('compat-dialog').close();
+});

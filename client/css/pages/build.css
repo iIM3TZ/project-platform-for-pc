@@ -566,3 +566,145 @@
   margin: var(--space-2) 0 0;
   padding-inline-start: var(--space-5);
 }
+
+/* ---------- Compatibility: the strip at the top, its details, and the yellow (warning) state ---------- */
+
+.build-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.build-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 700;
+}
+
+button.build-pill:not(:disabled) {
+  cursor: pointer;
+}
+
+button.build-pill:not(:disabled):hover {
+  border-color: var(--color-primary);
+}
+
+.build-pill:disabled {
+  color: var(--color-text-muted);
+}
+
+.build-pill-icon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: 50%;
+  font-size: var(--text-sm);
+}
+
+.build-pill.is-compatible { color: var(--color-success); }
+.build-pill.is-compatible .build-pill-icon { background: var(--color-success-soft); }
+.build-pill.is-warnings { color: var(--color-warning); }
+.build-pill.is-warnings .build-pill-icon { background: var(--color-warning-soft); }
+.build-pill.is-incompatible,
+.build-pill.is-error { color: var(--color-danger); }
+.build-pill.is-incompatible .build-pill-icon { background: var(--color-danger-soft); }
+
+.pc-dot.is-warning::before { background: var(--color-warning); }
+.build-status.is-warning { background: var(--color-warning); }
+
+.compat-dialog .picker-scroll {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.compat-big {
+  justify-self: start;
+  font-size: var(--text-xl);
+  border: 0;
+  padding-inline: 0;
+  background: none;
+}
+
+.compat-note {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  font-size: var(--text-sm);
+}
+
+.compat-heading {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-lg);
+}
+
+.compat-results,
+.compat-parts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compat-results li {
+  padding: var(--space-2) var(--space-3);
+  border-inline-start: 3px solid;
+  border-radius: var(--radius-sm);
+}
+
+.compat-results .is-error { border-color: var(--color-danger); background: var(--color-danger-soft); }
+.compat-results .is-warning { border-color: var(--color-warning); background: var(--color-warning-soft); }
+
+.compat-parts li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-2);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.compat-part-status { flex-shrink: 0; font-weight: 700; }
+.compat-part-status.is-ok { color: var(--color-success); }
+.compat-part-status.is-warning { color: var(--color-warning); }
+.compat-part-status.is-error { color: var(--color-danger); }
+
+/* Part picker: the "compatible only" switch and how many parts are shown */
+.picker-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.picker-meta p {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+/* The reason next to "Not compatible": regular text after the colored status, wraps on phones */
+.build-summary .build-pill {
+  flex-wrap: wrap;
+  text-align: start;
+}
+
+.build-pill-reason {
+  flex-basis: auto;
+  min-inline-size: 0;
+  padding-inline-start: var(--space-2);
+  border-inline-start: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 500;
+}

@@ -52,6 +52,15 @@ export function getProducts(filters = {}) {
   return request(text ? `/products?${text}` : '/products');
 }
 
+// ---------- Build checks ----------
+
+const asItems = (productIds) => productIds.map((id) => ({ product_id: id }));
+// { status, estimate_w, results, parts, missing } for the parts of a build
+export const checkBuild = (productIds) => request('/builds/check', { method: 'POST', body: { items: asItems(productIds) } });
+// { compatible_ids, total }: the parts of a category that fit the rest of the build
+export const compatibleProducts = (category, productIds) =>
+  request('/builds/compatible', { method: 'POST', body: { category, items: asItems(productIds) } });
+
 // ---------- Accounts ----------
 
 export const signUp = (values) => request('/auth/register', { method: 'POST', body: values });

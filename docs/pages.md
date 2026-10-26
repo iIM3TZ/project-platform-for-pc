@@ -96,11 +96,12 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
   - A scrollable list of parts of that category only (e.g. all GPUs). Each item: image, name, brand, and its cheapest and most trusted price.
   - A search box at the top to find a part by name, brand or model.
   - A price filter (min and max).
-  - Shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Show all" switch. (Added with the compatibility checks task.)
+  - Shows **only parts compatible** with the parts already in the build (e.g. only AM5 motherboards after an AM5 CPU), with a "Compatible only" switch (on by default) and a count like "12 compatible parts out of 40". A CPU without a cooler is not hidden: a missing cooler is not a clash.
+  - Later idea (BuildCores): a bigger picker with a grid of cards (key specs on each card) and filters in a side column (in stock, price slider, brand), with the build's part count, price and wattage at the top of the side column.
   - Clicking a part expands it **inside the same panel** to show its **prices in every store**: one row per store with its best total price (cheapest and most trusted badges), and the store's sellers when the row is opened.
   - The user picks the store and seller they want (the cheapest is selected by default), then: **"Add to build"** (puts the part in the build with that offer and closes the panel) or **"Add to My list"** (adds only this offer to My list, without changing the build). A small "Details" link opens its part page.
   - Closes with Escape, a close button, or a click outside; works with the keyboard.
-- **Compatibility results** at the top: errors in red, warnings in yellow, each linked to the parts involved.
+- **Compatibility strip** at the top (like BuildCores): a status button (✓ compatible in green, ! compatible with warnings in yellow, ✕ not compatible in red) and the estimated power draw. Pressing the status opens **Compatibility status**: the status, a note of what is checked and what is not yet, every error and warning in the current language, and **compatibility details**: each part of the build with its own status. Circles and rows of parts with an error turn red, with a warning yellow.
 - Estimated power draw next to the PSU.
 - **Live build total**: a bar that stays visible while scrolling (at the bottom on phones, beside the parts on wide screens) with the total price of the build (price + shipping of each chosen offer, in SAR), the number of parts, and the build status (ready, or what is missing or not compatible).
   - It updates **instantly** when a part is added, removed, or changed to another part or another store; the new total briefly highlights so the change is noticed.

@@ -27,6 +27,12 @@
     </div>
     <p class="alert alert-danger" id="build-error" role="alert" data-i18n="states.error" hidden></p>
 
+    <!-- Compatibility status (opens the details) and the estimated power draw -->
+    <div class="build-summary">
+      <button class="build-pill" type="button" id="compat-status" aria-haspopup="dialog"></button>
+      <span class="build-pill" id="build-watts" hidden></span>
+    </div>
+
     <div class="build-layout">
       <!-- The 3D case (or the flat drawing when 3D is not available). The circles are buttons. -->
       <div class="build-stage-wrap">
@@ -46,6 +52,17 @@
       </aside>
     </div>
   </main>
+
+  <!-- Compatibility details: the status, every problem, and the status of each part -->
+  <dialog class="picker compat-dialog" id="compat-dialog" aria-labelledby="compat-title">
+    <div class="picker-box">
+      <div class="picker-head">
+        <h2 id="compat-title" data-i18n="compat.title"></h2>
+        <button class="nav-icon-btn" type="button" id="compat-close" data-i18n-aria-label="actions.close">×</button>
+      </div>
+      <div class="picker-scroll" id="compat-body"></div>
+    </div>
+  </dialog>
 
   <!-- Part picker. The inner box holds everything, so a click on the dialog itself is a click outside -->
   <dialog class="picker" id="picker" aria-labelledby="picker-title">
@@ -68,6 +85,11 @@
           <label for="picker-max" data-i18n="filters.priceMax"></label>
           <input class="input" id="picker-max" type="number" min="0" step="any" inputmode="decimal">
         </div>
+      </div>
+
+      <div class="picker-meta">
+        <label class="checkbox"><input type="checkbox" id="picker-compatible" checked> <span data-i18n="build.compatibleOnly"></span></label>
+        <p class="text-muted" id="picker-count" aria-live="polite"></p>
       </div>
 
       <div class="picker-scroll">

@@ -39,6 +39,7 @@ export function createPartPicker({ onAdd }) {
     products: [],
     status: 'loading', // 'loading' | 'ready' | 'error'
     openId: null,      // the part whose prices are shown
+    compatibleIds: null, // Set of the parts that fit the rest of the build, or null when unknown
     chosenOfferId: null,
   };
 
@@ -49,7 +50,10 @@ export function createPartPicker({ onAdd }) {
     const min = numberOrNull($('picker-min'));
     const max = numberOrNull($('picker-max'));
 
+    const onlyCompatible = $('picker-compatible').checked && state.compatibleIds;
+
     return state.products.filter((product) => {
+      if (onlyCompatible && !state.compatibleIds.has(product.id)) return false;
       const text = `${product.brand} ${product.name} ${product.model ?? ''}`.toLowerCase();
       if (q && !text.includes(q)) return false;
       if (min === null && max === null) return true;
@@ -105,6 +109,8 @@ export function createPartPicker({ onAdd }) {
     }
 
     const products = visibleProducts();
+    const counted = $('picker-compatible').checked && state.compatibleIds ? 'build.showingCompatible' : 'build.showing';
+    $('picker-count').textContent = t(counted, { shown: products.length, total: state.products.length });
     if (products.length === 0) {
       stateBox.replaceChildren(t('build.noParts'));
       return;
@@ -236,16 +242,32 @@ export function createPartPicker({ onAdd }) {
     renderList();
   }
 
-  function open(category, categoryLabel) {
+  // Which parts of the category fit the rest of the build (asked again each time it opens)
+  async function loadCompatible(category, otherIds) {
+    state.compatibleIds = null;
+    try {
+      const { compatible_ids: ids } = await api.compatibleProducts(category, otherIds);
+      if (state.category !== category) return;
+      state.compatibleIds = new Set(ids);
+    } catch {
+      // Without the answer the picker shows every part
+    }
+    if (state.status === 'ready') renderList();
+  }
+
+  // otherIds: the product ids of the rest of the build, without the part being changed
+  function open(category, categoryLabel, otherIds = []) {
     state.category = category;
     state.categoryLabel = categoryLabel;
     state.openId = null;
+    $('picker-count').textContent = '';
     $('picker-search').value = '';
     $('picker-min').value = '';
     $('picker-max').value = '';
     dialog.showModal();
     $('picker-search').focus();
     loadProducts();
+    loadCompatible(category, otherIds);
   }
 
   // ---------- Events ----------
@@ -255,6 +277,7 @@ export function createPartPicker({ onAdd }) {
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
   });
+  $('picker-compatible').addEventListener('change', renderList);
   for (const id of ['picker-search', 'picker-min', 'picker-max']) {
     $(id).addEventListener('input', renderList);
   }

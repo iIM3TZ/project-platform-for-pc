@@ -81,4 +81,17 @@ async function update(id, { categoryId, brand, name, model, image_url, specs }) 
   return result.rowCount === 0 ? null : findByIdForAdmin(id);
 }
 
-module.exports = { findAll, findById, findAllForAdmin, findByIdForAdmin, create, update };
+// The visible parts with these ids, with their category and specs (for the compatibility checks)
+async function findByIds(ids) {
+  if (ids.length === 0) return [];
+  const result = await db.query(
+    `SELECT p.id, p.specs, c.slug AS category
+     FROM products p
+     JOIN categories c ON c.id = p.category_id
+     WHERE p.id = ANY($1::int[]) AND p.is_hidden = false`,
+    [ids]
+  );
+  return result.rows;
+}
+
+module.exports = { findAll, findById, findByIds, findAllForAdmin, findByIdForAdmin, create, update };
