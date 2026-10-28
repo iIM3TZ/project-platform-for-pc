@@ -775,3 +775,74 @@ button.build-pill:not(:disabled):hover {
   inline-size: 32px;
   block-size: 32px;
 }
+
+/* ---------- The live bar: always in view ---------- */
+
+/* Wide screens: it sticks under the top bar (its height is set by build.js) */
+.build-summary {
+  position: sticky;
+  inset-block-start: var(--header-height, 72px);
+  z-index: 5;
+  padding-block: var(--space-2);
+  background: var(--color-bg);
+}
+
+.build-total {
+  font-size: var(--text-lg);
+}
+
+.build-total .price {
+  color: var(--color-success);
+}
+
+.build-total-label {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* A short flash when the total changes */
+.build-total.is-changed {
+  animation: total-flash 0.9s ease;
+}
+
+@keyframes total-flash {
+  0% { background: var(--color-success-soft); border-color: var(--color-success); transform: scale(1.04); }
+  100% { background: var(--color-surface); border-color: var(--color-border); transform: scale(1); }
+}
+
+.build-pill.is-ready { color: var(--color-success); }
+.build-pill.is-missing { color: var(--color-text-muted); }
+
+/* Phones: a bar fixed at the bottom of the screen, one row that scrolls sideways if it must */
+@media (max-width: 700px) {
+  .build-summary {
+    position: fixed;
+    inset-block-end: 0;
+    inset-block-start: auto;
+    inset-inline: 0;
+    z-index: 15;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: var(--space-2) var(--space-3);
+    border-block-start: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  .build-summary .build-pill {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  /* The full reason is in the details dialog; the bar keeps only the status */
+  .build-summary .build-pill-reason {
+    display: none;
+  }
+
+  /* Room at the end of the page so the bar never covers the last part */
+  .build {
+    padding-block-end: 96px;
+  }
+}

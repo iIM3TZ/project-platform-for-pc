@@ -72,7 +72,57 @@ function overallStatus() {
   return state.check?.status ?? 'error';
 }
 
+// ---------- The live bar: total and readiness ----------
+
+// Price + shipping of every chosen offer (peripherals too), in SAR
+function buildTotal() {
+  return state.build.items.reduce((sum, item) => sum + item.offer.total_sar, 0);
+}
+
+// The core parts not chosen yet. The cooler is not listed: whether one is needed depends on the
+// CPU, and the compatibility check says so ("This CPU does not come with a cooler").
+function missingParts() {
+  return slugsToShow().filter((slug) => slug !== 'cooler' && itemsOf(state.build, slug).length === 0);
+}
+
+let shownTotal = null;
+
+function renderTotal() {
+  const total = buildTotal();
+  const box = $('build-total');
+  box.replaceChildren(
+    el('span', { class: 'build-total-label', text: t('build.total') }),
+    el('span', { class: 'price', text: formatPrice(total) }));
+  // A short flash when the total changes, so the change is noticed
+  if (shownTotal !== null && total !== shownTotal) {
+    box.classList.remove('is-changed');
+    void box.offsetWidth; // restarts the animation
+    box.classList.add('is-changed');
+  }
+  shownTotal = total;
+}
+
+function renderReady() {
+  const missing = missingParts();
+  const box = $('build-ready');
+  const ready = missing.length === 0 && state.check && state.check.status !== 'incompatible';
+  box.className = `build-pill ${ready ? 'is-ready' : 'is-missing'}`;
+  if (ready) {
+    box.textContent = `✓ ${t('build.ready')}`;
+    box.removeAttribute('title');
+  } else if (missing.length > 0) {
+    const names = missing.map((slug) => categoryName(slug)).join(' · ');
+    box.textContent = t('build.missing', { count: missing.length });
+    box.title = t('build.missingList', { parts: names });
+  } else {
+    box.textContent = t('build.notReady'); // every part is there, but they do not fit together
+    box.removeAttribute('title');
+  }
+}
+
 function renderSummary() {
+  renderTotal();
+  renderReady();
   const overall = overallStatus();
   const button = $('compat-status');
   button.className = `build-pill is-${overall}`;
@@ -341,6 +391,14 @@ function update() {
   runSuggestion();
 }
 
+// The live bar sticks right under the top bar, whose height changes with the screen size
+function followHeaderHeight() {
+  const header = $('site-header');
+  const apply = () => document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+  new ResizeObserver(apply).observe(header);
+  apply();
+}
+
 // ---------- Start ----------
 
 const picker = createPartPicker({
@@ -354,6 +412,7 @@ const picker = createPartPicker({
 initTheme();
 await initLanguage();
 initNavbar();
+followHeaderHeight();
 
 try {
   state.categories = await api.getCategories();
