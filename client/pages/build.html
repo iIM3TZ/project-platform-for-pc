@@ -35,10 +35,12 @@
     <!-- The live bar: total, ready or missing parts, compatibility (opens the details), power draw.
          It stays in view: under the top bar on wide screens, at the bottom of the screen on phones. -->
     <div class="build-summary" id="build-summary">
-      <span class="build-pill build-total" id="build-total" aria-live="polite"></span>
-      <span class="build-pill" id="build-ready"></span>
-      <button class="build-pill" type="button" id="compat-status" aria-haspopup="dialog"></button>
-      <span class="build-pill" id="build-watts" hidden></span>
+      <div class="build-bar">
+        <span class="build-pill build-total" id="build-total" aria-live="polite"></span>
+        <span class="build-pill" id="build-ready"></span>
+        <button class="build-pill" type="button" id="compat-status" aria-haspopup="dialog"></button>
+        <span class="build-pill build-watts" id="build-watts" hidden></span>
+      </div>
     </div>
 
     <!-- A ready-made PC with the same CPU and GPU (opens the Prebuilt PCs list, filtered) -->

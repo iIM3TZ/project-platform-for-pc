@@ -71,7 +71,38 @@ function openPicker(category, replaceIndex = null) {
 
 // ---------- Compatibility: the strip at the top and its details ----------
 
-const STATUS_ICONS = { compatible: '✓', warnings: '!', incompatible: '✕' };
+const STATUS_ICONS = { compatible: 'check', warnings: 'warning', incompatible: 'cross', error: 'cross' };
+
+// The icons of the live bar (24x24 line drawings)
+const BAR_ICONS = {
+  money: 'M3 7h18v10H3z M14.5 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z M6 10v4 M18 10v4',
+  parts: 'M7 7h10v10H7z M10 3v4 M14 3v4 M10 17v4 M14 17v4 M3 10h4 M3 14h4 M17 10h4 M17 14h4',
+  check: 'M5 12.5l4.5 4.5L19 7.5',
+  warning: 'M12 6v8 M12 18h.01',
+  cross: 'M7 7l10 10 M17 7L7 17',
+  bolt: 'M13 2L4 14h7l-1 8 9-12h-7z',
+  expand: 'M14 4h6v6 M10 20H4v-6 M20 4l-7 7 M4 20l7-7',
+};
+
+function barIcon(name) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', BAR_ICONS[name]);
+  svg.append(path);
+  return svg;
+}
+
+// One part of the bar: a round icon, a small label over the value, then anything extra
+function pillContent(icon, label, value, ...extra) {
+  return [
+    el('span', { class: 'build-pill-icon', 'aria-hidden': 'true' }, barIcon(icon)),
+    el('span', { class: 'build-pill-text' },
+      el('span', { class: 'build-pill-label', text: label }),
+      typeof value === 'string' ? el('span', { class: 'build-pill-value', text: value }) : value),
+    ...extra,
+  ].filter(Boolean);
+}
 
 function overallStatus() {
   if (state.build.items.length === 0) return 'empty';
@@ -97,9 +128,8 @@ let shownTotal = null;
 function renderTotal() {
   const total = buildTotal();
   const box = $('build-total');
-  box.replaceChildren(
-    el('span', { class: 'build-total-label', text: t('build.total') }),
-    el('span', { class: 'price', text: formatPrice(total) }));
+  box.replaceChildren(...pillContent('money', t('build.total'),
+    el('span', { class: 'build-pill-value price', text: formatPrice(total) })));
   // A short flash when the total changes, so the change is noticed
   if (shownTotal !== null && total !== shownTotal) {
     box.classList.remove('is-changed');
@@ -114,17 +144,15 @@ function renderReady() {
   const box = $('build-ready');
   const ready = missing.length === 0 && state.check && state.check.status !== 'incompatible';
   box.className = `build-pill ${ready ? 'is-ready' : 'is-missing'}`;
-  if (ready) {
-    box.textContent = `✓ ${t('build.ready')}`;
-    box.removeAttribute('title');
-  } else if (missing.length > 0) {
-    const names = missing.map((slug) => categoryName(slug)).join(' · ');
-    box.textContent = t('build.missing', { count: missing.length });
-    box.title = t('build.missingList', { parts: names });
-  } else {
-    box.textContent = t('build.notReady'); // every part is there, but they do not fit together
-    box.removeAttribute('title');
+  let value = t('build.ready');
+  box.removeAttribute('title');
+  if (!ready && missing.length > 0) {
+    value = t('build.missing', { count: missing.length });
+    box.title = t('build.missingList', { parts: missing.map((slug) => categoryName(slug)).join(' · ') });
+  } else if (!ready) {
+    value = t('build.notReady'); // every part is there, but they do not fit together
   }
+  box.replaceChildren(...pillContent(ready ? 'check' : 'parts', t('build.partsLabel'), value));
 }
 
 function renderSummary() {
@@ -134,14 +162,13 @@ function renderSummary() {
   const button = $('compat-status');
   button.className = `build-pill is-${overall}`;
   button.disabled = overall === 'empty' || overall === 'checking';
-  button.replaceChildren(
-    STATUS_ICONS[overall] ? el('span', { class: 'build-pill-icon', 'aria-hidden': 'true', text: STATUS_ICONS[overall] }) : null,
-    el('span', { text: t(`compat.${overall}`) }),
-    reasonText(overall));
+  button.replaceChildren(...pillContent(STATUS_ICONS[overall] ?? 'check', t('compat.label'), t(`compat.${overall}`),
+    reasonText(overall),
+    !button.disabled && el('span', { class: 'build-pill-expand', 'aria-hidden': 'true' }, barIcon('expand'))));
 
   const watts = state.check?.estimate_w;
   $('build-watts').hidden = !watts;
-  if (watts) $('build-watts').textContent = `⚡ ${t('compat.watts', { watts })}`;
+  if (watts) $('build-watts').replaceChildren(...pillContent('bolt', t('compat.wattsLabel'), t('compat.wattsValue', { watts })));
 }
 
 // The reason next to the status: the first error (or the first warning), and how many more there are
@@ -162,7 +189,7 @@ function renderCompatDetails() {
   const message = (item) => (getLanguage() === 'ar' ? item.message_ar : item.message_en);
   $('compat-body').replaceChildren(
     el('p', { class: `build-pill compat-big is-${overall}` },
-      STATUS_ICONS[overall] ? el('span', { class: 'build-pill-icon', 'aria-hidden': 'true', text: STATUS_ICONS[overall] }) : null,
+      STATUS_ICONS[overall] ? el('span', { class: 'build-pill-icon', 'aria-hidden': 'true' }, barIcon(STATUS_ICONS[overall])) : null,
       t(`compat.${overall}`)),
     el('p', { class: 'compat-note', text: t('compat.note') }),
     results.length > 0 && el('h3', { class: 'compat-heading', text: t('compat.problems') }),

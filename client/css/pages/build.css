@@ -571,22 +571,36 @@
 
 .build-summary {
   display: flex;
+}
+
+/* One bar with the parts side by side, split by thin lines */
+.build-bar {
+  display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: stretch;
+  max-inline-size: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .build-pill {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: none;
   color: var(--color-text);
   font: inherit;
   font-weight: 700;
+}
+
+.build-bar > .build-pill + .build-pill {
+  border-inline-start: 1px solid var(--color-border);
 }
 
 button.build-pill:not(:disabled) {
@@ -594,29 +608,76 @@ button.build-pill:not(:disabled) {
 }
 
 button.build-pill:not(:disabled):hover {
-  border-color: var(--color-primary);
+  background: var(--color-surface-2);
 }
 
 .build-pill:disabled {
   color: var(--color-text-muted);
 }
 
+/* The round icon: a solid color with the drawing in the page color */
 .build-pill-icon {
   display: inline-grid;
   place-items: center;
-  inline-size: 24px;
-  block-size: 24px;
+  flex-shrink: 0;
+  inline-size: 30px;
+  block-size: 30px;
   border-radius: 50%;
-  font-size: var(--text-sm);
+  background: var(--color-text-muted);
+  color: var(--color-surface);
 }
 
-.build-pill.is-compatible { color: var(--color-success); }
-.build-pill.is-compatible .build-pill-icon { background: var(--color-success-soft); }
+.build-pill-icon svg,
+.build-pill-expand svg {
+  inline-size: 17px;
+  block-size: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* A small label over the value */
+.build-pill-text {
+  display: grid;
+  line-height: 1.25;
+}
+
+.build-pill-label {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+}
+
+.build-pill-value {
+  font-size: var(--text-lg);
+}
+
+/* The expand mark: this part opens the details */
+.build-pill-expand {
+  display: inline-grid;
+  color: var(--color-text-muted);
+}
+
+.build-pill-expand svg {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+.build-pill.is-compatible,
+.build-pill.is-ready { color: var(--color-success); }
+.build-pill.is-compatible .build-pill-icon,
+.build-pill.is-ready .build-pill-icon,
+.build-total .build-pill-icon { background: var(--color-success); }
 .build-pill.is-warnings { color: var(--color-warning); }
-.build-pill.is-warnings .build-pill-icon { background: var(--color-warning-soft); }
+.build-pill.is-warnings .build-pill-icon,
+.build-watts .build-pill-icon { background: var(--color-warning); }
 .build-pill.is-incompatible,
 .build-pill.is-error { color: var(--color-danger); }
-.build-pill.is-incompatible .build-pill-icon { background: var(--color-danger-soft); }
+.build-pill.is-incompatible .build-pill-icon,
+.build-pill.is-error .build-pill-icon { background: var(--color-danger); }
+.build-pill.is-missing { color: var(--color-text-muted); }
 
 .pc-dot.is-warning::before { background: var(--color-warning); }
 .build-status.is-warning { background: var(--color-warning); }
@@ -694,16 +755,16 @@ button.build-pill:not(:disabled):hover {
   font-size: var(--text-sm);
 }
 
-/* The reason next to "Not compatible": regular text after the colored status, wraps on phones */
+/* The reason next to "Not compatible": regular text after the colored status */
 .build-summary .build-pill {
-  flex-wrap: wrap;
   text-align: start;
 }
 
 .build-pill-reason {
-  flex-basis: auto;
+  max-inline-size: 320px;
   min-inline-size: 0;
-  padding-inline-start: var(--space-2);
+  padding-inline-start: var(--space-3);
+  font-size: var(--text-sm);
   border-inline-start: 1px solid var(--color-border);
   color: var(--color-text);
   font-weight: 500;
@@ -787,18 +848,8 @@ button.build-pill:not(:disabled):hover {
   background: var(--color-bg);
 }
 
-.build-total {
-  font-size: var(--text-lg);
-}
-
 .build-total .price {
   color: var(--color-success);
-}
-
-.build-total-label {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  font-weight: 600;
 }
 
 /* A short flash when the total changes */
@@ -807,12 +858,9 @@ button.build-pill:not(:disabled):hover {
 }
 
 @keyframes total-flash {
-  0% { background: var(--color-success-soft); border-color: var(--color-success); transform: scale(1.04); }
-  100% { background: var(--color-surface); border-color: var(--color-border); transform: scale(1); }
+  0% { background: var(--color-success-soft); }
+  100% { background: transparent; }
 }
-
-.build-pill.is-ready { color: var(--color-success); }
-.build-pill.is-missing { color: var(--color-text-muted); }
 
 /* Phones: a bar fixed at the bottom of the screen, one row that scrolls sideways if it must */
 @media (max-width: 700px) {
@@ -824,16 +872,29 @@ button.build-pill:not(:disabled):hover {
     z-index: 15;
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding: var(--space-2) var(--space-3);
+    padding: 0;
     border-block-start: 1px solid var(--color-border);
     background: var(--color-surface);
     box-shadow: var(--shadow-md);
   }
 
+  .build-bar {
+    flex-wrap: nowrap;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
   .build-summary .build-pill {
     flex-shrink: 0;
-    flex-wrap: nowrap;
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
     white-space: nowrap;
+  }
+
+  .build-pill-value {
+    font-size: var(--text-base);
   }
 
   /* The full reason is in the details dialog; the bar keeps only the status */
