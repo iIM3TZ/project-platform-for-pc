@@ -12,6 +12,8 @@ const $ = (id) => document.getElementById(id);
 
 // The core parts, in the order of the list (docs/pages.md)
 const CORE_ORDER = ['cpu', 'motherboard', 'ram', 'gpu', 'storage', 'psu', 'case', 'cooler'];
+// Optional extras, shown under the core parts (not in the case drawing, not in the count)
+const PERIPHERAL_ORDER = ['monitor', 'mouse', 'keyboard', 'headset'];
 
 const state = {
   build: loadBuild(),
@@ -148,6 +150,11 @@ function slugsToShow() {
   return CORE_ORDER.filter((slug) => core.length === 0 || core.includes(slug));
 }
 
+function peripheralsToShow() {
+  const extras = state.categories.filter((c) => c.kind === 'peripheral').map((c) => c.slug);
+  return PERIPHERAL_ORDER.filter((slug) => extras.length === 0 || extras.includes(slug));
+}
+
 // ---------- The case: 3D when the browser can, the flat drawing otherwise ----------
 
 async function setupStage() {
@@ -253,6 +260,7 @@ function render() {
   const chosenCount = slugs.filter((slug) => status(slug) !== 'empty').length;
   $('build-count').textContent = t('build.count', { count: chosenCount, total: slugs.length });
   $('build-list').replaceChildren(...slugs.map((slug) => categoryRow(slug)));
+  $('peripheral-list').replaceChildren(...peripheralsToShow().map((slug) => categoryRow(slug)));
   renderStage();
   renderCredits();
   renderSummary();

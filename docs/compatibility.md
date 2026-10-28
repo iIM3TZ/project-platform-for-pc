@@ -17,7 +17,7 @@ Field names come from [categories.md](categories.md).
 
 - `POST /api/builds/check { items: [{ product_id }] }` returns `{ status, estimate_w, results, parts, missing }`: `status` is `compatible`, `warnings` or `incompatible`; `parts` gives each part `ok`, `warning` or `error`; `missing` lists parts that were removed or hidden.
 - `POST /api/builds/compatible { category, items }` returns `{ compatible_ids, total }`: the parts of a category that fit the rest of the build, for the part picker. Only errors that involve the candidate count, and rule 9 (cooler needed) does not.
-- Each result also has a `rule` key (`socket`, `ram_type`, `ram_slots`, `max_ram`, `m2_slots`, `form_factor`, `gpu_length`, `gpu_slots`, `cooler_needed`, `cooler_socket`, `cooler_height`, `psu_low`, `psu_headroom`, `psu_gpu_recommended`).
+- Each result also has a `rule` key (`socket`, `ram_type`, `ram_slots`, `max_ram`, `m2_slots`, `form_factor`, `gpu_length`, `gpu_slots`, `cooler_needed`, `cooler_socket`, `cooler_height`, `psu_low`, `psu_headroom`, `psu_gpu_recommended`, `monitor_power`, `monitor_ports`, `monitor_4k_link`).
 
 ## Core parts (errors)
 

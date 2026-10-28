@@ -91,6 +91,7 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
   - Circle color: grey = not chosen, green = chosen, red = has a compatibility error.
   - When the browser cannot draw 3D (no WebGL), the page shows a flat SVG drawing with the same circles (`pcCase.js`).
 - **Parts column** beside the case, at the inline end (left in Arabic, right in English; under the case on small screens), like BuildCores: one row per core part with its picture, name, price and store, and small change and remove buttons; an empty part has a "+ Choose" button. Pointing at a row lights its part up in the 3D case. A counter above shows how many parts are chosen.
+- **Peripherals (optional)** under the core parts in the same column: monitor, mouse, keyboard and headset, picked with the same picker. They are not in the case drawing and not in the parts count. The monitor is checked against the GPU (rules 13 and 14 of `docs/compatibility.md`, warnings only).
 - Each row: the chosen part with its best total price, or a "Choose" button that opens the part picker for that category; buttons to change or remove.
 - **Part picker** (a panel over the page, a `<dialog>`, without leaving it; the whole screen on phones):
   - A scrollable list of parts of that category only (e.g. all GPUs). Each item: image, name, brand, and its cheapest and most trusted price.

@@ -708,3 +708,10 @@ button.build-pill:not(:disabled):hover {
   color: var(--color-text);
   font-weight: 500;
 }
+
+/* The optional peripherals under the core parts */
+.build-subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}

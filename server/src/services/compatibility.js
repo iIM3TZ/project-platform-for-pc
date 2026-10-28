@@ -1,5 +1,5 @@
-// Compatibility checks for a build (docs/compatibility.md, rules 1 to 12: the core parts).
-// The monitor rules (13 and 14) come with the peripherals task.
+// Compatibility checks for a build (docs/compatibility.md): rules 1 to 12 for the core parts
+// (errors and warnings), rules 13 and 14 for the monitor against the GPU (warnings only).
 //
 // Input: the parts of the build, each { id, category, specs }. Storage can have several parts.
 // Output of checkBuild():
@@ -172,6 +172,59 @@ const RULES = [
     return results;
   },
 ];
+
+// ---------- Monitor and GPU (rules 13 and 14) ----------
+
+const PERFORMANCE_ORDER = ['weak', 'ok', 'good', 'excellent'];
+
+// For each monitor resolution: the GPU field to read, and the level needed below / from 120 Hz
+const MONITOR_NEEDS = {
+  '1920x1080': { field: 'perf_1080p', below120: 'good', from120: 'excellent' },
+  '2560x1440': { field: 'perf_1440p', below120: 'good', from120: 'excellent' },
+  '3440x1440': { field: 'perf_1440p', below120: 'excellent', from120: 'excellent' }, // ultrawide: a third more pixels
+  '3840x2160': { field: 'perf_4k', below120: 'good', from120: 'excellent' },
+};
+
+// Ports connect when they share a type; any HDMI works with any HDMI (at the lower speed)
+const portType = (port) => (port.startsWith('HDMI') ? 'HDMI' : port);
+
+function monitorPower({ gpu, monitor }) {
+  const needs = monitor && MONITOR_NEEDS[monitor.specs.resolution];
+  if (!gpu || !needs || !has(monitor.specs.refresh_hz)) return [];
+  const level = gpu.specs[needs.field];
+  if (!PERFORMANCE_ORDER.includes(level)) return [];
+  const needed = monitor.specs.refresh_hz >= 120 ? needs.from120 : needs.below120;
+  if (PERFORMANCE_ORDER.indexOf(level) >= PERFORMANCE_ORDER.indexOf(needed)) return [];
+  return [result('monitor_power', 'warning', [gpu, monitor],
+    'كرت الشاشة قد لا يستغل الشاشة بالكامل ({resolution} بتردد {refresh_hz} هرتز) في الألعاب الثقيلة.',
+    'The GPU may not get the most out of this monitor ({resolution} at {refresh_hz} Hz) in demanding games.',
+    { resolution: monitor.specs.resolution, refresh_hz: monitor.specs.refresh_hz })];
+}
+
+function monitorPorts({ gpu, monitor }) {
+  const outputs = gpu?.specs.outputs;
+  const inputs = monitor?.specs.inputs;
+  if (!Array.isArray(outputs) || !Array.isArray(inputs)) return [];
+
+  // A: at least one port in common
+  const shared = inputs.filter((input) => outputs.some((output) => portType(output) === portType(input)));
+  if (shared.length === 0) {
+    return [result('monitor_ports', 'warning', [gpu, monitor],
+      'لا يوجد منفذ مشترك بين كرت الشاشة والشاشة، ستحتاج محول.',
+      'The GPU and the monitor have no matching port. You will need an adapter.')];
+  }
+
+  // B: 4K at 120 Hz or more needs DP, or HDMI 2.1 on both sides
+  const fast4k = monitor.specs.resolution === '3840x2160' && monitor.specs.refresh_hz >= 120;
+  const hasFastLink = shared.includes('DP') || (inputs.includes('HDMI 2.1') && outputs.includes('HDMI 2.1'));
+  if (!fast4k || hasFastLink) return [];
+  return [result('monitor_4k_link', 'warning', [gpu, monitor],
+    'للحصول على {refresh_hz} هرتز بدقة 4K تحتاج منفذ DP أو HDMI 2.1 في الكرت والشاشة.',
+    'To get {refresh_hz} Hz at 4K you need DP, or HDMI 2.1 on both the GPU and the monitor.',
+    { refresh_hz: monitor.specs.refresh_hz })];
+}
+
+RULES.push(monitorPower, monitorPorts);
 
 // The parts by category: one part per category, except storage (a list)
 function byCategory(parts) {
