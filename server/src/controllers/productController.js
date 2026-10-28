@@ -2,6 +2,7 @@ const productModel = require('../models/productModel');
 const offerModel = require('../models/offerModel');
 const pricing = require('../services/pricing');
 const { SPEC_FIELDS } = require('../config/specFields');
+const { productsWithPrices } = require('../services/catalog');
 
 const MAX_SEARCH_LENGTH = 100;
 
@@ -29,26 +30,7 @@ async function listProducts(req, res) {
     return res.status(400).json({ error: { message: error } });
   }
 
-  const products = await productModel.findAll(filters);
-  const offerRows = await offerModel.findVisibleByProductIds(products.map((p) => p.id));
-  const offers = offerRows.map(pricing.formatOffer);
-
-  const data = products.map((product) => {
-    const productOffers = offers.filter((offer) => offer.product_id === product.id);
-    const storesInStock = new Set(
-      productOffers.filter((offer) => offer.in_stock).map((offer) => offer.store.id)
-    );
-
-    return {
-      ...product,
-      store_count: storesInStock.size,
-      store_ids: [...storesInStock],
-      cheapest: pricing.summarizeOffer(pricing.pickCheapest(productOffers)),
-      most_trusted: pricing.summarizeOffer(pricing.pickMostTrusted(productOffers)),
-    };
-  });
-
-  res.json({ data });
+  res.json({ data: await productsWithPrices(filters) });
 }
 
 // The specs as a list in the order of the category's fields (docs/categories.md), only the

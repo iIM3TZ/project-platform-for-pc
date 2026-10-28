@@ -22,6 +22,7 @@ const state = {
   scene: null,   // the 3D case, or null when the flat drawing is used
   modelSlugs: [], // the parts shown with a real 3D model (their authors are credited)
   check: null,     // the server's compatibility check: { status, estimate_w, results, parts }
+  suggestion: null, // a ready-made PC like the build: { count, cheapest, cpu_name, gpu_chipset }
   checking: false,
 };
 
@@ -118,6 +119,70 @@ function renderCompatDetails() {
           el('span', { text: `${product.brand} ${product.name}` }),
           el('span', { class: `compat-part-status is-${partStatus}`, text: t(PART_LABELS[partStatus]) }));
       })));
+}
+
+// ---------- Ready-made PC suggestion ----------
+
+// The parts a ready-made PC replaces; with all of them chosen, the build has a total to compare
+const PC_PARTS = ['cpu', 'motherboard', 'ram', 'gpu', 'storage', 'psu', 'case'];
+const DISMISSED_KEY = 'build:prebuiltDismissed';
+
+// The card stays closed until the CPU or the GPU changes: it remembers which pair it was closed for
+function cpuGpuKey() {
+  const id = (category) => itemsOf(state.build, category)[0]?.item.product.id ?? '';
+  return `${id('cpu')}-${id('gpu')}`;
+}
+
+function isDismissed() {
+  try {
+    return localStorage.getItem(DISMISSED_KEY) === cpuGpuKey();
+  } catch {
+    return false;
+  }
+}
+
+function renderSuggestion() {
+  const match = state.suggestion;
+  $('prebuilt-card').hidden = !match || isDismissed();
+  if (!match) return;
+
+  // Filtered on the GPU only: a CPU filter by name would hide the same-class CPUs of the other brand
+  const query = new URLSearchParams({ category: 'prebuilt', gpu_chipset: match.gpu_chipset });
+  $('prebuilt-link').href = `/pages/parts.html?${query}`;
+  $('prebuilt-offer').textContent = `${t('suggest.from', { price: formatPrice(match.cheapest.total_sar), store: match.cheapest.store_name })} · ${t('suggest.count', { count: match.count })}`;
+
+  // The difference only means something when the build has every part a ready-made PC has
+  const complete = PC_PARTS.every((category) => itemsOf(state.build, category).length > 0);
+  const buildTotal = state.build.items
+    .filter((item) => CORE_ORDER.includes(item.category))
+    .reduce((sum, item) => sum + item.offer.total_sar, 0);
+  const diff = match.cheapest.total_sar - buildTotal;
+  const diffBox = $('prebuilt-diff');
+  diffBox.hidden = !complete;
+  diffBox.className = `prebuilt-diff ${diff < 0 ? 'is-cheaper' : 'is-dearer'}`;
+  if (complete) {
+    diffBox.textContent = Math.abs(diff) < 1
+      ? t('suggest.same')
+      : t(diff < 0 ? 'suggest.cheaper' : 'suggest.dearer', { amount: formatPrice(Math.abs(diff)) });
+  }
+}
+
+let latestSuggestion = 0;
+
+async function runSuggestion() {
+  const request = ++latestSuggestion;
+  const hasCpuAndGpu = ['cpu', 'gpu'].every((category) => itemsOf(state.build, category).length > 0);
+  let match = null;
+  if (hasCpuAndGpu) {
+    try {
+      match = await api.prebuiltMatch(state.build.items.map((item) => item.product.id));
+    } catch {
+      // No suggestion this time; the build works without it
+    }
+  }
+  if (request !== latestSuggestion) return;
+  state.suggestion = match;
+  renderSuggestion();
 }
 
 // Only the answer to the latest request is used (the build may change while one is on its way)
@@ -264,6 +329,7 @@ function render() {
   renderStage();
   renderCredits();
   renderSummary();
+  renderSuggestion();
   if ($('compat-dialog').open) renderCompatDetails();
   document.title = `${t('build.title')} | ${t('site.name')}`;
 }
@@ -272,6 +338,7 @@ function update() {
   saveBuild(state.build);
   render();
   runCheck();
+  runSuggestion();
 }
 
 // ---------- Start ----------
@@ -296,7 +363,17 @@ try {
 await setupStage();
 render();
 runCheck();
+runSuggestion();
 document.addEventListener('languagechange', render);
+
+$('prebuilt-close').addEventListener('click', () => {
+  try {
+    localStorage.setItem(DISMISSED_KEY, cpuGpuKey());
+  } catch {
+    // It will show again after a reload
+  }
+  $('prebuilt-card').hidden = true;
+});
 
 $('compat-status').addEventListener('click', () => {
   renderCompatDetails();

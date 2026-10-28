@@ -61,6 +61,9 @@ export const checkBuild = (productIds) => request('/builds/check', { method: 'PO
 export const compatibleProducts = (category, productIds) =>
   request('/builds/compatible', { method: 'POST', body: { category, items: asItems(productIds) } });
 
+// { count, cheapest, cpu_name, gpu_chipset } for ready-made PCs like the build, or null
+export const prebuiltMatch = (productIds) => request('/builds/prebuilt-match', { method: 'POST', body: { items: asItems(productIds) } });
+
 // ---------- Accounts ----------
 
 export const signUp = (values) => request('/auth/register', { method: 'POST', body: values });

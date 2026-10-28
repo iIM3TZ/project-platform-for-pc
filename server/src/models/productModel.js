@@ -85,7 +85,7 @@ async function update(id, { categoryId, brand, name, model, image_url, specs }) 
 async function findByIds(ids) {
   if (ids.length === 0) return [];
   const result = await db.query(
-    `SELECT p.id, p.specs, c.slug AS category
+    `SELECT p.id, p.name, p.specs, c.slug AS category
      FROM products p
      JOIN categories c ON c.id = p.category_id
      WHERE p.id = ANY($1::int[]) AND p.is_hidden = false`,

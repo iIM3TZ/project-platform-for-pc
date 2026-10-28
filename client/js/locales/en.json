@@ -167,6 +167,17 @@
     "showingCompatible": "{shown} compatible parts out of {total}",
     "showing": "{shown} of {total} parts"
   },
+  "suggest": {
+    "title": "A ready-made PC has the same GPU and a close CPU",
+    "from": "From {price} at {store}",
+    "count": "Matching PCs: {count}",
+    "cheaper": "{amount} cheaper than your build",
+    "dearer": "{amount} more than your build",
+    "same": "About the same price as your build",
+    "note": "A ready-made PC comes with its own case, power supply and motherboard, which can differ from the parts you picked.",
+    "see": "See the PCs",
+    "close": "Hide this suggestion"
+  },
   "compat": {
     "title": "Compatibility status",
     "empty": "Pick parts to check compatibility",

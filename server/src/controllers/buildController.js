@@ -1,5 +1,7 @@
 const productModel = require('../models/productModel');
 const { checkBuild, fitsBuild } = require('../services/compatibility');
+const { matchPrebuilts } = require('../services/prebuiltMatch');
+const { productsWithPrices } = require('../services/catalog');
 
 const MAX_ITEMS = 40;
 
@@ -57,4 +59,18 @@ async function compatible(req, res) {
   res.json({ data: { compatible_ids: compatibleIds, total: candidates.length } });
 }
 
-module.exports = { check, compatible };
+// POST /api/builds/prebuilt-match { items }: ready-made PCs with the same CPU and GPU as the build
+// (and at least its RAM and storage). data is null when the build has no CPU or GPU, or nothing matches.
+async function prebuiltMatch(req, res) {
+  const { ids, error } = readItems(req.body);
+  if (error) return res.status(400).json({ error: { message: error } });
+
+  const { parts } = await loadParts(ids);
+  const hasCpuAndGpu = parts.some((p) => p.category === 'cpu') && parts.some((p) => p.category === 'gpu');
+  if (!hasCpuAndGpu) return res.json({ data: null });
+
+  const prebuilts = await productsWithPrices({ category: 'prebuilt' });
+  res.json({ data: matchPrebuilts(parts, prebuilts) });
+}
+
+module.exports = { check, compatible, prebuiltMatch };

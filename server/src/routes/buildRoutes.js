@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/check', builds.check);
 router.post('/compatible', builds.compatible);
+router.post('/prebuilt-match', builds.prebuiltMatch);
 
 module.exports = router;
