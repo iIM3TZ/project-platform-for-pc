@@ -10,6 +10,7 @@
 import * as api from '/js/api.js';
 import { t, formatPrice } from '/js/i18n.js';
 import { el } from '/js/components/dom.js';
+import { addWithNotice } from '/js/components/listButton.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -167,6 +168,12 @@ export function createPartPicker({ onAdd }) {
 
     const add = el('button', { class: 'btn btn-primary', type: 'button', text: t('actions.addToBuild') });
     add.addEventListener('click', () => addToBuild(product, offers));
+    // Only this offer goes to My list; the build and the panel stay as they are
+    const addToList = el('button', { class: 'btn btn-secondary', type: 'button', text: t('actions.addToMyList') });
+    addToList.addEventListener('click', () => {
+      const offer = offers.find((item) => item.id === state.chosenOfferId && item.in_stock);
+      if (offer) addWithNotice([{ product_id: product.id, offer_id: offer.id }]);
+    });
 
     return el('div', { class: 'picker-offers' },
       el('fieldset', { class: 'offer-choices' },
@@ -174,6 +181,7 @@ export function createPartPicker({ onAdd }) {
         ...offers.map((offer) => offerChoice(product, offer, entry.data))),
       el('div', { class: 'picker-actions' },
         add,
+        addToList,
         el('a', { class: 'btn btn-ghost', href: `/pages/part.html?id=${product.id}`, target: '_blank', rel: 'noopener', text: t('actions.details') })));
   }
 

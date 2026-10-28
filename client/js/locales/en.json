@@ -404,5 +404,32 @@
     "ok": "OK",
     "good": "Good",
     "excellent": "Excellent"
+  },
+  "myList": {
+    "title": "My list",
+    "intro": "The parts you saved with the store you chose, grouped by store. The site sells nothing: each link takes you to the part's page in its store.",
+    "empty": "Your list is empty. Add parts from any part page or from the Build page.",
+    "browse": "Browse parts",
+    "added": "Added to My list",
+    "open": "Open My list",
+    "addError": "We could not add it to your list. Try again.",
+    "addAll": "Add all to My list",
+    "summary": "List summary",
+    "parts": "Parts",
+    "stores": "Stores",
+    "longest": "Longest delivery",
+    "grandTotal": "Total",
+    "subtotal": "Store total",
+    "storeDelivery": "Delivery: up to {days}",
+    "offer": "Store and seller",
+    "quantity": "Quantity",
+    "priceLine": "Price {price}",
+    "shippingLine": "Shipping {price}",
+    "deliveryLine": "Delivery {days}",
+    "international": "International store",
+    "note": "Prices are from our last update and can change in the store. Shipping is counted once per part.",
+    "movedToAccount": "Your list from this browser moved to your account.",
+    "partsRemoved": "{count} parts were removed from your list because they are no longer on the site.",
+    "saveError": "We could not save your last change to the list. Check your connection and try again."
   }
 }

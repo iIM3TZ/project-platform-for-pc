@@ -4,6 +4,7 @@ import { initTheme } from '/js/theme.js';
 import { initNavbar } from '/js/components/navbar.js';
 import { renderStoreList, storeLink } from '/js/components/storeOffers.js';
 import { el } from '/js/components/dom.js';
+import { addToListButton } from '/js/components/listButton.js';
 import { isAddedToday } from '/js/addedDate.js';
 
 const $ = (id) => document.getElementById(id);
@@ -92,7 +93,9 @@ function pickCard(badges, { offer, storeName }) {
     el('div', { class: 'part-pick-badges' }, ...badges),
     el('p', { class: 'price part-pick-price', text: formatPrice(offer.total_sar) }),
     el('p', { class: 'text-muted', text: t('part.atStore', { store: storeName }) }),
-    storeLink(offer, storeName));
+    el('div', { class: 'part-pick-actions' },
+      storeLink(offer, storeName),
+      addToListButton(() => [{ product_id: state.product.id, offer_id: offer.id }])));
 }
 
 // The cheapest and the most trusted offer. When they are the same offer, one card with both labels.

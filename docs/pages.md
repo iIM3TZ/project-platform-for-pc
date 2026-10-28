@@ -134,6 +134,9 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 - Per store: subtotal and delivery days.
 - Grand total and the longest delivery time.
 - The site sells nothing: each part only links to its store.
+- "Add to My list" buttons: on each offer of the part page (and its cheapest and most trusted cards), in the part picker next to "Add to build" (the panel stays open), and "Add all to My list" under the parts of the Build page. A short message at the bottom says it was added, with a link to My list. The same part with the same offer is not added twice: its quantity goes up (at most 20).
+- API: guests send their list to `POST /api/list/details` to get today's prices (removed parts are left out and a banner says how many; a removed offer becomes the cheapest one). Signed-in users: `GET /api/list`, `POST /api/list` (add parts) and `PUT /api/list` (save the whole list after a change). At most 100 parts. Each part comes with the chosen offer and every offer of the part, for the store dropdown.
+- A part's total is price x quantity + its shipping once; the store total adds its parts, and the longest delivery uses each offer's longest delivery days.
 
 ## Sign up / Sign in
 

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قائمتي</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/pages/my-list.css">
+  <script type="module" src="/js/pages/myList.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container my-list page-decor">
+    <h1 data-i18n="myList.title"></h1>
+    <p class="text-muted" data-i18n="myList.intro"></p>
+
+    <p class="alert alert-info" id="list-notice" role="status" hidden></p>
+    <p class="alert alert-danger" id="list-save-error" role="alert" hidden></p>
+    <div id="list-state" class="state" role="status"></div>
+
+    <div class="list-layout" id="list-layout" hidden>
+      <!-- The parts, one box per store -->
+      <div class="list-stores" id="list-stores"></div>
+
+      <!-- Totals for the whole list -->
+      <aside class="card list-summary" aria-labelledby="list-summary-title">
+        <h2 id="list-summary-title" data-i18n="myList.summary"></h2>
+        <dl class="list-totals">
+          <div><dt data-i18n="myList.parts"></dt><dd id="list-count"></dd></div>
+          <div><dt data-i18n="myList.stores"></dt><dd id="list-store-count"></dd></div>
+          <div><dt data-i18n="myList.longest"></dt><dd id="list-longest"></dd></div>
+          <div class="list-grand"><dt data-i18n="myList.grandTotal"></dt><dd class="price" id="list-total"></dd></div>
+        </dl>
+        <p class="text-muted list-note" data-i18n="myList.note"></p>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

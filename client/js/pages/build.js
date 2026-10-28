@@ -11,6 +11,7 @@ import {
 } from '/js/buildStore.js';
 import { renderBuildsBar } from '/js/components/buildsBar.js';
 import { PART_MODELS } from '/js/pcModels.js';
+import { addWithNotice } from '/js/components/listButton.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -412,6 +413,7 @@ function render() {
   $('build-count').textContent = t('build.count', { count: chosenCount, total: slugs.length });
   $('build-list').replaceChildren(...slugs.map((slug) => categoryRow(slug)));
   $('peripheral-list').replaceChildren(...peripheralsToShow().map((slug) => categoryRow(slug)));
+  $('build-to-list').disabled = state.build.items.length === 0;
   renderStage();
   renderCredits();
   renderSummary();
@@ -689,6 +691,9 @@ runCheck();
 runSuggestion();
 checkOtherTabs();
 document.addEventListener('languagechange', render);
+
+// Every part of the build, with its chosen offer, goes to My list (the build stays as it is)
+$('build-to-list').addEventListener('click', () => addWithNotice(itemsForApi(state.build)));
 
 $('prebuilt-close').addEventListener('click', () => {
   try {

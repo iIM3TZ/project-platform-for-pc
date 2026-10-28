@@ -770,6 +770,12 @@ button.build-pill:not(:disabled):hover {
   font-weight: 500;
 }
 
+/* "Add all to My list" under the parts */
+.build-to-list {
+  justify-self: start;
+  margin-block-start: var(--space-2);
+}
+
 /* The optional peripherals under the core parts */
 .build-subtitle {
   margin: var(--space-2) 0 0;

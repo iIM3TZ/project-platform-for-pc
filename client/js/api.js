@@ -74,6 +74,14 @@ export const createBuild = (build) => request('/builds', { method: 'POST', body:
 export const updateBuild = (id, build, { keepalive = false } = {}) => request(`/builds/${id}`, { method: 'PUT', body: build, keepalive });
 export const deleteBuild = (id) => request(`/builds/${id}`, { method: 'DELETE' });
 
+// ---------- My list ----------
+
+// items: [{ product_id, offer_id, quantity }]. Each answer is { items: [{ product, quantity, offer, offers }] }.
+export const listDetails = (items) => request('/list/details', { method: 'POST', body: { items } });
+export const getList = () => request('/list');
+export const addListItems = (items) => request('/list', { method: 'POST', body: { items } });
+export const replaceList = (items, { keepalive = false } = {}) => request('/list', { method: 'PUT', body: { items }, keepalive });
+
 // ---------- Accounts ----------
 
 export const signUp = (values) => request('/auth/register', { method: 'POST', body: values });

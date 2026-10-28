@@ -17,6 +17,13 @@ async function findVisibleByProductIds(productIds) {
   return result.rows;
 }
 
+// The offers among these ids, with their part, to check that an offer belongs to its part
+async function findOwners(offerIds) {
+  if (offerIds.length === 0) return [];
+  const result = await db.query('SELECT id, product_id FROM offers WHERE id = ANY($1::int[])', [offerIds]);
+  return result.rows;
+}
+
 // ---------- Admin: includes hidden offers ----------
 
 const ADMIN_COLUMNS = `
@@ -89,6 +96,7 @@ async function update(id, offer) {
 
 module.exports = {
   findVisibleByProductIds,
+  findOwners,
   findByProductForAdmin,
   findByIdForAdmin,
   countSellersInStore,

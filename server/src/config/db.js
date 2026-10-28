@@ -20,4 +20,20 @@ function query(text, params) {
   return pool.query(text, params);
 }
 
-module.exports = { pool, query };
+// Runs work(client) in one transaction: everything is saved, or nothing when it fails half way
+async function inTransaction(work) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await work(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { pool, query, inTransaction };

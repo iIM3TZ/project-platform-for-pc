@@ -7,6 +7,7 @@
 
 import { t, formatPrice, formatDate } from '/js/i18n.js';
 import { el } from '/js/components/dom.js';
+import { addToListButton } from '/js/components/listButton.js';
 
 function fastestDelivery(group) {
   return Math.min(...group.offers.map((offer) => offer.delivery_days_min ?? Infinity));
@@ -69,7 +70,8 @@ function offerRow(offer, storeName, data) {
         class: offer.in_stock ? 'badge badge-success' : 'badge badge-danger',
         text: offer.in_stock ? t('part.inStock') : t('offers.outOfStock'),
       }),
-      storeLink(offer, storeName)));
+      storeLink(offer, storeName),
+      offer.in_stock && addToListButton(() => [{ product_id: offer.product_id, offer_id: offer.id }])));
 }
 
 function storeRow(group, data) {

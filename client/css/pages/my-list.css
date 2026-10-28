@@ -1,0 +1,239 @@
+/* My list: one box per store on one side, the totals on the other */
+
+.my-list h1 {
+  margin-block-end: var(--space-1);
+}
+
+.my-list > .alert,
+.my-list > .state {
+  margin-block-start: var(--space-4);
+}
+
+.my-list .state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.list-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--space-5);
+  align-items: start;
+  margin-block-start: var(--space-5);
+}
+
+.list-stores {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* ---------- One store ---------- */
+
+.list-store {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.list-store-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.list-store-head h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.list-store .alert {
+  margin: 0;
+}
+
+.list-items {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-store-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.list-store-foot strong {
+  color: var(--color-text);
+}
+
+/* ---------- One part ---------- */
+
+.list-item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding-block: var(--space-3);
+}
+
+.list-item + .list-item {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.list-item-media {
+  display: grid;
+  place-items: center;
+  inline-size: 72px;
+  block-size: 72px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.list-item-media img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.list-item-media .card-media-empty {
+  font-size: var(--text-xs, 0.75rem);
+  text-align: center;
+}
+
+.list-item-main {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.list-item-name {
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.list-item-name:hover {
+  color: var(--color-primary-text);
+}
+
+.list-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.list-item-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-1);
+}
+
+.list-item-controls .select {
+  flex: 1 1 220px;
+  min-inline-size: 0;
+}
+
+.list-qty {
+  inline-size: 72px;
+}
+
+.list-item-end {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-2);
+}
+
+/* ---------- Totals ---------- */
+
+.list-summary {
+  position: sticky;
+  inset-block-start: calc(var(--header-height, 72px) + var(--space-4));
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.list-summary h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.list-totals {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.list-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.list-totals dt {
+  color: var(--color-text-muted);
+}
+
+.list-totals dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.list-grand {
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+  font-size: var(--text-lg);
+}
+
+.list-grand dd {
+  color: var(--color-success);
+}
+
+.list-note {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+/* ---------- Small screens: totals on top, each part stacks ---------- */
+
+@media (max-width: 860px) {
+  .list-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .list-summary {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .list-item {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+
+  .list-item-media {
+    inline-size: 56px;
+    block-size: 56px;
+  }
+
+  .list-item-end {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

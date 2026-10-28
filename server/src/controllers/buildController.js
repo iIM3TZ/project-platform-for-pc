@@ -5,6 +5,7 @@ const pricing = require('../services/pricing');
 const { checkBuild, fitsBuild } = require('../services/compatibility');
 const { matchPrebuilts } = require('../services/prebuiltMatch');
 const { productsWithPrices } = require('../services/catalog');
+const { cleanItems } = require('../services/savedItems');
 
 const MAX_ITEMS = 40;
 
@@ -99,18 +100,6 @@ function readBuildBody(body) {
     clean.push({ product_id: productId, offer_id: offerId });
   }
   return { value: { name, items: clean } };
-}
-
-// Keeps only visible parts, and an offer only when it belongs to its part
-// (otherwise null, which means "use the cheapest offer")
-async function cleanItems(items) {
-  const visible = new Set((await productModel.findByIds([...new Set(items.map((i) => i.product_id))])).map((p) => p.id));
-  const owners = new Map(
-    (await buildModel.findOfferOwners(items.map((i) => i.offer_id).filter(Boolean))).map((o) => [o.id, o.product_id])
-  );
-  return items
-    .filter((item) => visible.has(item.product_id))
-    .map((item) => ({ product_id: item.product_id, offer_id: owners.get(item.offer_id) === item.product_id ? item.offer_id : null }));
 }
 
 // Saved parts ({ product_id, offer_id, brand, name, image_url, category }) in the shape the Build page

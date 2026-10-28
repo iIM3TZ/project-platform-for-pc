@@ -38,23 +38,8 @@ async function replaceItems(client, buildId, items) {
   }
 }
 
-async function inTransaction(work) {
-  const client = await db.pool.connect();
-  try {
-    await client.query('BEGIN');
-    const result = await work(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
-  }
-}
-
 async function create(userId, name, items) {
-  return inTransaction(async (client) => {
+  return db.inTransaction(async (client) => {
     const result = await client.query(
       'INSERT INTO builds (user_id, name) VALUES ($1, $2) RETURNING id, name, updated_at',
       [userId, name]
@@ -66,7 +51,7 @@ async function create(userId, name, items) {
 
 // Returns null when the build does not exist or belongs to someone else
 async function update(id, userId, name, items) {
-  return inTransaction(async (client) => {
+  return db.inTransaction(async (client) => {
     const result = await client.query(
       `UPDATE builds SET name = $3, updated_at = now()
        WHERE id = $1 AND user_id = $2
@@ -85,11 +70,4 @@ async function remove(id, userId) {
   return result.rowCount > 0;
 }
 
-// The offers among these ids, with their part, to check that an offer belongs to its part
-async function findOfferOwners(offerIds) {
-  if (offerIds.length === 0) return [];
-  const result = await db.query('SELECT id, product_id FROM offers WHERE id = ANY($1::int[])', [offerIds]);
-  return result.rows;
-}
-
-module.exports = { findAllByUser, countByUser, create, update, remove, findOfferOwners };
+module.exports = { findAllByUser, countByUser, create, update, remove };
