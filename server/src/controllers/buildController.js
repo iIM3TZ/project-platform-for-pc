@@ -1,4 +1,7 @@
 const productModel = require('../models/productModel');
+const buildModel = require('../models/buildModel');
+const offerModel = require('../models/offerModel');
+const pricing = require('../services/pricing');
 const { checkBuild, fitsBuild } = require('../services/compatibility');
 const { matchPrebuilts } = require('../services/prebuiltMatch');
 const { productsWithPrices } = require('../services/catalog');
@@ -73,4 +76,111 @@ async function prebuiltMatch(req, res) {
   res.json({ data: matchPrebuilts(parts, prebuilts) });
 }
 
-module.exports = { check, compatible, prebuiltMatch };
+// ---------- Saved builds (signed-in users) ----------
+
+const MAX_BUILDS = 50;
+const MAX_NAME = 60;
+
+// Reads { name, items: [{ product_id, offer_id }] }. Returns { value } or { error }.
+function readBuildBody(body) {
+  const name = typeof body?.name === 'string' ? body.name.trim() : '';
+  if (!name || name.length > MAX_NAME) return { error: `name must be 1 to ${MAX_NAME} characters` };
+
+  const items = body?.items ?? [];
+  if (!Array.isArray(items) || items.length > MAX_ITEMS) {
+    return { error: `items must be a list of at most ${MAX_ITEMS} parts` };
+  }
+  const clean = [];
+  for (const item of items) {
+    const productId = Number(item?.product_id);
+    const offerId = item?.offer_id === null || item?.offer_id === undefined ? null : Number(item.offer_id);
+    if (!Number.isInteger(productId) || productId <= 0) return { error: 'Every item needs a product_id (a positive integer)' };
+    if (offerId !== null && (!Number.isInteger(offerId) || offerId <= 0)) return { error: 'offer_id must be a positive integer or null' };
+    clean.push({ product_id: productId, offer_id: offerId });
+  }
+  return { value: { name, items: clean } };
+}
+
+// Keeps only visible parts, and an offer only when it belongs to its part
+// (otherwise null, which means "use the cheapest offer")
+async function cleanItems(items) {
+  const visible = new Set((await productModel.findByIds([...new Set(items.map((i) => i.product_id))])).map((p) => p.id));
+  const owners = new Map(
+    (await buildModel.findOfferOwners(items.map((i) => i.offer_id).filter(Boolean))).map((o) => [o.id, o.product_id])
+  );
+  return items
+    .filter((item) => visible.has(item.product_id))
+    .map((item) => ({ product_id: item.product_id, offer_id: owners.get(item.offer_id) === item.product_id ? item.offer_id : null }));
+}
+
+// Saved parts ({ product_id, offer_id, brand, name, image_url, category }) in the shape the Build page
+// uses, with today's price of the chosen offer. An offer that was removed or hidden is replaced by
+// the cheapest in stock; a part with no offer left is dropped.
+async function withCurrentPrices(rows) {
+  const productIds = [...new Set(rows.map((row) => row.product_id))];
+  const offers = (await offerModel.findVisibleByProductIds(productIds)).map(pricing.formatOffer);
+
+  return rows.map((row) => {
+    const own = offers.filter((offer) => offer.product_id === row.product_id);
+    const offer = own.find((o) => o.id === row.offer_id) ?? pricing.pickCheapest(own) ?? own[0];
+    if (!offer) return null;
+    return {
+      category: row.category,
+      product: { id: row.product_id, brand: row.brand, name: row.name, image_url: row.image_url },
+      offer: { id: offer.id, total_sar: offer.total_sar, store_name: offer.store.name, seller_name: offer.seller_name },
+    };
+  }).filter(Boolean);
+}
+
+// GET /api/builds: the user's builds with their parts at today's prices
+async function listMine(req, res) {
+  const { builds, items } = await buildModel.findAllByUser(req.user.id);
+  const priced = await Promise.all(builds.map((build) => withCurrentPrices(items.filter((item) => item.build_id === build.id))));
+  res.json({ data: builds.map((build, index) => ({ ...build, items: priced[index] })) });
+}
+
+// POST /api/builds/refresh { items: [{ product_id, offer_id }] }: the parts of a build kept in the
+// browser (a guest's), with today's prices. Parts that were removed or hidden are left out.
+async function refresh(req, res) {
+  const { value, error } = readBuildBody({ name: 'refresh', items: req.body?.items });
+  if (error) return res.status(400).json({ error: { message: error } });
+
+  const parts = await productModel.findByIds([...new Set(value.items.map((item) => item.product_id))]);
+  const byId = new Map(parts.map((part) => [part.id, part]));
+  const rows = value.items
+    .filter((item) => byId.has(item.product_id))
+    .map((item) => {
+      const part = byId.get(item.product_id);
+      return { ...item, brand: part.brand, name: part.name, image_url: part.image_url, category: part.category };
+    });
+  res.json({ data: { items: await withCurrentPrices(rows) } });
+}
+
+// POST /api/builds { name, items }
+async function createMine(req, res) {
+  const { value, error } = readBuildBody(req.body);
+  if (error) return res.status(400).json({ error: { message: error } });
+  if (await buildModel.countByUser(req.user.id) >= MAX_BUILDS) {
+    return res.status(400).json({ error: { message: `At most ${MAX_BUILDS} builds per account` } });
+  }
+  const build = await buildModel.create(req.user.id, value.name, await cleanItems(value.items));
+  res.status(201).json({ data: build });
+}
+
+// PUT /api/builds/:id { name, items }: the whole build is saved (its parts are replaced)
+async function updateMine(req, res) {
+  const { value, error } = readBuildBody(req.body);
+  if (error) return res.status(400).json({ error: { message: error } });
+  const build = await buildModel.update(req.id, req.user.id, value.name, await cleanItems(value.items));
+  if (!build) return res.status(404).json({ error: { message: 'Build not found' } });
+  res.json({ data: build });
+}
+
+// DELETE /api/builds/:id
+async function removeMine(req, res) {
+  const removed = await buildModel.remove(req.id, req.user.id);
+  if (!removed) return res.status(404).json({ error: { message: 'Build not found' } });
+  res.json({ data: { deleted: true } });
+}
+
+module.exports = { check, compatible, prebuiltMatch, refresh, listMine, createMine, updateMine, removeMine };

@@ -26,6 +26,11 @@
       <p class="build-count" id="build-count" aria-live="polite"></p>
     </div>
     <p class="alert alert-danger" id="build-error" role="alert" data-i18n="states.error" hidden></p>
+    <p class="alert alert-success" id="build-notice" role="status" hidden></p>
+    <p class="alert alert-danger" id="build-save-error" role="alert" data-i18n="build.saveFailed" hidden></p>
+
+    <!-- One tab per build, "+" for a new one, and rename / duplicate / delete for the open one -->
+    <div class="builds-bar" id="builds-bar"></div>
 
     <!-- The live bar: total, ready or missing parts, compatibility (opens the details), power draw.
          It stays in view: under the top bar on wide screens, at the bottom of the screen on phones. -->
@@ -68,7 +73,7 @@
         <ul class="build-list" id="build-list"></ul>
         <h2 class="build-subtitle" data-i18n="build.peripherals"></h2>
         <ul class="build-list" id="peripheral-list"></ul>
-        <p class="text-muted build-note" data-i18n="build.savedHere"></p>
+        <p class="text-muted build-note" id="build-saved-note"></p>
       </aside>
     </div>
   </main>

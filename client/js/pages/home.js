@@ -3,6 +3,7 @@ import { initLanguage, getLanguage, t, formatPrice } from '/js/i18n.js';
 import { initTheme } from '/js/theme.js';
 import { initNavbar } from '/js/components/navbar.js';
 import { el } from '/js/components/dom.js';
+import { loadLocalBuilds, loadOpenBuildId, fromServer, itemsForApi } from '/js/buildStore.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -13,6 +14,7 @@ const state = {
   categories: [],
   products: [],
   categoriesStatus: 'loading', // 'loading' | 'ready' | 'error'
+  myBuild: null, // the visitor's open build from the Build page, when it has parts
 };
 
 // ---------- Hero: the 3D case and the sample build ----------
@@ -44,20 +46,52 @@ function sampleBuild() {
     .filter(Boolean);
 }
 
-function renderSampleBuild() {
-  const parts = sampleBuild();
-  $('hero-card').hidden = parts.length === 0;
-  if (parts.length === 0) return;
+// The card shows the visitor's own build when it has parts, or else the sample build.
+// Each line: { name, image_url, price }.
+function cardLines() {
+  if (state.myBuild) {
+    return state.myBuild.items.map(({ product, offer }) => ({ name: product.name, image_url: product.image_url, price: offer.total_sar }));
+  }
+  return sampleBuild().map((product) => ({ name: product.name, image_url: product.image_url, price: product.cheapest.total_sar }));
+}
 
-  $('hero-count').textContent = t('home.partsCount', { count: parts.length });
-  $('hero-card-list').replaceChildren(...parts.map((product) => el('span', { class: 'hero-card-item' },
-    product.image_url
-      ? el('img', { src: product.image_url, alt: '', loading: 'lazy' })
+function renderSampleBuild() {
+  const lines = cardLines();
+  $('hero-card').hidden = lines.length === 0;
+  if (lines.length === 0) return;
+
+  $('hero-card-title').textContent = state.myBuild
+    ? t('home.yourBuild', { name: state.myBuild.name })
+    : t('home.sampleBuild');
+  $('hero-count').textContent = t('home.partsCount', { count: lines.length });
+  $('hero-card-list').replaceChildren(...lines.map((line) => el('span', { class: 'hero-card-item' },
+    line.image_url
+      ? el('img', { src: line.image_url, alt: '', loading: 'lazy' })
       : el('span', { class: 'hero-card-thumb', 'aria-hidden': 'true' }),
-    el('span', { class: 'hero-card-name', text: product.name }),
-    el('span', { class: 'price', text: formatPrice(product.cheapest.total_sar) }))));
-  const total = parts.reduce((sum, product) => sum + product.cheapest.total_sar, 0);
-  $('hero-total').textContent = formatPrice(total);
+    el('span', { class: 'hero-card-name', text: line.name }),
+    el('span', { class: 'price', text: formatPrice(line.price) }))));
+  $('hero-total').textContent = formatPrice(lines.reduce((sum, line) => sum + line.price, 0));
+}
+
+// The open build of the Build page: from the account for a signed-in visitor, from this browser
+// for a guest (with today's prices, as the guest's copy can be old). null when it has no parts.
+async function loadMyBuild() {
+  try {
+    const user = await api.getMe();
+    let build;
+    if (user) {
+      const builds = (await api.getBuilds()).map(fromServer);
+      build = builds.find((item) => item.id === String(loadOpenBuildId(user.id))) ?? builds[0];
+    } else {
+      const local = loadLocalBuilds();
+      build = local.builds.find((item) => item.id === local.currentId) ?? local.builds[0];
+      if (build?.items.length) build.items = (await api.refreshBuildItems(itemsForApi(build))).items;
+    }
+    state.myBuild = build?.items.length ? build : null;
+  } catch {
+    state.myBuild = null; // the sample build shows instead
+  }
+  renderSampleBuild();
 }
 
 // ---------- Category cards ----------
@@ -109,6 +143,16 @@ initNavbar();
 renderAll();
 setupHeroCase();
 loadData();
+loadMyBuild();
+
+// When the Build page changes the build in another tab, the card follows: at once for a guest
+// (the browser tells about localStorage changes), and when coming back to this tab otherwise
+window.addEventListener('storage', (event) => {
+  if (event.key?.startsWith('builds:')) loadMyBuild();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') loadMyBuild();
+});
 
 // The category names, prices and the page title follow the language
 document.addEventListener('languagechange', renderAll);

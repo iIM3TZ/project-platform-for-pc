@@ -5,7 +5,11 @@ import { initNavbar } from '/js/components/navbar.js';
 import { el } from '/js/components/dom.js';
 import { renderPcCase } from '/js/components/pcCase.js';
 import { createPartPicker } from '/js/components/partPicker.js';
-import { loadBuild, saveBuild, itemsOf, choosePart, removeItem, MULTI_CATEGORIES } from '/js/buildStore.js';
+import {
+  loadLocalBuilds, saveLocalBuilds, clearLocalBuilds, loadOpenBuildId, saveOpenBuildId,
+  itemsForApi, fromServer, newLocalId, itemsOf, choosePart, removeItem, MULTI_CATEGORIES,
+} from '/js/buildStore.js';
+import { renderBuildsBar } from '/js/components/buildsBar.js';
 import { PART_MODELS } from '/js/pcModels.js';
 
 const $ = (id) => document.getElementById(id);
@@ -16,7 +20,10 @@ const CORE_ORDER = ['cpu', 'motherboard', 'ram', 'gpu', 'storage', 'psu', 'case'
 const PERIPHERAL_ORDER = ['monitor', 'mouse', 'keyboard', 'headset'];
 
 const state = {
-  build: loadBuild(),
+  user: null,      // the signed-in user, or null for a guest
+  builds: [],      // every build of the user (one tab each)
+  build: { id: '', name: '', items: [] }, // the open build
+  tabStatus: {},   // build id -> its last compatibility status, for the dot on its tab
   categories: [],
   pending: null, // { category, replaceIndex } while the picker is open
   scene: null,   // the 3D case, or null when the flat drawing is used
@@ -81,8 +88,8 @@ function buildTotal() {
 
 // The core parts not chosen yet. The cooler is not listed: whether one is needed depends on the
 // CPU, and the compatibility check says so ("This CPU does not come with a cooler").
-function missingParts() {
-  return slugsToShow().filter((slug) => slug !== 'cooler' && itemsOf(state.build, slug).length === 0);
+function missingParts(build = state.build) {
+  return slugsToShow().filter((slug) => slug !== 'cooler' && itemsOf(build, slug).length === 0);
 }
 
 let shownTotal = null;
@@ -256,6 +263,7 @@ async function runCheck() {
   }
   if (request !== latestCheck) return;
   state.check = check;
+  state.tabStatus[state.build.id] = check?.status;
   state.checking = false;
   render();
 }
@@ -371,6 +379,7 @@ function categoryRow(slug) {
 }
 
 function render() {
+  renderBar();
   const slugs = slugsToShow();
   const chosenCount = slugs.filter((slug) => status(slug) !== 'empty').length;
   $('build-count').textContent = t('build.count', { count: chosenCount, total: slugs.length });
@@ -385,7 +394,7 @@ function render() {
 }
 
 function update() {
-  saveBuild(state.build);
+  saveOpenBuild();
   render();
   runCheck();
   runSuggestion();
@@ -397,6 +406,227 @@ function followHeaderHeight() {
   const apply = () => document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
   new ResizeObserver(apply).observe(header);
   apply();
+}
+
+// ---------- Builds: tabs, saving, and moving a guest's builds to the account ----------
+
+const SAVE_DELAY_MS = 400; // quick changes in a row are saved in one request
+const saveTimers = new Map(); // build id -> waiting save
+
+function defaultName(number) {
+  return t('build.defaultName', { n: number });
+}
+
+function showNote() {
+  $('build-saved-note').textContent = t(state.user ? 'build.savedAccount' : 'build.savedGuest');
+}
+
+// The dot on a tab: red with a clash, green when ready, grey while empty or in progress
+function dotOf(build) {
+  if (build.items.length === 0) return 'empty';
+  const status = state.tabStatus[build.id];
+  if (status === 'incompatible') return 'error';
+  if (status && missingParts(build).length === 0) return 'ready';
+  return 'progress';
+}
+
+function renderBar() {
+  renderBuildsBar($('builds-bar'), {
+    builds: state.builds,
+    currentId: state.build.id,
+    dotOf,
+    onSelect: openBuild,
+    onAdd: () => addBuild(),
+    onRename: renameBuild,
+    onDuplicate: duplicateBuild,
+    onDelete: deleteBuild,
+  });
+  showNote();
+}
+
+function rememberOpenBuild() {
+  if (state.user) saveOpenBuildId(state.user.id, state.build.id);
+  else saveLocalBuilds(state.builds, state.build.id);
+}
+
+function openBuild(id) {
+  state.build = state.builds.find((build) => build.id === id) ?? state.builds[0];
+  state.check = null;
+  state.suggestion = null;
+  rememberOpenBuild();
+  render();
+  runCheck();
+  runSuggestion();
+}
+
+async function saveToAccount(build, options) {
+  saveTimers.delete(build.id);
+  try {
+    await api.updateBuild(build.id, { name: build.name, items: itemsForApi(build) }, options);
+    $('build-save-error').hidden = true;
+  } catch {
+    $('build-save-error').hidden = false;
+  }
+}
+
+// Every change is saved right away: guests in this browser, signed-in users in their account
+function saveOpenBuild() {
+  if (!state.user) {
+    saveLocalBuilds(state.builds, state.build.id);
+    return;
+  }
+  const build = state.build;
+  clearTimeout(saveTimers.get(build.id));
+  saveTimers.set(build.id, setTimeout(() => saveToAccount(build), SAVE_DELAY_MS));
+}
+
+// A change made just before closing the page is still sent
+window.addEventListener('pagehide', () => {
+  for (const [id, timer] of saveTimers) {
+    clearTimeout(timer);
+    const build = state.builds.find((item) => item.id === id);
+    if (build) saveToAccount(build, { keepalive: true });
+  }
+});
+
+async function addBuild(name = defaultName(state.builds.length + 1), items = []) {
+  let build;
+  if (state.user) {
+    try {
+      const saved = await api.createBuild({ name, items: itemsForApi({ items }) });
+      build = { id: String(saved.id), name: saved.name, items };
+    } catch {
+      $('build-save-error').hidden = false;
+      return;
+    }
+  } else {
+    build = { id: newLocalId(), name, items };
+  }
+  state.builds.push(build);
+  openBuild(build.id);
+}
+
+function renameBuild() {
+  const answer = window.prompt(t('build.renamePrompt'), state.build.name);
+  const name = answer?.trim().slice(0, 60);
+  if (!name) return;
+  state.build.name = name;
+  saveOpenBuild();
+  renderBar();
+}
+
+// A copy in a new tab, to try other parts without changing the original
+function duplicateBuild() {
+  const items = state.build.items.map((item) => ({ ...item, product: { ...item.product }, offer: { ...item.offer } }));
+  addBuild(t('build.copyName', { name: state.build.name }).slice(0, 60), items);
+}
+
+// Only the user deletes a build, after saying yes. There is always at least one build.
+async function deleteBuild() {
+  if (!window.confirm(t('build.deleteConfirm', { name: state.build.name }))) return;
+  const build = state.build;
+  if (state.user) {
+    clearTimeout(saveTimers.get(build.id));
+    saveTimers.delete(build.id);
+    try {
+      await api.deleteBuild(build.id);
+    } catch {
+      $('build-save-error').hidden = false;
+      return;
+    }
+  }
+  state.builds = state.builds.filter((item) => item !== build);
+  delete state.tabStatus[build.id];
+  if (state.builds.length === 0) {
+    await addBuild(defaultName(1));
+    return;
+  }
+  openBuild(state.builds[0].id);
+}
+
+// After signing in, the builds made as a guest in this browser move to the account
+async function moveGuestBuilds(local) {
+  const waiting = local.builds.filter((build) => build.items.length > 0);
+  let moved = 0;
+  for (const build of waiting) {
+    try {
+      await api.createBuild({ name: build.name || defaultName(moved + 1), items: itemsForApi(build) });
+      moved += 1;
+    } catch {
+      // The rest stay in this browser and move next time
+      saveLocalBuilds(waiting.slice(moved), null);
+      return moved;
+    }
+  }
+  clearLocalBuilds();
+  return moved;
+}
+
+function chooseOpenBuild(rememberedId) {
+  state.build = state.builds.find((build) => build.id === rememberedId) ?? state.builds[0];
+}
+
+async function loadBuilds() {
+  const local = loadLocalBuilds();
+
+  if (state.user) {
+    try {
+      const moved = await moveGuestBuilds(local);
+      if (moved > 0) {
+        $('build-notice').textContent = t('build.movedToAccount');
+        $('build-notice').hidden = false;
+      }
+      state.builds = (await api.getBuilds()).map(fromServer);
+      if (state.builds.length === 0) {
+        const saved = await api.createBuild({ name: defaultName(1), items: [] });
+        state.builds = [{ id: String(saved.id), name: saved.name, items: [] }];
+      }
+      chooseOpenBuild(String(loadOpenBuildId(state.user.id) ?? ''));
+      return;
+    } catch {
+      // The account could not be read: keep building in this browser for now
+      $('build-error').hidden = false;
+      state.user = null;
+    }
+  }
+
+  state.builds = local.builds.length > 0 ? local.builds : [{ id: newLocalId(), name: '', items: [] }];
+  state.builds.forEach((build, index) => { if (!build.name) build.name = defaultName(index + 1); });
+  chooseOpenBuild(local.currentId);
+  await refreshLocalPrices();
+}
+
+// A guest's builds keep a copy of each price, so the prices are asked again when the page opens:
+// a changed price is updated, a removed offer becomes the cheapest one, a removed part goes away.
+async function refreshLocalPrices() {
+  let removed = 0;
+  await Promise.all(state.builds.filter((build) => build.items.length > 0).map(async (build) => {
+    try {
+      const { items } = await api.refreshBuildItems(itemsForApi(build));
+      removed += build.items.length - items.length;
+      build.items = items;
+    } catch {
+      // The saved prices stay until next time
+    }
+  }));
+  saveLocalBuilds(state.builds, state.build.id);
+  if (removed > 0) {
+    $('build-notice').textContent = t('build.partsRemoved', { count: removed });
+    $('build-notice').hidden = false;
+  }
+}
+
+// The dots of the other tabs: their compatibility is checked once when the page opens
+async function checkOtherTabs() {
+  const others = state.builds.filter((build) => build !== state.build && build.items.length > 0);
+  await Promise.all(others.map(async (build) => {
+    try {
+      state.tabStatus[build.id] = (await api.checkBuild(build.items.map((item) => item.product.id))).status;
+    } catch {
+      // the tab keeps a grey dot
+    }
+  }));
+  renderBar();
 }
 
 // ---------- Start ----------
@@ -415,6 +645,13 @@ initNavbar();
 followHeaderHeight();
 
 try {
+  state.user = await api.getMe();
+} catch {
+  state.user = null; // treated as a guest
+}
+await loadBuilds();
+
+try {
   state.categories = await api.getCategories();
 } catch {
   $('build-error').hidden = false; // the parts list still shows, with the category slugs
@@ -423,6 +660,7 @@ await setupStage();
 render();
 runCheck();
 runSuggestion();
+checkOtherTabs();
 document.addEventListener('languagechange', render);
 
 $('prebuilt-close').addEventListener('click', () => {

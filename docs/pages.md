@@ -42,7 +42,7 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 ## Home
 
 - **Hero** (like BuildCores): on one side a big title, a short intro, four features with icons (compare prices, build in 3D, compatibility checks, prices in SAR with shipping), the buttons "Start building" (Build) and "Compare prices" (Parts).
-- On the other side the 3D case from the Build page with every part in place, turning slowly (drag to turn; no zoom, so the wheel scrolls the page), and a **sample build card** leaning over it: the cheapest part (in stock) of each core category with its price and the total. It is real data, labelled as a sample; it links to Build. On phones the card sits flat under the case. No "compatible" badge until the compatibility checks exist.
+- On the other side the 3D case from the Build page with every part in place, turning slowly (drag to turn; no zoom, so the wheel scrolls the page), and a **build card** leaning over it: the visitor's own open build from the Build page (its parts, prices and total; from the account when signed in, from the browser for a guest, with today's prices), or, when they have no parts yet, a sample build: the cheapest part (in stock) of each core category. It follows changes made on the Build page in another tab (at once for guests, on coming back to the tab otherwise) and links to Build. On phones the card sits flat under the case. No "compatible" badge until the compatibility checks exist.
 - Category shortcuts: one card per category (CPU, GPU, monitor, prebuilt PCs...) with a picture on top and the name under it; opens Parts filtered by that category. The pictures are line icons in `client/images/categories/<slug>.svg` (one file per category slug); a file can be replaced by a photo with the same name.
 - **Most searched parts**: the parts people search for most. Needs search tracking (a count per part when it appears in search results or is opened), so it comes after the parts listing works.
 - **Biggest price drops**: parts whose price fell the most recently. Needs `price_history`, so it comes in Phase 5.
@@ -120,7 +120,8 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
   - The open tab is the **current build**; clicking another tab opens that build.
   - A **"+"** button starts a new, empty build in a new tab. The other builds stay as they are.
   - Each tab can be **renamed** (e.g. "Build 1" -> "Gaming PC"), **duplicated** (a copy in a new tab, to try other parts without changing the original) and **deleted**. A build is never removed by the site: it stays until the user deletes it, and deleting asks for confirmation first.
-  - Every change is saved to the current build right away (no save button): guests in localStorage, signed-in users in their account (name, budget, purpose, parts). After sign-in, a guest's builds move to the account.
+  - Every change is saved to the current build right away (no save button): guests in localStorage, signed-in users in their account (`GET/POST /api/builds`, `PUT/DELETE /api/builds/:id`, each user only reaches their own builds). Quick changes in a row are sent as one save, and a change made just before closing the page is still sent. When a signed-in user opens the Build page, the builds made as a guest in that browser move to the account (a notice says so).
+  - Renaming asks for the new name; deleting asks for confirmation. Deleting the last build leaves a new empty one, so there is always a tab.
   - Each tab shows a small status dot: green when the build is ready, red when it has a compatibility error.
 - **"Add all to My list"** button: adds every part in the build, with its chosen offer, to My list. Works for a full build or a partial one (only the parts chosen so far).
 
@@ -161,7 +162,7 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
   - **Hide** (the main option): the item disappears from the site but stays in the admin page and can be shown again. Saved builds and lists keep it and show "no longer available".
   - **Delete** (permanent): asks for confirmation first. If the item is used in saved builds or lists, the confirmation shows how many and suggests hiding instead. If the admin still deletes it: a deleted part is removed from those builds and lists; a deleted offer is replaced by the cheapest other offer for that part.
   - **Users are told**: each affected user gets a notification (e.g. "RTX 4060 ASUS Dual was removed from your build \"Gaming PC\" because it is no longer available"). It shows as a banner on Build or My list until they close it.
-  - Guests (build in localStorage): when the build loads and a part no longer exists, the page removes it and shows the same kind of banner.
+  - Guests (build in localStorage): when the Build page opens, it asks for today's prices of the saved parts (`POST /api/builds/refresh`): a changed price is updated, a removed offer becomes the cheapest one, and a part that no longer exists is removed with a banner saying how many. Signed-in users always get today's prices from `GET /api/builds`.
 - **Stores**: add or edit a store (name, website, ships from, delivery, warranty, returns, trust score).
 - **Users**: list of users; give or remove admin access (an admin cannot remove their own).
 - Later (Phase 5): "paste link" tool, "update now" button, and the offer alerts above.

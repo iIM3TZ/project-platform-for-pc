@@ -10,8 +10,9 @@ export class ApiError extends Error {
 }
 
 // body: an object sent as JSON. file: a File sent as it is (for picture uploads).
-async function request(path, { method = 'GET', body, file } = {}) {
-  const options = { method, headers: {} };
+// keepalive: the request goes on even if the page is being closed (last save of a build).
+async function request(path, { method = 'GET', body, file, keepalive = false } = {}) {
+  const options = { method, headers: {}, keepalive };
   if (file) {
     options.headers['Content-Type'] = file.type;
     options.body = file;
@@ -63,6 +64,15 @@ export const compatibleProducts = (category, productIds) =>
 
 // { count, cheapest, cpu_name, gpu_chipset } for ready-made PCs like the build, or null
 export const prebuiltMatch = (productIds) => request('/builds/prebuilt-match', { method: 'POST', body: { items: asItems(productIds) } });
+
+// Today's prices for parts kept in the browser: { items } (removed parts left out)
+export const refreshBuildItems = (items) => request('/builds/refresh', { method: 'POST', body: { items } });
+
+// The signed-in user's saved builds. build: { name, items: [{ product_id, offer_id }] }
+export const getBuilds = () => request('/builds');
+export const createBuild = (build) => request('/builds', { method: 'POST', body: build });
+export const updateBuild = (id, build, { keepalive = false } = {}) => request(`/builds/${id}`, { method: 'PUT', body: build, keepalive });
+export const deleteBuild = (id) => request(`/builds/${id}`, { method: 'DELETE' });
 
 // ---------- Accounts ----------
 
