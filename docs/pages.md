@@ -84,9 +84,9 @@ Two parts: a **top bar** for the pages and search, and a **menu** (hamburger) th
 
 ## Build
 
-- **Interactive 3D PC case** (three.js, `client/js/components/pcCase3d.js`): a big dark "showroom" stage with a floor grid, an open case with a glass side, fans that spin and orange RGB light. The parts are simple shapes made in code, not a model per product.
+- **Interactive 3D PC case** (three.js, `client/js/components/pcCase3d.js`): a big dark "showroom" stage with a floor grid, an open case with a clear glass side, a mesh front and fans that spin. The parts are detailed shapes made in code (not a model per product), placed where they go in a real PC: the graphics card lies flat in the top PCIe slot, the tower cooler stands out from the board, the power supply sits under the shroud and its cables go to the board, the CPU and the graphics card. Small pictures (circuit lines on the board, the front mesh, labels) are drawn on a canvas, so no image files are needed. Lighting is like a product photo (soft key light, fill, a white LED strip inside the top of the case, a low orange rim light from behind), so the parts keep their real colors. A real `.glb` model can replace any part (`client/js/pcModels.js`, `client/models/README.md`).
   - Drag to turn it around (it turns slowly by itself until the user touches it; no turning when the system asks for reduced motion).
-  - A part that is not chosen is a see-through "ghost"; once chosen it becomes solid and lit, so the user watches the PC being built.
+  - A part that is not chosen is a thin outline box of where it goes (no see-through layers), so a beginner sees each part's place; pointing at its circle turns the outline orange. Once chosen, the real part drops into place, so the user watches the PC being built.
   - A small circle sits on each core part (CPU, motherboard, RAM, GPU, storage, PSU, case, cooler) and follows it as the case turns. Circles are real `<button>` elements. **Hovering** or focusing one shows a tooltip with the chosen part's picture, its category and its name; it also lights the part up in orange. **Clicking** it opens the part picker for that category (a tap on phones).
   - Circle color: grey = not chosen, green = chosen, red = has a compatibility error.
   - When the browser cannot draw 3D (no WebGL), the page shows a flat SVG drawing with the same circles (`pcCase.js`).

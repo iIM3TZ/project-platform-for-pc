@@ -1,7 +1,8 @@
 # 3D models of the parts
 
-The Build page shows a real 3D model for each part that has a file here. A part without a file
-is drawn in code instead, so the page works with any number of files (even none).
+The Build page shows a real 3D model for each part that has a file here (and is set in
+`client/js/pcModels.js`). A part without a file is drawn in code instead, so the page works with any
+number of files (even none).
 
 ## Files
 
@@ -30,7 +31,7 @@ is drawn in code instead, so the page works with any number of files (even none)
 ## After adding a file
 
 1. Put it here with the name from the table.
-2. Fill its `credit` in `client/js/pcModels.js` (title, author, license, link). The Build page lists
+2. In `client/js/pcModels.js`, set the part's `file` (e.g. `file: '/models/gpu.glb'`; it is `null` until then, so the page never asks for a missing file), and fill its `credit` in `client/js/pcModels.js` (title, author, license, link). The Build page lists
    the credits under the case; CC BY requires it.
 3. Open the Build page. The model is scaled and placed in its part's space by itself. If it is turned
    the wrong way, change its `rotation` in `pcModels.js` (degrees around x, y, z).

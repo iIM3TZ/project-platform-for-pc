@@ -1,8 +1,12 @@
 // The 3D PC case on the Build page, drawn with three.js. Each part is a real 3D model when its
-// .glb file is in client/models (see pcModels.js), or else a shape drawn in code, so the page
-// always works. Models are general, not one per product. A part that is not chosen yet is a faint "ghost"; when the user
-// chooses it, it drops into place with an orange flash and stays solid, so the user watches
-// the PC being built.
+// .glb file is set in pcModels.js, or else a detailed shape drawn in code, so the page always
+// works. Models are general, not one per product.
+//
+// A part that is not chosen yet is a clean outline of where it goes (a "blueprint" box), so a
+// beginner sees where each part sits without layers of see-through shapes. When the user chooses
+// it, the real part drops into place with an orange flash, so the user watches the PC being built.
+// The parts sit where they go in a real PC: the graphics card lies flat in the top PCIe slot, the
+// tower cooler's fins stand out from the board, the power supply is under the shroud.
 //
 // Drag to turn it around. It turns slowly by itself until the user drags it, and stops while the
 // pointer is over it so the circles are easy to reach. A circle (a real <button>) sits on each
@@ -10,12 +14,14 @@
 // back to the flat SVG drawing (pcCase.js).
 //
 // Colors: the scene is a dark showroom in both themes. Its fixed colors are below; the orange
-// accent comes from the --color-stage-accent token in base.css.
+// accent comes from the --color-stage-accent token in base.css. The small pictures on the parts
+// (circuit lines, the front mesh, labels) are drawn on a canvas here, so no image files are needed.
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { PART_MODELS } from '/js/pcModels.js';
@@ -25,22 +31,23 @@ import { el } from '/js/components/dom.js';
 // The case, in scene units (about 10 cm each): front at -x, back at +x, glass side at +z
 const CASE = { depth: 4.4, height: 4.6, width: 2.2 };
 const FLOOR_Y = -CASE.height / 2 - 0.14;
-
-const GHOST_OPACITY = 0.07;      // a part that is not chosen: barely there
-const CASE_GHOST_OPACITY = 0.4;  // the case stays easier to see, it holds everything
-const DROP_MS = 700;             // how long a new part takes to drop into place
+const DROP_MS = 700; // how long a new part takes to drop into place
 
 // A black case with silver and white parts, so every part stands out from the case
 const COLORS = {
-  caseBody: 0x15171b,
-  tray: 0x0e1013,
-  pcb: 0x14171c,
-  dark: 0x23272e,
-  shroud: 0x2b3038,
-  silver: 0xc8cdd5,
-  white: 0xe8ebef,
+  caseBody: 0x1a1d22,
+  tray: 0x101216,
+  pcb: 0x15181d,
+  dark: 0x24282f,
+  slot: 0x0c0d10,
+  shroud: 0x2a2f37,
+  silver: 0xc9ced6,
+  white: 0xe9ecf0,
+  copper: 0xd39a5f,
+  sleeve: 0x16181c,
   glass: 0xffffff,
   edge: 0x3a404a,
+  outline: 0xe8ebf0,
 };
 
 function cssColor(name, fallback) {
@@ -48,19 +55,33 @@ function cssColor(name, fallback) {
   return value || fallback;
 }
 
-// ---------- Materials and shapes ----------
+// ---------- Materials, pictures and shapes ----------
 
-function standard(color, { metalness = 0.3, roughness = 0.5, opacity = 1 } = {}) {
-  return new THREE.MeshStandardMaterial({ color, metalness, roughness, transparent: opacity < 1, opacity });
+function standard(color, { metalness = 0.3, roughness = 0.5, map = null } = {}) {
+  return new THREE.MeshStandardMaterial({ color, metalness, roughness, map });
 }
 
-const metal = (color = COLORS.silver) => standard(color, { metalness: 0.95, roughness: 0.28 });
-const matte = (color) => standard(color, { metalness: 0.2, roughness: 0.7 });
+const metal = (color = COLORS.silver, roughness = 0.3) => standard(color, { metalness: 0.95, roughness });
+const brushed = (color = COLORS.silver) => standard(color, { metalness: 0.85, roughness: 0.42 });
+const matte = (color, roughness = 0.75) => standard(color, { metalness: 0.15, roughness });
 
-function glowMaterial(accent) {
-  const material = new THREE.MeshStandardMaterial({ color: accent, emissive: accent, emissiveIntensity: 2, roughness: 0.4 });
+function glowMaterial(accent, intensity = 1.4) {
+  const material = new THREE.MeshStandardMaterial({ color: accent, emissive: accent, emissiveIntensity: intensity, roughness: 0.4 });
   material.userData.isGlow = true;
+  material.userData.glow = intensity;
   return material;
+}
+
+// A picture drawn on a canvas, used as a texture (circuit lines, mesh holes, labels)
+function canvasTexture(width, height, draw) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  draw(canvas.getContext('2d'), width, height);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  return texture;
 }
 
 // A box with rounded edges (radius in scene units)
@@ -69,38 +90,177 @@ function rbox(width, height, depth, material, radius = 0.03) {
   return new THREE.Mesh(new RoundedBoxGeometry(width, height, depth, 3, r), material);
 }
 
-// A 120 mm style fan facing +z: square frame, glowing ring, hub and blades (returned to spin)
-function makeFan(size, accent, frameColor) {
+function cylinder(radius, length, material, segments = 16) {
+  return new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, segments), material);
+}
+
+// A 120 mm style fan facing +z: square frame, a thin lit ring, hub and curved blades
+// (the blades are returned so they can spin)
+function makeFan(size, accent, frameColor, { ring = true } = {}) {
   const group = new THREE.Group();
-  const bar = size * 0.12;
-  const frame = matte(frameColor);
+  const bar = size * 0.1;
+  const frame = matte(frameColor, 0.6);
   for (const [w, h, x, y] of [
     [size, bar, 0, (size - bar) / 2], [size, bar, 0, -(size - bar) / 2],
     [bar, size, (size - bar) / 2, 0], [bar, size, -(size - bar) / 2, 0],
   ]) {
-    const side = rbox(w, h, 0.12, frame, 0.02);
+    const side = rbox(w, h, 0.14, frame, 0.02);
     side.position.set(x, y, 0);
     group.add(side);
   }
-  group.add(new THREE.Mesh(new THREE.TorusGeometry(size * 0.42, size * 0.03, 10, 48), glowMaterial(accent)));
+  // The round opening inside the square frame
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(size * 0.47, size * 0.47, 0.13, 40, 1, true), frame);
+  shell.rotation.x = Math.PI / 2;
+  group.add(shell);
+  if (ring) {
+    const glow = new THREE.Mesh(new THREE.TorusGeometry(size * 0.455, size * 0.012, 8, 64), glowMaterial(accent, 1.1));
+    glow.position.z = 0.07;
+    group.add(glow);
+  }
 
-  const hub = new THREE.Mesh(new THREE.CylinderGeometry(size * 0.13, size * 0.13, 0.1, 24), frame);
+  const hub = cylinder(size * 0.14, 0.12, matte(frameColor, 0.5), 32);
   hub.rotation.x = Math.PI / 2;
   group.add(hub);
+  const cap = cylinder(size * 0.1, 0.01, matte(frameColor === COLORS.white ? COLORS.silver : COLORS.edge, 0.4), 32);
+  cap.rotation.x = Math.PI / 2;
+  cap.position.z = 0.066;
+  group.add(cap);
 
+  // Seven wide blades, twisted, so the fan reads as a fan even at a small size
   const blades = new THREE.Group();
-  const bladeMaterial = standard(frameColor, { roughness: 0.4, opacity: 0.92 });
-  for (let i = 0; i < 9; i += 1) {
+  const bladeMaterial = standard(frameColor, { roughness: 0.45, metalness: 0.1 });
+  const bladeShape = new THREE.Shape();
+  bladeShape.moveTo(0, -size * 0.05);
+  bladeShape.quadraticCurveTo(size * 0.2, -size * 0.12, size * 0.33, -size * 0.02);
+  bladeShape.quadraticCurveTo(size * 0.26, size * 0.12, 0, size * 0.07);
+  const bladeGeometry = new THREE.ExtrudeGeometry(bladeShape, { depth: 0.012, bevelEnabled: false });
+  for (let i = 0; i < 7; i += 1) {
     const pivot = new THREE.Group();
-    pivot.rotation.z = (i / 9) * Math.PI * 2;
-    const blade = new THREE.Mesh(new THREE.BoxGeometry(size * 0.3, size * 0.12, 0.012), bladeMaterial);
-    blade.position.x = size * 0.27;
-    blade.rotation.x = 0.5;
+    pivot.rotation.z = (i / 7) * Math.PI * 2;
+    const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+    blade.position.x = size * 0.11;
+    blade.rotation.x = 0.45;
     pivot.add(blade);
     blades.add(pivot);
   }
   group.add(blades);
   return { group, blades };
+}
+
+// A soft round cable through the given points (a sleeved power cable)
+function cable(points, radius, material) {
+  const curve = new THREE.CatmullRomCurve3(points.map((p) => new THREE.Vector3(...p)));
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, 48, radius, 8, false), material);
+}
+
+// ---------- Pictures drawn on canvas ----------
+
+// The motherboard: dark board with faint circuit lines, white print around the slots and screw holes.
+// box: the board in scene units; marks: rectangles to outline, in scene units too.
+function pcbTexture(box, marks) {
+  const scale = 200; // pixels per scene unit
+  const width = Math.round((box.x1 - box.x0) * scale);
+  const height = Math.round((box.y1 - box.y0) * scale);
+  const px = (x) => (x - box.x0) * scale;
+  const py = (y) => (box.y1 - y) * scale;
+  return canvasTexture(width, height, (ctx) => {
+    ctx.fillStyle = '#16191f';
+    ctx.fillRect(0, 0, width, height);
+    // Circuit lines: thin, a bit lighter than the board, in straight runs with 45 degree turns
+    ctx.strokeStyle = 'rgba(80, 92, 110, 0.35)';
+    ctx.lineWidth = 1.2;
+    let seed = 7;
+    const random = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    for (let i = 0; i < 140; i += 1) {
+      let x = random() * width;
+      let y = random() * height;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      for (let step = 0; step < 3; step += 1) {
+        const run = 20 + random() * 70;
+        if (step % 2 === 0) x += random() > 0.5 ? run : -run;
+        else { x += run * 0.5; y += random() > 0.5 ? run * 0.5 : -run * 0.5; }
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    // White print around the slots and parts
+    ctx.strokeStyle = 'rgba(220, 226, 235, 0.55)';
+    ctx.lineWidth = 2;
+    for (const [x0, y0, x1, y1] of marks) {
+      ctx.strokeRect(px(x0), py(y1), (x1 - x0) * scale, (y1 - y0) * scale);
+    }
+    // Screw holes with a metal ring
+    for (const [x, y] of [[0.08, 0.08], [0.92, 0.08], [0.08, 0.5], [0.92, 0.5], [0.08, 0.93], [0.6, 0.93], [0.92, 0.93]]) {
+      ctx.beginPath();
+      ctx.arc(x * width, y * height, 9, 0, Math.PI * 2);
+      ctx.fillStyle = '#b9bfc8';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x * width, y * height, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#0b0c0f';
+      ctx.fill();
+    }
+    // Small chips and resistors
+    ctx.fillStyle = '#0d0f12';
+    for (let i = 0; i < 26; i += 1) {
+      ctx.fillRect(random() * width, random() * height, 8 + random() * 18, 6 + random() * 10);
+    }
+  });
+}
+
+// The front of the case: a fine mesh of round holes
+function meshTexture() {
+  const texture = canvasTexture(128, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#1b1e23';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#07080a';
+    for (let y = 0; y < 8; y += 1) {
+      for (let x = 0; x < 8; x += 1) {
+        ctx.beginPath();
+        ctx.arc(x * 16 + (y % 2) * 8 + 4, y * 16 + 8, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  });
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(5, 10);
+  return texture;
+}
+
+// The back plate of the graphics card: dark metal with rows of air slots
+function backplateTexture() {
+  return canvasTexture(512, 220, (ctx, w, h) => {
+    ctx.fillStyle = '#2c3038';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#121418';
+    for (let row = 0; row < 3; row += 1) {
+      for (let i = 0; i < 18; i += 1) ctx.fillRect(250 + i * 13, 40 + row * 55, 6, 36);
+    }
+    ctx.strokeStyle = 'rgba(200, 206, 214, 0.35)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(20, h - 30);
+    ctx.lineTo(200, h - 30);
+    ctx.lineTo(230, 30);
+    ctx.stroke();
+  });
+}
+
+// The side of the power supply: a white label with grey lines and boxes (no words or numbers)
+function labelTexture() {
+  return canvasTexture(256, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#e7eaee';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#9aa1ab';
+    for (let i = 0; i < 6; i += 1) ctx.fillRect(18, 18 + i * 13, 90 + (i % 3) * 30, 5);
+    ctx.strokeStyle = '#9aa1ab';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 4; i += 1) ctx.strokeRect(150 + i * 24, 20, 18, 18);
+    ctx.fillStyle = '#2b2f36';
+    for (let i = 0; i < 26; i += 1) ctx.fillRect(150 + i * 3.6, 60, i % 3 === 0 ? 2.4 : 1.2, 44);
+  });
 }
 
 // ---------- The scene ----------
@@ -112,9 +272,11 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  // Neutral tone mapping keeps the real colors of the parts (white stays white, black stays black)
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  RectAreaLightUniformsLib.init();
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const accent = new THREE.Color(cssColor('--color-stage-accent', '#ff7a29'));
@@ -123,10 +285,10 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   // Reflections of a soft room on metal and glass: the biggest step towards a real look
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.75;
+  scene.environmentIntensity = 0.85;
 
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-  camera.position.set(-3.4, 1.7, 9.2);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  camera.position.set(-5.4, 2.6, 8.4); // a three-quarter view from the front, so the depth shows
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, -0.1, 0);
@@ -145,25 +307,32 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   container.addEventListener('pointerenter', () => { pointerInside = true; });
   container.addEventListener('pointerleave', () => { pointerInside = false; });
 
-  // Lights: a key light that casts shadows, an orange rim light from behind, and an orange glow
-  // inside the case (the "RGB")
-  scene.add(new THREE.HemisphereLight(0xdde6ff, 0x0a0a0d, 0.25));
-  const key = new THREE.DirectionalLight(0xffffff, 2.2);
+  // Lights, like a product photo: a soft key light that casts shadows, a fill from the other side,
+  // a white LED strip inside the top of the case so the parts are clear, and an orange rim
+  // light from behind for the stage color
+  scene.add(new THREE.HemisphereLight(0xe6ecff, 0x101014, 0.45));
+  const key = new THREE.DirectionalLight(0xffffff, 2.1);
   key.position.set(-5, 9, 8);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
-  key.shadow.bias = -0.0005;
+  key.shadow.bias = -0.0004;
+  key.shadow.normalBias = 0.02;
   Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5 });
   scene.add(key);
-  const rim = new THREE.DirectionalLight(accent, 1.4);
-  rim.position.set(6, 3, -7);
+  const fill = new THREE.DirectionalLight(0xdfe7ff, 0.7);
+  fill.position.set(7, 2, 5);
+  scene.add(fill);
+  // Low and from behind, so it outlines the case without coloring the parts inside
+  const rim = new THREE.DirectionalLight(accent, 0.8);
+  rim.position.set(5, -0.5, -8);
   scene.add(rim);
-  const inner = new THREE.PointLight(accent, 5, 6);
-  inner.position.set(0, 0.6, 0.2);
-  scene.add(inner);
+  const strip = new THREE.RectAreaLight(0xffffff, 2.4, CASE.depth - 0.6, 0.5);
+  strip.position.set(0, CASE.height / 2 - 0.12, 0.25);
+  strip.lookAt(0, -CASE.height / 2, 0.25);
+  scene.add(strip);
 
   // The floor: catches the shadow of the case, with a faint grid like a showroom
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.5 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.55 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = FLOOR_Y;
   floor.receiveShadow = true;
@@ -171,35 +340,33 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   const grid = new THREE.GridHelper(40, 40, accent, COLORS.edge);
   grid.position.y = FLOOR_Y + 0.001;
   grid.material.transparent = true;
-  grid.material.opacity = 0.16;
+  grid.material.opacity = 0.14;
   scene.add(grid);
 
   // ---------- Parts ----------
 
-  const parts = {}; // slug -> { group, meshes, fans, anchor, ghostOpacity, chosen, drop }
+  // slug -> { group, ghost, meshes, fans, anchor, ghostEach, chosen, drop }
+  const parts = {};
   let spinning = []; // fan blades
 
-  function addPart(slug, anchor, ghostOpacity = GHOST_OPACITY) {
+  function addPart(slug, anchor, { ghostEach = false } = {}) {
     const group = new THREE.Group();
     scene.add(group);
-    parts[slug] = { group, meshes: [], fans: [], anchor: new THREE.Vector3(...anchor), ghostOpacity, chosen: null, drop: null };
+    parts[slug] = { group, ghost: null, meshes: [], fans: [], anchor: new THREE.Vector3(...anchor), ghostEach, chosen: null, drop: null };
     return parts[slug];
   }
 
-  // Each mesh gets its own copy of the material, so ghosting one part never touches another
-  function add(part, object, position = [0, 0, 0], rotation = [0, 0, 0]) {
+  // Each mesh gets its own copy of the material, so lighting one part up never touches another.
+  // noGhost: the object is left out of the part's outline (e.g. cables, which go everywhere).
+  function add(part, object, position = [0, 0, 0], rotation = [0, 0, 0], { noGhost = false } = {}) {
     object.position.set(...position);
     object.rotation.set(...rotation);
+    object.userData.noGhost = noGhost;
     part.group.add(object);
     object.traverse((child) => {
       if (!child.isMesh) return;
       // A model's mesh can have several materials; each one gets its own copy
-      const copy = (material) => {
-        const clone = material.clone();
-        clone.userData.baseOpacity = clone.opacity;
-        clone.userData.baseTransparent = clone.transparent;
-        return clone;
-      };
+      const copy = (material) => material.clone();
       child.material = Array.isArray(child.material) ? child.material.map(copy) : copy(child.material);
       child.castShadow = true;
       child.receiveShadow = true;
@@ -208,8 +375,8 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
     return object;
   }
 
-  function addFan(part, size, position, rotation, frameColor = COLORS.dark) {
-    const fan = makeFan(size, accent, frameColor);
+  function addFan(part, size, position, rotation, frameColor = COLORS.dark, options = {}) {
+    const fan = makeFan(size, accent, frameColor, options);
     add(part, fan.group, position, rotation);
     spinning.push(fan.blades);
     part.fans.push(fan.blades);
@@ -218,85 +385,217 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   const { depth: D, height: H, width: W } = CASE;
   const TRAY_Z = -W / 2 + 0.06; // the inside face of the back tray, where the motherboard sits
   const FACE_FRONT = [0, -Math.PI / 2, 0]; // turns a fan to face the front of the case (-x)
+  const FACE_UP = [-Math.PI / 2, 0, 0];
+  const FACE_DOWN = [Math.PI / 2, 0, 0];
+  const SHROUD_Y = -1.36; // top of the cover over the power supply
 
-  // --- Case: panels, glass side with a black frame, feet, fans, and the shroud over the PSU ---
-  const pcCase = addPart('case', [-D / 2 + 0.05, H / 2 - 0.35, W / 2 - 0.1], CASE_GHOST_OPACITY);
-  const caseMetal = standard(COLORS.caseBody, { metalness: 0.6, roughness: 0.38 });
-  add(pcCase, rbox(D, 0.1, W, caseMetal, 0.04), [0, H / 2, 0]);                    // top
-  add(pcCase, rbox(D, 0.1, W, caseMetal, 0.04), [0, -H / 2, 0]);                   // bottom
-  add(pcCase, rbox(0.1, H, W, caseMetal, 0.04), [D / 2, 0, 0]);                    // back
-  add(pcCase, rbox(D, H, 0.06, matte(COLORS.tray), 0.02), [0, 0, -W / 2]);         // tray
-  add(pcCase, rbox(0.08, H, W, standard(COLORS.caseBody, { roughness: 0.8, opacity: 0.6 }), 0.03), [-D / 2, 0, 0]); // front mesh
+  // The motherboard (ATX, 30.5 x 24.4 cm, standing up) and where its slots are
+  const BOARD = { x0: -0.6, x1: 1.92, y0: -1.2, y1: 1.95 };
+  const SOCKET = { x: 0.92, y: 1.22 };
+  const DIMM_X = [0.08, 0.2, 0.32, 0.44];
+  const DIMM_Y = 1.25;
+  const PCIE_Y = 0.22;      // the top x16 slot, where the graphics card goes
+  const PCIE2_Y = -0.62;
+  const M2 = { x: 0.95, y: 0.62 };
+
+  // --- Case: panels, tinted glass side with a black frame, mesh front, feet, fans and the shroud ---
+  const pcCase = addPart('case', [-D / 2 + 0.2, H / 2 - 0.2, W / 2]);
+  const caseMetal = standard(COLORS.caseBody, { metalness: 0.55, roughness: 0.42 });
+  add(pcCase, rbox(D, 0.1, W, caseMetal, 0.05), [0, H / 2, 0]);                     // top
+  add(pcCase, rbox(D, 0.1, W, caseMetal, 0.05), [0, -H / 2, 0]);                    // bottom
+  add(pcCase, rbox(0.1, H, W, caseMetal, 0.04), [D / 2, 0, 0]);                     // back
+  add(pcCase, rbox(D, H, 0.06, matte(COLORS.tray, 0.85), 0.02), [0, 0, -W / 2]);    // tray behind the board
+  add(pcCase, rbox(0.1, H, W, standard(0xffffff, { roughness: 0.8, metalness: 0.2, map: meshTexture() }), 0.04), [-D / 2, 0, 0]); // mesh front
+  // Rubber cable holes in the tray, beside the board and above it
+  for (const [w, h, x, y] of [[0.16, 0.8, BOARD.x0 - 0.28, 0.85], [0.16, 0.6, BOARD.x0 - 0.28, -0.4], [0.7, 0.14, 0.3, H / 2 - 0.22]]) {
+    add(pcCase, rbox(w, h, 0.02, matte(0x050506, 0.9), 0.06), [x, y, TRAY_Z + 0.005]);
+  }
+  // The rear panel inside: the slot covers for the expansion cards, and a cutout for the board's ports
+  for (let i = 0; i < 5; i += 1) add(pcCase, rbox(0.03, 0.12, 0.7, brushed(COLORS.dark), 0.01), [D / 2 - 0.07, PCIE_Y - 0.05 - i * 0.2, TRAY_Z + 0.5]);
   const glass = new THREE.MeshPhysicalMaterial({
-    color: COLORS.glass, metalness: 0, roughness: 0.03, transparent: true, opacity: 0.06, clearcoat: 1,
+    color: 0xc4ccd8, metalness: 0, roughness: 0.03, transparent: true, opacity: 0.05, clearcoat: 1, depthWrite: false,
   });
-  add(pcCase, new THREE.Mesh(new THREE.BoxGeometry(D - 0.1, H - 0.1, 0.02), glass), [0, 0, W / 2]);
-  for (const [w, h, x, y] of [[D, 0.06, 0, H / 2 - 0.03], [D, 0.06, 0, -H / 2 + 0.03], [0.06, H, -D / 2 + 0.03, 0], [0.06, H, D / 2 - 0.03, 0]]) {
-    add(pcCase, rbox(w, h, 0.03, caseMetal, 0.01), [x, y, W / 2 + 0.01]);          // glass frame
+  const pane = add(pcCase, new THREE.Mesh(new THREE.BoxGeometry(D - 0.1, H - 0.1, 0.02), glass), [0, 0, W / 2]);
+  pane.castShadow = false;
+  for (const [w, h, x, y] of [[D, 0.08, 0, H / 2 - 0.04], [D, 0.08, 0, -H / 2 + 0.04], [0.08, H, -D / 2 + 0.04, 0], [0.08, H, D / 2 - 0.04, 0]]) {
+    add(pcCase, rbox(w, h, 0.04, matte(0x0b0c0e, 0.5), 0.01), [x, y, W / 2 + 0.01]); // black glass frame
   }
-  for (const x of [-D / 2 + 0.35, D / 2 - 0.35]) {
-    for (const z of [-W / 2 + 0.3, W / 2 - 0.3]) add(pcCase, rbox(0.4, 0.14, 0.34, matte(COLORS.tray), 0.05), [x, -H / 2 - 0.07, z]);
+  for (const x of [-D / 2 + 0.4, D / 2 - 0.4]) {
+    for (const z of [-W / 2 + 0.3, W / 2 - 0.3]) add(pcCase, rbox(0.45, 0.14, 0.32, matte(COLORS.tray), 0.06), [x, -H / 2 - 0.07, z]);
   }
-  for (const y of [1.25, 0.05]) addFan(pcCase, 1.15, [-D / 2 + 0.16, y, 0], FACE_FRONT);
-  addFan(pcCase, 1.0, [D / 2 - 0.16, 1.45, -0.25], FACE_FRONT);
-  // PSU shroud: a top plate and a side plate with an opening at the back where the PSU shows
-  add(pcCase, rbox(D - 0.12, 0.06, W - 0.12, caseMetal, 0.02), [0, -1.36, 0]);
-  add(pcCase, rbox(2.55, 0.86, 0.06, caseMetal, 0.02), [-0.86, -1.82, W / 2 - 0.12]);
-  add(pcCase, rbox(0.25, 0.86, 0.06, caseMetal, 0.02), [D / 2 - 0.18, -1.82, W / 2 - 0.12]);
+  for (const y of [1.6, 0.48]) addFan(pcCase, 1.08, [-D / 2 + 0.17, y, -0.05], FACE_FRONT);        // front intake
+  addFan(pcCase, 1.0, [D / 2 - 0.17, 1.5, -0.35], FACE_FRONT);                                      // rear exhaust
+  for (const x of [-1.05, 0.15]) addFan(pcCase, 1.0, [x, H / 2 - 0.15, -0.3], FACE_UP);             // top exhaust
+  // Shroud over the power supply, with a window at the back where the PSU shows
+  add(pcCase, rbox(D - 0.14, 0.06, W - 0.1, caseMetal, 0.02), [0, SHROUD_Y, 0]);
+  add(pcCase, rbox(2.6, H / 2 + SHROUD_Y - 0.05, 0.06, caseMetal, 0.02), [-0.85, (SHROUD_Y - H / 2) / 2, W / 2 - 0.1]);
+  add(pcCase, rbox(0.2, H / 2 + SHROUD_Y - 0.05, 0.06, caseMetal, 0.02), [D / 2 - 0.16, (SHROUD_Y - H / 2) / 2, W / 2 - 0.1]);
 
-  // --- Motherboard: board, power heatsinks, rear I/O cover, slots and chipset heatsink ---
-  const board = addPart('motherboard', [-0.95, -0.85, TRAY_Z + 0.1]);
-  add(board, rbox(3.0, 3.35, 0.06, matte(COLORS.pcb), 0.02), [0.4, 0.55, TRAY_Z + 0.03]);
-  add(board, rbox(0.28, 1.05, 0.22, metal(), 0.04), [-0.6, 1.35, TRAY_Z + 0.17]);
-  add(board, rbox(1.05, 0.28, 0.22, metal(), 0.04), [0.3, 2.02, TRAY_Z + 0.17]);
-  add(board, rbox(0.4, 1.15, 0.42, matte(COLORS.dark), 0.05), [1.72, 1.55, TRAY_Z + 0.27]);
-  add(board, rbox(0.75, 0.75, 0.12, metal(), 0.05), [1.0, -0.85, TRAY_Z + 0.12]);
-  for (const y of [-0.15, -0.65]) add(board, rbox(2.1, 0.07, 0.09, metal(COLORS.dark), 0.02), [0.1, y, TRAY_Z + 0.1]);
-  for (let i = 0; i < 4; i += 1) add(board, rbox(0.07, 1.15, 0.06, matte(COLORS.dark), 0.01), [0.82 + i * 0.13, 1.18, TRAY_Z + 0.08]);
-  add(board, rbox(0.12, 0.5, 0.12, matte(COLORS.dark), 0.02), [-1.0, 0.95, TRAY_Z + 0.1]);  // 24-pin power connector
-
-  // --- CPU: the metal lid in the socket (under the cooler) ---
-  const cpu = addPart('cpu', [-0.05, 1.0, TRAY_Z + 0.15]);
-  add(cpu, rbox(0.6, 0.6, 0.06, metal(), 0.03), [0.25, 1.22, TRAY_Z + 0.09]);
-  add(cpu, rbox(0.7, 0.7, 0.03, matte(COLORS.dark), 0.02), [0.25, 1.22, TRAY_Z + 0.06]);
-
-  // --- Tower air cooler: heat pipes, a stack of silver fins, a cap and a white fan in front ---
-  const cooler = addPart('cooler', [0.3, 2.05, -0.35]);
-  const COOLER_Z = -0.45;
-  for (const z of [-0.75, -0.55, -0.35, -0.15]) {
-    add(cooler, new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.45, 12), metal(0xd9a066)), [0.25, 1.28, z]);
+  // --- Motherboard: printed board, slots, power heatsinks, port cover and chipset heatsink ---
+  const board = addPart('motherboard', [-0.25, -0.95, TRAY_Z + 0.1]);
+  const BOARD_Z = TRAY_Z + 0.04;
+  const boardWidth = BOARD.x1 - BOARD.x0;
+  const boardHeight = BOARD.y1 - BOARD.y0;
+  const marks = [
+    [SOCKET.x - 0.38, SOCKET.y - 0.38, SOCKET.x + 0.38, SOCKET.y + 0.38],
+    [DIMM_X[0] - 0.06, DIMM_Y - 0.72, DIMM_X[3] + 0.06, DIMM_Y + 0.72],
+    [BOARD.x1 - 1.95, PCIE_Y - 0.06, BOARD.x1 - 0.1, PCIE_Y + 0.06],
+    [BOARD.x1 - 1.95, PCIE2_Y - 0.06, BOARD.x1 - 0.1, PCIE2_Y + 0.06],
+    [M2.x - 0.45, M2.y - 0.12, M2.x + 0.45, M2.y + 0.12],
+    [-0.35, -1.1, 0.35, -0.75],
+  ];
+  const pcb = standard(0xffffff, { metalness: 0.2, roughness: 0.65, map: pcbTexture(BOARD, marks) });
+  add(board, rbox(boardWidth, boardHeight, 0.05, pcb, 0.015), [(BOARD.x0 + BOARD.x1) / 2, (BOARD.y0 + BOARD.y1) / 2, BOARD_Z]);
+  // CPU socket frame: a metal bracket with a lever (the CPU itself is its own part)
+  add(board, rbox(0.82, 0.82, 0.05, brushed(0x9aa1ab), 0.03), [SOCKET.x, SOCKET.y, BOARD_Z + 0.05]);
+  add(board, rbox(0.68, 0.68, 0.06, matte(COLORS.slot), 0.02), [SOCKET.x, SOCKET.y, BOARD_Z + 0.06]);
+  add(board, cylinder(0.012, 0.75, metal()), [SOCKET.x + 0.45, SOCKET.y, BOARD_Z + 0.08]);
+  // Power delivery heatsinks with fins, above and behind the socket
+  const vrm = standard(COLORS.dark, { metalness: 0.75, roughness: 0.35 });
+  add(board, rbox(0.95, 0.3, 0.26, vrm, 0.04), [SOCKET.x - 0.05, SOCKET.y + 0.58, BOARD_Z + 0.16]);
+  add(board, rbox(0.3, 1.0, 0.26, vrm, 0.04), [SOCKET.x + 0.62, SOCKET.y + 0.05, BOARD_Z + 0.16]);
+  for (let i = 0; i < 6; i += 1) add(board, rbox(0.9, 0.02, 0.05, brushed(), 0.005), [SOCKET.x - 0.05, SOCKET.y + 0.47 + i * 0.045, BOARD_Z + 0.3]);
+  // The port cover at the back top, over the rear ports
+  add(board, rbox(0.32, 1.05, 0.5, standard(0x1e2228, { metalness: 0.6, roughness: 0.35 }), 0.05), [BOARD.x1 - 0.2, 1.38, BOARD_Z + 0.28]);
+  add(board, rbox(0.02, 0.9, 0.04, glowMaterial(accent, 0.9), 0.005), [BOARD.x1 - 0.37, 1.38, BOARD_Z + 0.51]);
+  // Memory slots, the long slots for expansion cards (the top one with a metal shield) and the M.2 slot
+  for (const x of DIMM_X) {
+    add(board, rbox(0.06, 1.42, 0.08, matte(COLORS.slot), 0.01), [x, DIMM_Y, BOARD_Z + 0.06]);
+    add(board, rbox(0.07, 0.07, 0.1, matte(COLORS.edge), 0.01), [x, DIMM_Y + 0.74, BOARD_Z + 0.07]);
   }
-  for (let i = 0; i < 18; i += 1) add(cooler, rbox(0.5, 0.025, 0.95, metal(), 0.005), [0.25, 0.68 + i * 0.07, COOLER_Z]);
-  add(cooler, rbox(0.54, 0.09, 0.99, matte(COLORS.white), 0.03), [0.25, 1.98, COOLER_Z]);
-  addFan(cooler, 1.0, [-0.08, 1.3, COOLER_Z], FACE_FRONT, COLORS.white);
-
-  // --- RAM: four sticks with white heat spreaders and a glowing top ---
-  const ram = addPart('ram', [1.25, 1.85, -0.6]);
-  for (let i = 0; i < 4; i += 1) {
-    const x = 0.82 + i * 0.13;
-    add(ram, rbox(0.06, 1.05, 0.36, standard(COLORS.white, { metalness: 0.5, roughness: 0.35 }), 0.015), [x, 1.2, TRAY_Z + 0.26]);
-    add(ram, rbox(0.065, 0.09, 0.36, glowMaterial(accent), 0.015), [x, 1.76, TRAY_Z + 0.26]);
+  add(board, rbox(0.95, 0.09, 0.1, brushed(), 0.015), [BOARD.x1 - 0.6, PCIE_Y, BOARD_Z + 0.07]);
+  add(board, rbox(0.95, 0.07, 0.08, matte(COLORS.slot), 0.01), [BOARD.x1 - 0.6, PCIE2_Y, BOARD_Z + 0.06]);
+  add(board, rbox(0.9, 0.22, 0.04, matte(COLORS.slot), 0.01), [M2.x, M2.y, BOARD_Z + 0.04]);
+  // Chipset heatsink at the lower front, and the power connectors at the edge
+  add(board, rbox(0.72, 0.42, 0.14, standard(COLORS.shroud, { metalness: 0.8, roughness: 0.3 }), 0.05), [0.0, -0.92, BOARD_Z + 0.09]);
+  add(board, rbox(0.4, 0.05, 0.02, glowMaterial(accent, 0.9), 0.01), [0.0, -0.92, BOARD_Z + 0.17]);
+  add(board, rbox(0.12, 0.55, 0.16, matte(0x0e0f12, 0.6), 0.02), [BOARD.x0 + 0.1, 0.85, BOARD_Z + 0.1]);   // 24-pin
+  add(board, rbox(0.4, 0.12, 0.16, matte(0x0e0f12, 0.6), 0.02), [0.3, BOARD.y1 - 0.1, BOARD_Z + 0.1]);    // CPU 8-pin
+  // Capacitors around the socket
+  for (const [x, y] of [[0.4, 0.6], [0.5, 0.6], [1.45, 0.75], [1.45, 0.65], [-0.3, 0.2], [-0.2, 0.2]]) {
+    add(board, cylinder(0.035, 0.1, brushed(0x6a7079), 12), [x, y, BOARD_Z + 0.07], [Math.PI / 2, 0, 0]);
   }
 
-  // --- Graphics card: mounted upright behind the glass, so its three fans face the user ---
-  const gpu = addPart('gpu', [-1.35, -0.1, 0.8]);
-  const GPU_Z = 0.5;
-  add(gpu, rbox(2.85, 1.15, 0.42, standard(COLORS.shroud, { metalness: 0.7, roughness: 0.3 }), 0.08), [-0.05, -0.5, GPU_Z]);
-  add(gpu, rbox(2.85, 1.15, 0.04, metal(), 0.03), [-0.05, -0.5, GPU_Z - 0.23]);          // backplate
-  add(gpu, rbox(2.5, 0.05, 0.03, glowMaterial(accent), 0.01), [-0.05, 0.05, GPU_Z + 0.21]); // light strip
-  add(gpu, rbox(0.08, 1.35, 0.5, metal(), 0.02), [1.42, -0.5, GPU_Z]);                   // bracket
-  for (const x of [-0.98, -0.05, 0.88]) addFan(gpu, 0.82, [x, -0.52, GPU_Z + 0.24], [0, 0, 0]);
+  // --- CPU: the metal lid with chamfered edges in the socket (under the cooler) ---
+  const cpu = addPart('cpu', [SOCKET.x - 0.3, SOCKET.y - 0.32, BOARD_Z + 0.15]);
+  add(cpu, rbox(0.6, 0.6, 0.04, standard(0x1d4d3a, { roughness: 0.6 }), 0.01), [SOCKET.x, SOCKET.y, BOARD_Z + 0.1]);
+  add(cpu, rbox(0.5, 0.5, 0.05, metal(0xc4c9d0, 0.38), 0.04), [SOCKET.x, SOCKET.y, BOARD_Z + 0.14]);
 
-  // --- Power supply: under the shroud, its white label shows through the opening ---
-  const psu = addPart('psu', [1.15, -1.85, W / 2 - 0.15]);
-  add(psu, rbox(1.6, 0.8, 1.5, standard(COLORS.tray, { metalness: 0.5, roughness: 0.5 }), 0.06), [1.15, -1.85, -0.1]);
-  add(psu, rbox(1.05, 0.4, 0.02, matte(COLORS.white), 0.02), [1.15, -1.85, 0.66]);
-  addFan(psu, 0.7, [1.15, -1.44, -0.1], [-Math.PI / 2, 0, 0]);
+  // --- Tower air cooler: copper heat pipes, a tall stack of fins that stands out from the board,
+  //     a top cover, and a fan on the front of the fins blowing to the back ---
+  const cooler = addPart('cooler', [SOCKET.x, SOCKET.y + 0.75, -0.05]);
+  const FIN_X = SOCKET.x + 0.05;
+  const FIN_Z0 = BOARD_Z + 0.42;
+  add(cooler, rbox(0.45, 0.45, 0.1, metal(COLORS.copper, 0.3), 0.02), [SOCKET.x, SOCKET.y, BOARD_Z + 0.21]);   // base
+  for (const dy of [-0.3, -0.1, 0.1, 0.3]) {
+    add(cooler, cylinder(0.03, 1.25, metal(COLORS.copper, 0.25), 12), [FIN_X, SOCKET.y + dy, BOARD_Z + 0.85], [Math.PI / 2, 0, 0]);
+  }
+  for (let i = 0; i < 20; i += 1) add(cooler, rbox(0.55, 1.15, 0.018, brushed(), 0.004), [FIN_X, SOCKET.y, FIN_Z0 + i * 0.05]);
+  add(cooler, rbox(0.6, 1.2, 0.06, standard(COLORS.white, { metalness: 0.4, roughness: 0.35 }), 0.03), [FIN_X, SOCKET.y, FIN_Z0 + 1.02]); // top cover
+  for (const dy of [-0.3, -0.1, 0.1, 0.3]) {
+    add(cooler, cylinder(0.034, 0.04, metal(0xb9bfc7), 16), [FIN_X, SOCKET.y + dy, FIN_Z0 + 1.07], [Math.PI / 2, 0, 0]); // pipe ends
+  }
+  addFan(cooler, 1.05, [FIN_X - 0.36, SOCKET.y, FIN_Z0 + 0.5], FACE_FRONT, COLORS.white, { ring: false });
 
-  // --- Storage: an M.2 heatsink on the board and two drives standing on the shroud ---
-  const storage = addPart('storage', [-1.75, -0.75, 0.6]);
-  add(storage, rbox(0.8, 0.2, 0.06, metal(), 0.02), [-0.3, 0.2, TRAY_Z + 0.08]);
-  for (const z of [0.55, 0.15]) add(storage, rbox(0.45, 0.72, 0.07, standard(COLORS.white, { metalness: 0.4, roughness: 0.4 }), 0.03), [-1.75, -0.97, z]);
+  // --- RAM: four sticks standing in their slots: white heat spreaders, the green board edge with
+  //     gold contacts showing at the bottom, and a light bar on top ---
+  const ram = addPart('ram', [DIMM_X[1] + 0.06, DIMM_Y + 0.55, BOARD_Z + 0.5], { ghostEach: true });
+  for (const x of DIMM_X) {
+    const stick = new THREE.Group();
+    const spreader = rbox(0.055, 1.33, 0.36, standard(COLORS.white, { metalness: 0.55, roughness: 0.3 }), 0.012);
+    spreader.position.z = 0.22;
+    const edge = rbox(0.03, 1.3, 0.1, matte(0x1e3a2a, 0.6), 0.005);
+    edge.position.z = 0.06;
+    const contacts = rbox(0.032, 1.2, 0.03, metal(0xd4a94a, 0.3), 0.005);
+    contacts.position.z = 0.03;
+    const light = rbox(0.045, 1.25, 0.03, glowMaterial(accent, 0.7), 0.012);
+    light.position.z = 0.415;
+    stick.add(spreader, edge, contacts, light);
+    add(ram, stick, [x, DIMM_Y, BOARD_Z + 0.06]);
+  }
+
+  // --- Graphics card: lies flat in the top slot like in most PCs. Its fans face down, its back
+  //     plate is on top, and its side with a light bar faces the glass. The metal bracket screws
+  //     to the back of the case. ---
+  const gpu = addPart('gpu', [0.2, PCIE_Y - 0.25, TRAY_Z + 1.45]);
+  const GPU = { x0: -0.95, x1: D / 2 - 0.12, yTop: PCIE_Y + 0.02, thick: 0.58, z0: TRAY_Z + 0.16, z1: TRAY_Z + 1.4 };
+  const gpuLength = GPU.x1 - GPU.x0;
+  const gpuCenterX = (GPU.x0 + GPU.x1) / 2 - 0.06;
+  const gpuCenterZ = (GPU.z0 + GPU.z1) / 2;
+  const gpuShell = standard(COLORS.shroud, { metalness: 0.7, roughness: 0.32 });
+  add(gpu, rbox(gpuLength - 0.12, GPU.thick - 0.06, GPU.z1 - GPU.z0, gpuShell, 0.08), [gpuCenterX, GPU.yTop - GPU.thick / 2 - 0.03, gpuCenterZ]);
+  add(gpu, rbox(gpuLength - 0.12, 0.04, GPU.z1 - GPU.z0, standard(0xffffff, { metalness: 0.8, roughness: 0.4, map: backplateTexture() }), 0.02), [gpuCenterX, GPU.yTop + 0.01, gpuCenterZ]); // back plate
+  // The side that faces the glass: a light bar and two silver accent lines
+  add(gpu, rbox(gpuLength * 0.55, 0.035, 0.02, glowMaterial(accent, 1.6), 0.01), [gpuCenterX - 0.3, GPU.yTop - 0.12, GPU.z1 + 0.005]);
+  for (const dy of [0.24, 0.32]) add(gpu, rbox(gpuLength * 0.3, 0.015, 0.02, metal(), 0.005), [gpuCenterX + 0.55, GPU.yTop - dy, GPU.z1 + 0.005]);
+  // Three fans under the card, behind a frame
+  for (const x of [-0.6, 0.35, 1.3]) addFan(gpu, 0.86, [gpuCenterX + x - 0.35, GPU.yTop - GPU.thick - 0.01, gpuCenterZ], FACE_DOWN, COLORS.dark, { ring: false });
+  // The bracket with display ports, and the 16-pin power socket on the side facing the glass
+  add(gpu, rbox(0.03, GPU.thick + 0.1, 1.1, brushed(), 0.01), [GPU.x1 + 0.03, GPU.yTop - GPU.thick / 2, TRAY_Z + 0.72]);
+  add(gpu, rbox(0.3, 0.1, 0.06, matte(0x0b0c0e, 0.6), 0.01), [gpuCenterX + 0.15, GPU.yTop - 0.06, GPU.z1 + 0.02]);
+
+  // --- Power supply: under the shroud at the back, fan facing down, its label through the window.
+  //     Its cables go up through the tray to the board (24-pin), the CPU (8-pin) and the graphics card. ---
+  const psu = addPart('psu', [1.35, -1.85, W / 2 - 0.05]);
+  const PSU = { x: 1.25, y: -1.83, z: -0.15 };
+  add(psu, rbox(1.5, 0.86, 1.4, standard(0x15171b, { metalness: 0.55, roughness: 0.45 }), 0.06), [PSU.x, PSU.y, PSU.z]);
+  add(psu, rbox(1.0, 0.5, 0.02, standard(0xffffff, { roughness: 0.7, map: labelTexture() }), 0.02), [PSU.x, PSU.y, PSU.z + 0.71]);
+  addFan(psu, 0.8, [PSU.x, PSU.y - 0.44, PSU.z], FACE_DOWN, COLORS.dark, { ring: false });
+  const sleeve = standard(COLORS.sleeve, { metalness: 0.1, roughness: 0.85 });
+  const grommet = BOARD.x0 - 0.28;
+  // 24-pin: a wide bundle of thin wires from the tray hole into the board's power connector
+  for (let i = 0; i < 6; i += 1) {
+    const y = 0.68 + i * 0.065;
+    add(psu, cable([[grommet, y, TRAY_Z - 0.02], [grommet + 0.05, y, TRAY_Z + 0.2], [BOARD.x0 + 0.02, y, BOARD_Z + 0.2], [BOARD.x0 + 0.1, y, BOARD_Z + 0.17]], 0.022, sleeve), [0, 0, 0], [0, 0, 0], { noGhost: true });
+  }
+  // CPU 8-pin: through the hole at the top of the tray
+  for (let i = 0; i < 2; i += 1) {
+    const x = 0.2 + i * 0.07;
+    add(psu, cable([[x, H / 2 - 0.22, TRAY_Z - 0.02], [x, H / 2 - 0.3, TRAY_Z + 0.2], [x + 0.1, BOARD.y1 - 0.1, BOARD_Z + 0.18]], 0.025, sleeve), [0, 0, 0], [0, 0, 0], { noGhost: true });
+  }
+  // Graphics card power: up from the shroud into the socket on the card's glass side
+  add(psu, cable([[gpuCenterX + 0.15, SHROUD_Y + 0.02, GPU.z1 - 0.1], [gpuCenterX + 0.12, SHROUD_Y + 0.35, GPU.z1 + 0.2], [gpuCenterX + 0.15, GPU.yTop - 0.06, GPU.z1 + 0.12], [gpuCenterX + 0.15, GPU.yTop - 0.06, GPU.z1 + 0.04]], 0.04, sleeve), [0, 0, 0], [0, 0, 0], { noGhost: true });
+
+  // --- Storage: an M.2 drive with a heatsink on the board, and a 2.5" SSD on top of the shroud ---
+  const storage = addPart('storage', [-1.55, SHROUD_Y + 0.12, 0.35], { ghostEach: true });
+  add(storage, rbox(0.85, 0.2, 0.06, standard(COLORS.shroud, { metalness: 0.85, roughness: 0.3 }), 0.02), [M2.x, M2.y, BOARD_Z + 0.08]);
+  const ssd = new THREE.Group();
+  const ssdBody = rbox(1.0, 0.07, 0.7, standard(COLORS.white, { metalness: 0.45, roughness: 0.4 }), 0.02);
+  const ssdLabel = rbox(0.6, 0.005, 0.4, matte(0x2b2f36, 0.6), 0.002);
+  ssdLabel.position.y = 0.037;
+  ssd.add(ssdBody, ssdLabel);
+  add(storage, ssd, [-1.55, SHROUD_Y + 0.07, 0.3]);
+
+  // ---------- Outlines of the parts that are not chosen yet ----------
+
+  const outlineMaterial = new THREE.LineBasicMaterial({ color: COLORS.outline, transparent: true, opacity: 0.34, depthWrite: false });
+  const ghostFill = new THREE.MeshBasicMaterial({ color: COLORS.outline, transparent: true, opacity: 0.035, depthWrite: false });
+
+  // The boxes around a part (one for the whole part, or one per object when ghostEach), as
+  // thin lines and a very faint fill, so its place is clear without see-through layers
+  function buildGhost(part) {
+    if (part.ghost) scene.remove(part.ghost);
+    const ghost = new THREE.Group();
+    const boxes = [];
+    for (const child of part.group.children) {
+      if (child.userData.noGhost) continue;
+      const box = new THREE.Box3().setFromObject(child);
+      if (part.ghostEach || boxes.length === 0) boxes.push(box);
+      else boxes[0].union(box);
+    }
+    for (const box of boxes) {
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const shape = new THREE.BoxGeometry(size.x, size.y, size.z);
+      const lines = new THREE.LineSegments(new THREE.EdgesGeometry(shape), outlineMaterial.clone());
+      const fillMesh = new THREE.Mesh(shape, ghostFill.clone());
+      lines.position.copy(center);
+      fillMesh.position.copy(center);
+      ghost.add(lines, fillMesh);
+    }
+    scene.add(ghost);
+    part.ghost = ghost;
+  }
 
   // ---------- Real models: each one takes the place of the shape drawn for its part ----------
 
@@ -308,7 +607,8 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   // Scales and moves a model so it fills the box of the drawn shape, then swaps them
   function useModel(slug, model, settings) {
     const part = parts[slug];
-    const space = new THREE.Box3().setFromObject(part.group);
+    const space = new THREE.Box3();
+    for (const child of part.group.children) if (!child.userData.noGhost) space.union(new THREE.Box3().setFromObject(child));
     const spaceSize = space.getSize(new THREE.Vector3());
     const spaceCenter = space.getCenter(new THREE.Vector3());
 
@@ -326,27 +626,29 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
     spinning = spinning.filter((blades) => !part.fans.includes(blades));
     part.fans = [];
     add(part, pivot, spaceCenter.sub(modelCenter).toArray());
-    // The new meshes get the ghost or solid look of the part (no drop-in: it was not just chosen)
+    buildGhost(part);
+    // The model gets the chosen or not-chosen look of the part (no drop-in: it was not just chosen)
     part.chosen = status(slug) !== 'empty';
     setLook(part, part.chosen);
   }
 
+  // Only parts with a file set in pcModels.js are asked for, so a missing file is never requested
   async function loadModels() {
     const loaded = [];
     await Promise.all(Object.entries(PART_MODELS).map(async ([slug, settings]) => {
-      if (!parts[slug]) return;
+      if (!parts[slug] || !settings.file) return;
       try {
         const gltf = await loader.loadAsync(settings.file);
         useModel(slug, gltf.scene, settings);
         loaded.push(slug);
       } catch {
-        // No file yet (or a broken one): the shape drawn in code stays
+        // A broken file: the shape drawn in code stays
       }
     }));
     onModels?.(loaded);
   }
 
-  // ---------- States: ghost or solid, dropping in, and the hovered part ----------
+  // ---------- States: chosen or outline, dropping in, and the hovered part ----------
 
   // Every material of a part (a model's mesh can have several)
   function materialsOf(part) {
@@ -354,14 +656,8 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   }
 
   function setLook(part, chosen) {
-    for (const mesh of part.meshes) mesh.castShadow = chosen;
-    for (const material of materialsOf(part)) {
-      material.transparent = !chosen || material.userData.baseTransparent;
-      material.opacity = material.userData.baseOpacity * (chosen ? 1 : part.ghostOpacity);
-      material.depthWrite = !material.transparent;
-      if (material.userData.isGlow) material.emissiveIntensity = chosen ? 2 : 0.1;
-      material.needsUpdate = true;
-    }
+    part.group.visible = chosen;
+    part.ghost.visible = !chosen;
   }
 
   // An orange light on the part (hover, or the flash when it drops in). Only materials that
@@ -373,6 +669,14 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
       if (amount > 0) material.emissive.copy(accent);
       else material.emissive.copy(material.userData.baseEmissive);
       material.emissiveIntensity = amount > 0 ? amount : 1;
+    }
+  }
+
+  // The outline of a part that is not chosen turns orange and a little stronger when pointed at
+  function setGhostHighlight(part, on) {
+    for (const child of part.ghost.children) {
+      child.material.color.set(on ? accent : COLORS.outline);
+      child.material.opacity = child.isLineSegments ? (on ? 0.95 : 0.34) : (on ? 0.12 : 0.035);
     }
   }
 
@@ -402,10 +706,17 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   }
 
   let highlighted = null;
+  function lightUp(slug, on) {
+    const part = parts[slug];
+    if (!part || part.drop) return;
+    if (part.chosen) setGlow(part, on ? 0.45 : 0);
+    else setGhostHighlight(part, on);
+  }
+
   function highlight(slug) {
-    if (highlighted && parts[highlighted] && !parts[highlighted].drop) setGlow(parts[highlighted], 0);
+    if (highlighted) lightUp(highlighted, false);
     highlighted = slug && parts[slug] ? slug : null;
-    if (highlighted && !parts[highlighted].drop) setGlow(parts[highlighted], 0.45);
+    if (highlighted) lightUp(highlighted, true);
   }
 
   // ---------- The circles over the parts ----------
@@ -477,11 +788,12 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   new ResizeObserver(resize).observe(container);
   resize();
 
-  const clock = new THREE.Clock();
+  const timer = new THREE.Timer();
   function drawFrame(now) {
     requestAnimationFrame(drawFrame);
+    timer.update(now);
     if (document.hidden || !width) return;
-    const delta = clock.getDelta();
+    const delta = timer.getDelta();
     if (!reducedMotion) spinning.forEach((blades) => { blades.rotation.z -= delta * 5; });
     animateDrops(now ?? performance.now());
     controls.autoRotate = autoTurn && !pointerInside;
@@ -496,6 +808,7 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
     renderDots();
   }
 
+  Object.values(parts).forEach(buildGhost);
   update();
   drawFrame();
   loadModels();
