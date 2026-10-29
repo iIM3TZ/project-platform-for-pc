@@ -31,11 +31,26 @@ async function setupHeroCase() {
       status: () => 'chosen',
       onPick: () => {},
       zoom: false,
+      distance: 1.3,
+      gridDivisions: 90,
     });
+    enterOnClick($('hero-stage'));
   } catch (err) {
     console.warn('3D case not available on the home page:', err.message);
     $('hero-stage').hidden = true;
   }
+}
+
+// A click on the case (not the end of a drag that turned it) opens the Build page
+function enterOnClick(stage) {
+  let start = null;
+  stage.addEventListener('pointerdown', (event) => { start = { x: event.clientX, y: event.clientY }; });
+  stage.addEventListener('pointerup', (event) => {
+    if (!start) return;
+    const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+    start = null;
+    if (moved < 6) location.href = '/pages/build.html';
+  });
 }
 
 // The cheapest part (with an offer in stock) of each core category

@@ -69,27 +69,75 @@
   padding-inline: var(--space-6);
 }
 
-/* The 3D case on its dark showroom stage */
+/* The 3D case stands right on the page background (no box around it): its floor grid and glow
+   fade out at the edges. Dragging turns it; a click opens the Build page. */
 .hero-visual {
   position: relative;
+  min-inline-size: 0; /* the stage's canvas never widens the column */
   padding-block-end: var(--space-6);
 }
 
 .hero-stage {
   position: relative;
-  block-size: clamp(340px, 55vh, 560px);
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(ellipse at 50% 40%, var(--color-stage-glow), transparent 60%),
-    var(--color-stage-bg);
+  block-size: clamp(380px, 62vh, 620px);
+  background: radial-gradient(ellipse at 50% 45%, var(--color-stage-glow), transparent 62%);
 }
 
 .hero-stage .pc-canvas {
+  position: absolute;
+  inset: 0 0 -220px; /* reaches below the stage, so the floor lines go down to the categories */
   display: block;
   inline-size: 100%;
   block-size: 100%;
-  cursor: grab;
+  cursor: pointer;
+  /* Fades out on the left and right, and at the bottom (only the last part) */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 18%, #000 82%, transparent),
+    linear-gradient(to bottom, transparent, #000 8%, #000 72%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 18%, #000 82%, transparent),
+    linear-gradient(to bottom, transparent, #000 8%, #000 72%, transparent);
+  mask-composite: intersect;
+}
+
+/* Wide screens: the stage reaches past its column on both sides, so the floor lines spread
+   out to the left and right: under the text on one side (the text stays on top, and clickable),
+   and up to the edge of the window on the other, never past it (no sideways scrolling). */
+@media (min-width: 1000px) {
+  /* The stage itself is dir="ltr" (the 3D drawing does not flip), so its sides are set by the
+     page's direction: in Arabic the text is on the right, in English on the left */
+  .hero-stage {
+    --hero-bleed-text: calc(-1 * min(22vw, 340px));
+    --hero-bleed-edge: calc(-1 * max(var(--space-4), (100vw - var(--container-width)) / 2 + var(--space-4) - 12px));
+    margin-right: var(--hero-bleed-text);
+    margin-left: var(--hero-bleed-edge);
+  }
+
+  :root[dir="ltr"] .hero-stage {
+    margin-right: var(--hero-bleed-edge);
+    margin-left: var(--hero-bleed-text);
+  }
+
+  .hero-text {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.hero-stage .pc-canvas:active {
+  cursor: grabbing;
+}
+
+.hero-stage-hint {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  pointer-events: none;
 }
 
 /* The sample build: a card leaning over the bottom of the stage, like a floating screen.
@@ -196,6 +244,13 @@
 
 .hero-card-total .price {
   font-size: var(--text-xl);
+}
+
+/* The sections under the hero sit above the stage's canvas (it reaches down behind them),
+   so their cards and links stay clickable */
+.home-section {
+  position: relative;
+  z-index: 1;
 }
 
 /* ---------- Category cards: the picture on top, the name under it ---------- */

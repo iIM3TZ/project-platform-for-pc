@@ -267,7 +267,9 @@ function labelTexture() {
 
 // onModels(slugs): called once the model files have loaded, with the parts that have a real model
 // zoom: false on the home page, so the mouse wheel scrolls the page instead of zooming
-export function createPcScene(container, { slugs, categoryName, partInfo, status, onPick, onModels, zoom = true }) {
+// distance: how far the camera starts (1 = the Build page; bigger leaves room around the case)
+// gridDivisions: how many squares the floor grid has along each side (more = smaller squares)
+export function createPcScene(container, { slugs, categoryName, partInfo, status, onPick, onModels, zoom = true, distance = 1, gridDivisions = 40 }) {
   // WebGLRenderer throws when the browser cannot draw 3D; the caller falls back to the SVG drawing
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -288,7 +290,7 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   scene.environmentIntensity = 0.85;
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  camera.position.set(-5.4, 2.6, 8.4); // a three-quarter view from the front, so the depth shows
+  camera.position.set(-5.4, 2.6, 8.4).multiplyScalar(distance); // a three-quarter view from the front, so the depth shows
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, -0.1, 0);
@@ -296,7 +298,7 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   controls.enablePan = false;
   controls.enableZoom = zoom;
   controls.minDistance = 5.5;
-  controls.maxDistance = 14;
+  controls.maxDistance = Math.max(14, camera.position.length());
   controls.maxPolarAngle = Math.PI * 0.56; // never look from under the floor
   controls.autoRotateSpeed = 0.6;
 
@@ -337,7 +339,7 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   floor.position.y = FLOOR_Y;
   floor.receiveShadow = true;
   scene.add(floor);
-  const grid = new THREE.GridHelper(40, 40, accent, COLORS.edge);
+  const grid = new THREE.GridHelper(40, gridDivisions, accent, COLORS.edge);
   grid.position.y = FLOOR_Y + 0.001;
   grid.material.transparent = true;
   grid.material.opacity = 0.14;
@@ -775,17 +777,23 @@ export function createPcScene(container, { slugs, categoryName, partInfo, status
   renderer.domElement.classList.add('pc-canvas');
   renderer.domElement.setAttribute('aria-hidden', 'true');
 
+  // The drawing follows the canvas's own size. On the Build page the canvas fills the stage; on the
+  // home page it reaches below it, and that extra part only shows more floor: the case stays
+  // framed as in the stage (a view offset extends the picture downwards).
   let width = 0;
   let height = 0;
   function resize() {
-    width = container.clientWidth;
-    height = container.clientHeight;
+    width = renderer.domElement.clientWidth;
+    height = renderer.domElement.clientHeight;
+    const framed = Math.min(container.clientHeight || height, height);
     if (!width || !height) return;
     renderer.setSize(width, height, false);
-    camera.aspect = width / height;
+    camera.aspect = width / framed;
+    if (height > framed) camera.setViewOffset(width, framed, 0, 0, width, height);
+    else camera.clearViewOffset();
     camera.updateProjectionMatrix();
   }
-  new ResizeObserver(resize).observe(container);
+  new ResizeObserver(resize).observe(renderer.domElement);
   resize();
 
   const timer = new THREE.Timer();

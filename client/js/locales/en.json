@@ -23,6 +23,7 @@
     "title": "Compare PC part prices across stores",
     "intro": "See each store's price, shipping and delivery in one place, and build your PC with compatibility checks between the parts.",
     "compare": "Compare prices",
+    "stageHint": "Drag to turn the PC, click it to start building",
     "categories": "Browse by category",
     "start": "Start building",
     "featureCompare": "Compare prices across Saudi stores",
