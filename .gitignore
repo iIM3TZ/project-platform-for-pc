@@ -1,2 +1,6 @@
 node_modules
 .env
+
+# Private planning notes, kept only on this computer
+CLAUDE.md
+TASKS.md

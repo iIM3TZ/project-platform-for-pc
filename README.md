@@ -10,7 +10,6 @@ others (socket, RAM type, sizes, power), and the total updates live.
 The site sells nothing and takes no payments: each offer links to its store.
 
 > Status: in development. A live link and screenshots will be added after the first deploy.
-> The plan and progress are in [TASKS.md](TASKS.md).
 
 ## Features
 
